@@ -197,8 +197,8 @@ export default function CreateProdiItem() {
               }`}
             >
               <Laptop className="w-5 h-5 mb-2 text-[#0F4C81] dark:text-sky-400" />
-              <h4 className="font-bold text-sm sm:text-base">1. Teknologi & SaaS</h4>
-              <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Live Demo Sandbox</p>
+              <h4 className="font-bold text-sm sm:text-base">1. Teknologi & Digital</h4>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Aplikasi, AI, SaaS & Web</p>
             </button>
 
             <button
@@ -212,8 +212,8 @@ export default function CreateProdiItem() {
               }`}
             >
               <Cpu className="w-5 h-5 mb-2 text-[#C5A059]" />
-              <h4 className="font-bold text-sm sm:text-base">2. Produk Fisik & IoT</h4>
-              <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">3D Frame Scroll</p>
+              <h4 className="font-bold text-sm sm:text-base">2. Produk Inovasi & Riset</h4>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Pangan, Herbal, Mesin & Fisik</p>
             </button>
 
             <button
@@ -227,8 +227,8 @@ export default function CreateProdiItem() {
               }`}
             >
               <Wrench className="w-5 h-5 mb-2 text-slate-600 dark:text-slate-300" />
-              <h4 className="font-bold text-sm sm:text-base">3. Jasa Software</h4>
-              <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Video Demo & SLA</p>
+              <h4 className="font-bold text-sm sm:text-base">3. Jasa & Layanan Keahlian</h4>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Konsultasi, Uji Lab & Pelatihan</p>
             </button>
           </div>
 
@@ -295,7 +295,7 @@ export default function CreateProdiItem() {
         {/* Card 2: Foto Mockup & Live Demo (Elemen 1 & 2) */}
         <div className="p-6 rounded-3xl bg-white dark:bg-[#07192C] border border-slate-200 dark:border-slate-800 shadow-sm space-y-4">
           <h3 className="font-bold text-sm sm:text-base text-slate-900 dark:text-white border-b border-slate-100 dark:border-slate-800 pb-2">
-            2. Foto Mockup & Tautan Live Demo / 3D
+            2. Foto Mockup & Tautan Live Demo / 3D (Opsional)
           </h3>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">

@@ -7,7 +7,8 @@ import { CatalogItem } from "../../types/catalog";
 import { useApp } from "../../context/AppContext";
 import { 
   Laptop, Cpu, Wrench, Play, Eye, 
-  ArrowUpRight, Building2, User 
+  ArrowUpRight, Building2, User,
+  Sparkles, Package
 } from "lucide-react";
 
 interface ProductCardProps {
@@ -36,33 +37,111 @@ export const ProductCard: React.FC<ProductCardProps> = ({
   };
 
   const getCategoryConfig = () => {
-    switch (item.category?.slug) {
-      case "teknologi":
+    const slug = item.category?.slug || "produk";
+    const nama = (item.nama_item || "").toLowerCase();
+    const prodi = (item.prodi?.nama_prodi || "").toLowerCase();
+    const kodeProdi = (item.prodi?.kode_prodi || "").toUpperCase();
+
+    if (slug === "teknologi") {
+      return {
+        icon: <Laptop className="w-3.5 h-3.5" />,
+        label: currentLang === "en" ? "Technology & Digital" : "Teknologi & Digital",
+        bg: "bg-blue-50 dark:bg-blue-950/60 text-[#0F4C81] dark:text-sky-300 border-blue-200 dark:border-blue-900/50",
+      };
+    }
+
+    if (slug === "produk") {
+      // Deteksi bidang produk agar relevan untuk seluruh fakultas/prodi
+      if (prodi.includes("farmasi") || kodeProdi.includes("FAR") || nama.includes("oil") || nama.includes("effervescent") || nama.includes("sehati") || nama.includes("herbliss")) {
         return {
-          icon: <Laptop className="w-3.5 h-3.5" />,
-          label: currentLang === "en" ? "Technology (SaaS)" : "Teknologi (SaaS)",
-          bg: "bg-blue-50 dark:bg-blue-950/60 text-[#0F4C81] dark:text-sky-300 border-blue-200 dark:border-blue-900/50",
-          actionText: currentLang === "en" ? "Live Demo" : "Coba Live Demo",
-          actionIcon: <Play className="w-3.5 h-3.5 fill-current" />,
+          icon: <Sparkles className="w-3.5 h-3.5" />,
+          label: currentLang === "en" ? "Herbal & Health" : "Produk Herbal & Farmasi",
+          bg: "bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-900/50",
         };
-      case "produk":
+      }
+      if (prodi.includes("kebidanan") || prodi.includes("agribisnis") || prodi.includes("pangan") || kodeProdi.includes("KEB") || kodeProdi.includes("AGR") || nama.includes("beras") || nama.includes("vookies") || nama.includes("snazzle") || nama.includes("latte")) {
+        return {
+          icon: <Package className="w-3.5 h-3.5" />,
+          label: currentLang === "en" ? "Food & Nutrition" : "Produk Pangan & Gizi",
+          bg: "bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 border-amber-200 dark:border-amber-900/50",
+        };
+      }
+      if (prodi.includes("kimia") || kodeProdi.includes("TKIM") || nama.includes("mhp") || nama.includes("powder")) {
+        return {
+          icon: <Sparkles className="w-3.5 h-3.5" />,
+          label: currentLang === "en" ? "Chemical Materials" : "Material & Kimia Terapan",
+          bg: "bg-purple-50 dark:bg-purple-950/60 text-purple-700 dark:text-purple-300 border-purple-200 dark:border-purple-900/50",
+        };
+      }
+      if (prodi.includes("desain") || prodi.includes("media") || kodeProdi.includes("DMD") || kodeProdi.includes("DKV") || nama.includes("animasi") || nama.includes("rajamala")) {
+        return {
+          icon: <Sparkles className="w-3.5 h-3.5" />,
+          label: currentLang === "en" ? "Creative & Media" : "Karya Animasi & Media",
+          bg: "bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border-indigo-200 dark:border-indigo-900/50",
+        };
+      }
+      if (prodi.includes("manufaktur") || prodi.includes("mesin") || kodeProdi.includes("TRM") || nama.includes("cnc") || nama.includes("milling") || nama.includes("turning")) {
         return {
           icon: <Cpu className="w-3.5 h-3.5" />,
-          label: currentLang === "en" ? "Hardware (IoT)" : "Produk Fisik (IoT)",
-          bg: "bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 border-amber-200 dark:border-amber-900/50",
-          actionText: currentLang === "en" ? "View 3D" : "3D Frame Scroll",
-          actionIcon: <Eye className="w-3.5 h-3.5" />,
+          label: currentLang === "en" ? "Precision Machinery" : "Permesinan & Manufaktur",
+          bg: "bg-blue-50 dark:bg-blue-950/60 text-[#0F4C81] dark:text-sky-300 border-blue-200 dark:border-blue-900/50",
         };
-      case "jasa":
-      default:
+      }
+      if (nama.includes("robot") || nama.includes("iot") || nama.includes("pest control")) {
         return {
-          icon: <Wrench className="w-3.5 h-3.5" />,
-          label: currentLang === "en" ? "Software Services" : "Jasa Software",
-          bg: "bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700",
-          actionText: "Video Demo",
-          actionIcon: <Play className="w-3.5 h-3.5 fill-current" />,
+          icon: <Cpu className="w-3.5 h-3.5" />,
+          label: currentLang === "en" ? "Hardware & IoT" : "Hardware & IoT Cerdas",
+          bg: "bg-sky-50 dark:bg-sky-950/60 text-sky-700 dark:text-sky-300 border-sky-200 dark:border-sky-900/50",
         };
+      }
+      return {
+        icon: <Package className="w-3.5 h-3.5" />,
+        label: currentLang === "en" ? "Applied Product" : "Produk Inovasi & Riset",
+        bg: "bg-amber-50 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 border-amber-200 dark:border-amber-900/50",
+      };
     }
+
+    // Default: Jasa / Layanan Keahlian
+    if (prodi.includes("pajak") || kodeProdi.includes("PJK") || nama.includes("pajak") || nama.includes("brevet")) {
+      return {
+        icon: <Building2 className="w-3.5 h-3.5" />,
+        label: currentLang === "en" ? "Tax & Finance Clinic" : "Klinik Pajak & Keuangan",
+        bg: "bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-900/50",
+      };
+    }
+    if (prodi.includes("sipil") || kodeProdi.includes("TS") || nama.includes("bim") || nama.includes("gatc")) {
+      return {
+        icon: <Wrench className="w-3.5 h-3.5" />,
+        label: currentLang === "en" ? "BIM & Civil Training" : "Pelatihan BIM Konstruksi",
+        bg: "bg-blue-50 dark:bg-blue-950/60 text-[#0F4C81] dark:text-sky-300 border-blue-200 dark:border-blue-900/50",
+      };
+    }
+    if (nama.includes("ndt") || nama.includes("test")) {
+      return {
+        icon: <Wrench className="w-3.5 h-3.5" />,
+        label: currentLang === "en" ? "NDT Material Testing" : "Pengujian Material (NDT)",
+        bg: "bg-cyan-50 dark:bg-cyan-950/60 text-cyan-700 dark:text-cyan-300 border-cyan-200 dark:border-cyan-900/50",
+      };
+    }
+    if (prodi.includes("pustaka") || kodeProdi.includes("PUS") || nama.includes("naskah") || nama.includes("alih media")) {
+      return {
+        icon: <Building2 className="w-3.5 h-3.5" />,
+        label: currentLang === "en" ? "Digital Preservation" : "Preservasi & Digitalisasi",
+        bg: "bg-amber-50 dark:bg-amber-950/60 text-amber-800 dark:text-amber-300 border-amber-200 dark:border-amber-900/50",
+      };
+    }
+    if (prodi.includes("wisata") || kodeProdi.includes("UPW") || nama.includes("wellness") || nama.includes("wisata")) {
+      return {
+        icon: <Sparkles className="w-3.5 h-3.5" />,
+        label: currentLang === "en" ? "Wellness Tourism" : "Layanan Wisata Kebugaran",
+        bg: "bg-teal-50 dark:bg-teal-950/60 text-teal-700 dark:text-teal-300 border-teal-200 dark:border-teal-900/50",
+      };
+    }
+    return {
+      icon: <Wrench className="w-3.5 h-3.5" />,
+      label: currentLang === "en" ? "Expert Services" : "Jasa & Layanan Keahlian",
+      bg: "bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700",
+    };
   };
 
   const cat = getCategoryConfig();
@@ -163,7 +242,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
         </div>
 
         <div className="flex items-center gap-2 shrink-0">
-          {item.category?.slug === "teknologi" && item.live_demo_url && (
+          {item.live_demo_url && (
             <button
               type="button"
               onClick={handleAction}
@@ -175,37 +254,38 @@ export const ProductCard: React.FC<ProductCardProps> = ({
             </button>
           )}
 
-          {item.category?.slug === "jasa" && (
-            <button
-              type="button"
-              onClick={handleAction}
-              style={{ borderRadius: "9999px" }}
-              className="spring-btn inline-flex items-center justify-center gap-1.5 px-4 py-2 rounded-full bg-slate-100 hover:bg-[#000080] text-slate-800 hover:text-white dark:bg-slate-800 dark:hover:bg-[#FFD800] dark:text-slate-100 dark:hover:text-[#000080] text-xs sm:text-sm font-bold shadow-xs hover:shadow-sm hover:scale-105 active:scale-95 transition-all duration-200 cursor-pointer border border-slate-200/80 dark:border-white/10 whitespace-nowrap shrink-0"
-            >
-              <Play className="w-3.5 h-3.5 fill-current shrink-0" />
-              <span className="whitespace-nowrap">Video Demo</span>
-            </button>
-          )}
-
-          {item.category?.slug === "produk" && (
+          {item.model_3d_url && (
             <Link
               href={`/katalog/${item.slug}`}
               style={{ borderRadius: "9999px" }}
               className="spring-btn inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-full bg-amber-500/10 hover:bg-[#FFD800] text-amber-800 hover:text-[#000080] dark:bg-amber-400/10 dark:text-[#FFD800] dark:hover:bg-[#FFD800] dark:hover:text-[#000080] text-xs sm:text-sm font-bold shadow-xs hover:shadow-sm hover:scale-105 active:scale-95 transition-all duration-200 border border-amber-500/20 dark:border-[#FFD800]/30 whitespace-nowrap shrink-0"
             >
               <Eye className="w-3.5 h-3.5 shrink-0" />
-              <span className="whitespace-nowrap">{currentLang === "en" ? "View 3D" : "Lihat 3D"}</span>
+              <span className="whitespace-nowrap">{currentLang === "en" ? "View 3D" : "Model 3D"}</span>
             </Link>
           )}
 
-          <Link
-            href={`/katalog/${item.slug}`}
-            style={{ borderRadius: "9999px" }}
-            className="spring-btn w-9 h-9 rounded-full flex items-center justify-center bg-slate-100 hover:bg-[#000080] text-slate-600 hover:text-white dark:bg-slate-800/90 dark:hover:bg-[#FFD800] dark:text-slate-300 dark:hover:text-[#000080] border border-slate-200/80 dark:border-white/10 shadow-xs hover:scale-105 active:scale-95 transition-all duration-200 shrink-0"
-            title={currentLang === "en" ? "View Product Details" : "Lihat Detail Produk"}
-          >
-            <ArrowUpRight className="w-4 h-4 shrink-0" />
-          </Link>
+          {!item.live_demo_url && !item.model_3d_url && (
+            <Link
+              href={`/katalog/${item.slug}`}
+              style={{ borderRadius: "9999px" }}
+              className="spring-btn inline-flex items-center justify-center gap-1 px-3.5 py-2 rounded-full bg-slate-100 hover:bg-[#000080] text-slate-800 hover:text-white dark:bg-slate-800 dark:hover:bg-[#FFD800] dark:text-slate-100 dark:hover:text-[#000080] text-xs sm:text-sm font-bold shadow-xs hover:shadow-sm hover:scale-105 active:scale-95 transition-all duration-200 border border-slate-200/80 dark:border-white/10 whitespace-nowrap shrink-0"
+            >
+              <span>{currentLang === "en" ? "Details" : "Lihat Detail"}</span>
+              <ArrowUpRight className="w-3.5 h-3.5 shrink-0" />
+            </Link>
+          )}
+
+          {(item.live_demo_url || item.model_3d_url) && (
+            <Link
+              href={`/katalog/${item.slug}`}
+              style={{ borderRadius: "9999px" }}
+              className="spring-btn w-9 h-9 rounded-full flex items-center justify-center bg-slate-100 hover:bg-[#000080] text-slate-600 hover:text-white dark:bg-slate-800/90 dark:hover:bg-[#FFD800] dark:text-slate-300 dark:hover:text-[#000080] border border-slate-200/80 dark:border-white/10 shadow-xs hover:scale-105 active:scale-95 transition-all duration-200 shrink-0"
+              title={currentLang === "en" ? "View Product Details" : "Lihat Detail Produk"}
+            >
+              <ArrowUpRight className="w-4 h-4 shrink-0" />
+            </Link>
+          )}
         </div>
       </div>
     </motion.div>

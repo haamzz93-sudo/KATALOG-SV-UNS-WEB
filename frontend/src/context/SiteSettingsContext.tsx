@@ -301,14 +301,14 @@ export const DEFAULT_SITE_SETTINGS: SiteSettings = {
   service_1_btn: "Buka Demo Sandbox",
   service_1_link: "/katalog?kategori=teknologi",
   service_2_badge: "Layanan 2 (Unggulan)",
-  service_2_title: "2. Produk Fisik & IoT",
-  service_2_desc: "Alat mekatronika presisi, robot patroli otonom, dan perangkat embedded cerdas berstandar manufaktur.",
-  service_2_btn: "Putar Objek 3D",
+  service_2_title: "2. Produk Inovasi & Riset Terapan",
+  service_2_desc: "Karya hilirisasi produk pangan fungsional, formulasi herbal farmasi, mesin manufaktur presisi, dan prototipe riset terapan.",
+  service_2_btn: "Jelajahi Produk",
   service_2_link: "/katalog?kategori=produk",
   service_3_badge: "Layanan 3",
-  service_3_title: "3. Jasa Software House",
-  service_3_desc: "Layanan konsultasi, rancang bangun sistem kustom, sprint agile, dan garansi pemeliharaan sistem teruji.",
-  service_3_btn: "Konsultasi Proyek",
+  service_3_title: "3. Jasa & Layanan Keahlian",
+  service_3_desc: "Layanan pengujian laboratorium terakreditasi, sertifikasi kompetensi, konsultasi bisnis & perpajakan, serta alih media arsip.",
+  service_3_btn: "Konsultasi Layanan",
   service_3_link: "/katalog?kategori=jasa",
 
   // Hardware Lab Slider
@@ -426,12 +426,12 @@ export const DEFAULT_SITE_SETTINGS: SiteSettings = {
   // Default Tab Filter Kategori Katalog
   catalog_tab_all_id: "Semua",
   catalog_tab_all_en: "All",
-  catalog_tab_teknologi_id: "Teknologi (SaaS)",
-  catalog_tab_teknologi_en: "Technology (SaaS)",
-  catalog_tab_produk_id: "Produk (IoT/Robot)",
-  catalog_tab_produk_en: "Hardware (IoT)",
-  catalog_tab_jasa_id: "Jasa Software",
-  catalog_tab_jasa_en: "Software House",
+  catalog_tab_teknologi_id: "Teknologi & Digital",
+  catalog_tab_teknologi_en: "Technology & Digital",
+  catalog_tab_produk_id: "Produk Inovasi",
+  catalog_tab_produk_en: "Applied Products",
+  catalog_tab_jasa_id: "Layanan & Jasa",
+  catalog_tab_jasa_en: "Expert Services",
 };
 
 interface SiteSettingsContextType {

@@ -159,7 +159,7 @@ export default function ProdiDashboard() {
                             <span>3D Canvas</span>
                           </span>
                         ) : (
-                          <span className="text-xs text-slate-400 font-medium">Video Walkthrough</span>
+                          <span className="text-xs text-slate-400 font-medium">Katalog Standar</span>
                         )}
                       </td>
                       <td className="py-4 text-center">

@@ -9,7 +9,7 @@ import {
   TrendingUp, Users, Award, ExternalLink,
   Search, Star, Building2, Check,
   Layers, SlidersHorizontal, Quote, HelpCircle,
-  Camera, Image as ImageIcon
+  Camera, Image as ImageIcon, Package, Briefcase
 } from "lucide-react";
 import { DynamicIslandHeader } from "../components/navigation/DynamicIslandHeader";
 import { ProductCard } from "../components/catalog/ProductCard";
@@ -637,23 +637,23 @@ export default function HomePage() {
               {[
                 { 
                   key: "", 
-                  label: isEn ? (settings.catalog_tab_all_en || "All") : (settings.catalog_tab_all_id || "Semua"), 
-                  icon: null 
+                  label: isEn ? (settings.catalog_tab_all_en || "All Categories") : (settings.catalog_tab_all_id || "Semua Inovasi"), 
+                  icon: Layers 
                 },
                 { 
                   key: "teknologi", 
-                  label: isEn ? (settings.catalog_tab_teknologi_en || "Technology (SaaS)") : (settings.catalog_tab_teknologi_id || "Teknologi (SaaS)"), 
+                  label: isEn ? (settings.catalog_tab_teknologi_en || "Technology & Digital") : (settings.catalog_tab_teknologi_id || "Teknologi & Digital"), 
                   icon: Laptop 
                 },
                 { 
                   key: "produk", 
-                  label: isEn ? (settings.catalog_tab_produk_en || "Hardware (IoT)") : (settings.catalog_tab_produk_id || "Produk (IoT/Robot)"), 
-                  icon: Cpu 
+                  label: isEn ? (settings.catalog_tab_produk_en || "Applied Products") : (settings.catalog_tab_produk_id || "Produk Inovasi"), 
+                  icon: Package 
                 },
                 { 
                   key: "jasa", 
-                  label: isEn ? (settings.catalog_tab_jasa_en || "Software House") : (settings.catalog_tab_jasa_id || "Jasa Software"), 
-                  icon: Wrench 
+                  label: isEn ? (settings.catalog_tab_jasa_en || "Expert Services") : (settings.catalog_tab_jasa_id || "Layanan & Jasa"), 
+                  icon: Briefcase 
                 },
               ].map((tab) => {
                 const isActive = selectedCategory === tab.key;

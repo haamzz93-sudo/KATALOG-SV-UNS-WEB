@@ -8,7 +8,7 @@ import {
   Film, Clock, Save, RotateCcw, Play, Video,
   HelpCircle, Plus, Trash2, Edit3, Eye, EyeOff, MessageSquare,
   Globe, Palette, Settings2, UploadCloud, Key, Search, Lock, Award, Laptop,
-  Briefcase, Handshake, ExternalLink, ExternalLink as ExtLink, TrendingUp, Box, Cpu, Wrench, Building2,
+  Briefcase, Handshake, ExternalLink, ExternalLink as ExtLink, TrendingUp, Box, Cpu, Wrench, Building2, Package,
   GraduationCap, Navigation, X, LayoutGrid, SlidersHorizontal, AlignLeft, AlignRight,
   Star, Quote, Camera, Image as ImageIcon
 } from "lucide-react";
@@ -2128,9 +2128,9 @@ function AdminDashboardContent() {
                   className="px-3.5 py-2 text-xs rounded-full border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-200 font-bold cursor-pointer"
                 >
                   <option value="all">Semua Kategori</option>
-                  <option value="1">1. Teknologi & SaaS</option>
-                  <option value="2">2. Produk Fisik & IoT</option>
-                  <option value="3">3. Jasa & Konsultasi</option>
+                  <option value="1">1. Teknologi & Digital</option>
+                  <option value="2">2. Produk Inovasi & Riset</option>
+                  <option value="3">3. Jasa & Layanan Keahlian</option>
                 </select>
 
                 <select
@@ -3863,9 +3863,9 @@ function AdminDashboardContent() {
 
                 {/* Tab 2: Teknologi */}
                 <div className="p-4 rounded-2xl border border-blue-200 dark:border-blue-900/60 bg-blue-50/20 dark:bg-blue-950/20 space-y-3">
-                  <span className="text-xs font-extrabold text-[#000080] dark:text-sky-300 flex items-center gap-1.5 pb-1 border-b border-blue-200/60 dark:border-blue-900/40">
+                  <span className="text-xs font-extrabold text-[#0F4C81] dark:text-sky-300 flex items-center gap-1.5 pb-1 border-b border-blue-200/60 dark:border-blue-900/40">
                     <Laptop className="w-3.5 h-3.5" />
-                    <span>Tab 2: Teknologi (SaaS)</span>
+                    <span>Tab 2: Teknologi & Digital</span>
                   </span>
                   <div>
                     <label className="text-[11px] font-bold text-slate-600 dark:text-slate-400 block mb-1">
@@ -3875,7 +3875,7 @@ function AdminDashboardContent() {
                       type="text"
                       value={cmsForm.catalog_tab_teknologi_id || ""}
                       onChange={(e) => setCmsForm((prev: any) => ({ ...prev, catalog_tab_teknologi_id: e.target.value }))}
-                      placeholder="Teknologi (SaaS)"
+                      placeholder="Teknologi & Digital"
                       className="w-full px-3 py-1.5 text-xs rounded-full border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white font-bold"
                     />
                   </div>
@@ -3887,7 +3887,7 @@ function AdminDashboardContent() {
                       type="text"
                       value={cmsForm.catalog_tab_teknologi_en || ""}
                       onChange={(e) => setCmsForm((prev: any) => ({ ...prev, catalog_tab_teknologi_en: e.target.value }))}
-                      placeholder="Technology (SaaS)"
+                      placeholder="Technology & Digital"
                       className="w-full px-3 py-1.5 text-xs rounded-full border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white font-bold"
                     />
                   </div>
@@ -3896,8 +3896,8 @@ function AdminDashboardContent() {
                 {/* Tab 3: Produk */}
                 <div className="p-4 rounded-2xl border border-amber-200 dark:border-amber-900/60 bg-amber-50/20 dark:bg-amber-950/20 space-y-3">
                   <span className="text-xs font-extrabold text-amber-700 dark:text-amber-400 flex items-center gap-1.5 pb-1 border-b border-amber-200/60 dark:border-amber-900/40">
-                    <Cpu className="w-3.5 h-3.5" />
-                    <span>Tab 3: Hardware (IoT)</span>
+                    <Package className="w-3.5 h-3.5" />
+                    <span>Tab 3: Produk Inovasi (Pangan, Herbal, Mesin, dsb.)</span>
                   </span>
                   <div>
                     <label className="text-[11px] font-bold text-slate-600 dark:text-slate-400 block mb-1">
@@ -3907,7 +3907,7 @@ function AdminDashboardContent() {
                       type="text"
                       value={cmsForm.catalog_tab_produk_id || ""}
                       onChange={(e) => setCmsForm((prev: any) => ({ ...prev, catalog_tab_produk_id: e.target.value }))}
-                      placeholder="Produk (IoT/Robot)"
+                      placeholder="Produk Inovasi"
                       className="w-full px-3 py-1.5 text-xs rounded-full border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white font-bold"
                     />
                   </div>
@@ -3919,7 +3919,7 @@ function AdminDashboardContent() {
                       type="text"
                       value={cmsForm.catalog_tab_produk_en || ""}
                       onChange={(e) => setCmsForm((prev: any) => ({ ...prev, catalog_tab_produk_en: e.target.value }))}
-                      placeholder="Hardware (IoT)"
+                      placeholder="Applied Products"
                       className="w-full px-3 py-1.5 text-xs rounded-full border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white font-bold"
                     />
                   </div>
@@ -3928,8 +3928,8 @@ function AdminDashboardContent() {
                 {/* Tab 4: Jasa */}
                 <div className="p-4 rounded-2xl border border-slate-300 dark:border-slate-700 bg-slate-50/40 dark:bg-slate-800/20 space-y-3">
                   <span className="text-xs font-extrabold text-slate-800 dark:text-slate-200 flex items-center gap-1.5 pb-1 border-b border-slate-200 dark:border-slate-700">
-                    <Wrench className="w-3.5 h-3.5" />
-                    <span>Tab 4: Software House</span>
+                    <Briefcase className="w-3.5 h-3.5" />
+                    <span>Tab 4: Layanan & Jasa (Konsultasi, Uji Lab, dsb.)</span>
                   </span>
                   <div>
                     <label className="text-[11px] font-bold text-slate-600 dark:text-slate-400 block mb-1">
@@ -3939,7 +3939,7 @@ function AdminDashboardContent() {
                       type="text"
                       value={cmsForm.catalog_tab_jasa_id || ""}
                       onChange={(e) => setCmsForm((prev: any) => ({ ...prev, catalog_tab_jasa_id: e.target.value }))}
-                      placeholder="Jasa Software"
+                      placeholder="Layanan & Jasa"
                       className="w-full px-3 py-1.5 text-xs rounded-full border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white font-bold"
                     />
                   </div>
@@ -3951,7 +3951,7 @@ function AdminDashboardContent() {
                       type="text"
                       value={cmsForm.catalog_tab_jasa_en || ""}
                       onChange={(e) => setCmsForm((prev: any) => ({ ...prev, catalog_tab_jasa_en: e.target.value }))}
-                      placeholder="Software House"
+                      placeholder="Expert Services"
                       className="w-full px-3 py-1.5 text-xs rounded-full border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white font-bold"
                     />
                   </div>
@@ -6799,9 +6799,9 @@ function AdminDashboardContent() {
                   >
                     <div className="flex items-center gap-2 mb-1">
                       <Laptop className="w-4 h-4 text-[#0F4C81] dark:text-sky-300" />
-                      <span className="text-xs font-bold">1. Teknologi & SaaS</span>
+                      <span className="text-xs font-bold">1. Teknologi & Digital</span>
                     </div>
-                    <span className="text-[10px] text-slate-500 dark:text-slate-400">Software & Sandbox</span>
+                    <span className="text-[10px] text-slate-500 dark:text-slate-400">Web, Mobile, AI & SaaS</span>
                   </button>
 
                   <button
@@ -6815,10 +6815,10 @@ function AdminDashboardContent() {
                     }`}
                   >
                     <div className="flex items-center gap-2 mb-1">
-                      <Cpu className="w-4 h-4 text-[#C5A059]" />
-                      <span className="text-xs font-bold">2. Produk Fisik & IoT</span>
+                      <Package className="w-4 h-4 text-[#C5A059]" />
+                      <span className="text-xs font-bold">2. Produk Inovasi & Riset</span>
                     </div>
-                    <span className="text-[10px] text-slate-500 dark:text-slate-400">Robotika, AI & Hardware</span>
+                    <span className="text-[10px] text-slate-500 dark:text-slate-400">Pangan, Herbal, Mesin, Kimia</span>
                   </button>
 
                   <button
@@ -6832,10 +6832,10 @@ function AdminDashboardContent() {
                     }`}
                   >
                     <div className="flex items-center gap-2 mb-1">
-                      <Wrench className="w-4 h-4 text-[#0F4C81] dark:text-sky-300" />
-                      <span className="text-xs font-bold">3. Jasa & Konsultasi</span>
+                      <Briefcase className="w-4 h-4 text-[#0F4C81] dark:text-sky-300" />
+                      <span className="text-xs font-bold">3. Jasa & Layanan Keahlian</span>
                     </div>
-                    <span className="text-[10px] text-slate-500 dark:text-slate-400">Software House & Audit</span>
+                    <span className="text-[10px] text-slate-500 dark:text-slate-400">Konsultasi, Pelatihan & Uji Lab</span>
                   </button>
                 </div>
               </div>
