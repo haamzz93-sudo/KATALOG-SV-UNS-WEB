@@ -3,7 +3,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { 
   ChevronDown, Search, Check, GraduationCap, X, 
-  Clock, TrendingUp, PlayCircle, Sparkles, Filter 
+  Clock, TrendingUp, PlayCircle, Filter 
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Prodi } from "../../types/catalog";

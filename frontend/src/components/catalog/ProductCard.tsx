@@ -8,7 +8,7 @@ import { useApp } from "../../context/AppContext";
 import { 
   Laptop, Cpu, Wrench, Play, Eye, 
   ArrowUpRight, Building2, User,
-  Sparkles, Package
+  Package, Leaf, FlaskConical, Film, Compass
 } from "lucide-react";
 
 interface ProductCardProps {
@@ -54,7 +54,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
       // Deteksi bidang produk agar relevan untuk seluruh fakultas/prodi
       if (prodi.includes("farmasi") || kodeProdi.includes("FAR") || nama.includes("oil") || nama.includes("effervescent") || nama.includes("sehati") || nama.includes("herbliss")) {
         return {
-          icon: <Sparkles className="w-3.5 h-3.5" />,
+          icon: <Leaf className="w-3.5 h-3.5" />,
           label: currentLang === "en" ? "Herbal & Health" : "Produk Herbal & Farmasi",
           bg: "bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-900/50",
         };
@@ -68,14 +68,14 @@ export const ProductCard: React.FC<ProductCardProps> = ({
       }
       if (prodi.includes("kimia") || kodeProdi.includes("TKIM") || nama.includes("mhp") || nama.includes("powder")) {
         return {
-          icon: <Sparkles className="w-3.5 h-3.5" />,
+          icon: <FlaskConical className="w-3.5 h-3.5" />,
           label: currentLang === "en" ? "Chemical Materials" : "Material & Kimia Terapan",
           bg: "bg-purple-50 dark:bg-purple-950/60 text-purple-700 dark:text-purple-300 border-purple-200 dark:border-purple-900/50",
         };
       }
       if (prodi.includes("desain") || prodi.includes("media") || kodeProdi.includes("DMD") || kodeProdi.includes("DKV") || nama.includes("animasi") || nama.includes("rajamala")) {
         return {
-          icon: <Sparkles className="w-3.5 h-3.5" />,
+          icon: <Film className="w-3.5 h-3.5" />,
           label: currentLang === "en" ? "Creative & Media" : "Karya Animasi & Media",
           bg: "bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border-indigo-200 dark:border-indigo-900/50",
         };
@@ -132,7 +132,7 @@ export const ProductCard: React.FC<ProductCardProps> = ({
     }
     if (prodi.includes("wisata") || kodeProdi.includes("UPW") || nama.includes("wellness") || nama.includes("wisata")) {
       return {
-        icon: <Sparkles className="w-3.5 h-3.5" />,
+        icon: <Compass className="w-3.5 h-3.5" />,
         label: currentLang === "en" ? "Wellness Tourism" : "Layanan Wisata Kebugaran",
         bg: "bg-teal-50 dark:bg-teal-950/60 text-teal-700 dark:text-teal-300 border-teal-200 dark:border-teal-900/50",
       };
