@@ -7,8 +7,9 @@
     "tagline": "Aplikasi Pertanian Presisi Berbasis Analisis Hara Tanah & Prediksi Iklim",
     "deskripsi_singkat": "Aplikasi pertanian cerdas yang dirancang untuk mendukung keberlanjutan sektor pemupukan melalui pendekatan presisi berbasis IoT dan analisis hara tanah.",
     "deskripsi_lengkap": "Rabuk Apps adalah aplikasi pertanian cerdas yang dirancang untuk mendukung keberlanjutan sektor pemupukan melalui pendekatan presisi. Berbasis analisis unsur hara tanah dan prediksi anomali iklim, sistem ini membantu petani mengoptimalkan dosis pupuk secara akurat, menjaga efisiensi biaya, serta mendorong kesadaran petani yang selama ini belum melakukan pemupukan secara teratur.\n\nSebagai bentuk dukungan konkret bagi komoditas lokal, aplikasi ini difokuskan untuk meningkatkan produktivitas dan kualitas panen salak Magelang. Dengan hasil panen yang konsisten dan memenuhi standar mutu internasional, Rabuk Apps siap memperkuat daya saing dan potensi ekspor salak Magelang ke pasar global.",
-    "thumbnail_url": "/images/catalog/pdf_img_p5_0_437.png",
+    "thumbnail_url": "/images/catalog/rabuk-apps.png",
     "gallery": [
+      "/images/catalog/rabuk-apps.png",
       "/images/catalog/pdf_img_p5_0_437.png",
       "/images/catalog/pdf_img_p5_1_438.png",
       "/images/catalog/pdf_img_p5_2_439.png"
@@ -50,8 +51,9 @@
     "tagline": "Permesinan Industri Kokoh & Berdaya Tahan Tinggi untuk Manufaktur Skala Presisi",
     "deskripsi_singkat": "Solusi permesinan industri berdaya tahan tinggi berstruktur gantry dua kolom kaku untuk manufaktur presisi skala menengah hingga besar.",
     "deskripsi_lengkap": "Mesin Double Column CNC Milling 3-Axis merupakan solusi permesinan industri berdaya tahan tinggi yang dirancang untuk kebutuhan manufaktur presisi skala menengah hingga besar. Dengan struktur dua kolom (gantry) yang sangat kokoh dan kaku, mesin ini memberikan kestabilan optimal serta mampu meredam getaran (vibration resistant) secara efektif selama proses pemotongan intensif.\n\nDilengkapi dengan spindle torsi tinggi dan sistem kontrol otomatis presisi, mesin ini mampu melakukan pemesinan berbagai material logam keras, cetakan mold & die, serta komponen struktural presisi dengan toleransi mikron.",
-    "thumbnail_url": "/images/catalog/pdf_img_p6_0_446.png",
+    "thumbnail_url": "/images/catalog/mesin-cnc-milling.png",
     "gallery": [
+      "/images/catalog/mesin-cnc-milling.png",
       "/images/catalog/pdf_img_p6_0_446.png"
     ],
     "harga_tipe": "starting_at",
@@ -91,8 +93,9 @@
     "tagline": "Solusi Pembubutan Silindris Otomatis Skala Industri dengan Akurasi Repetisi Tinggi",
     "deskripsi_singkat": "Mesin bubut otomatis presisi untuk membentuk benda kerja silindris dengan repetisi tinggi dan toleransi mikro.",
     "deskripsi_lengkap": "Inovasi Mesin CNC Turning merupakan solusi presisi untuk mengoptimalkan efisiensi proses manufaktur modern. Mesin ini dirancang khusus untuk membentuk benda kerja silindris melalui proses pembubutan otomatis dengan akurasi dan repetisi yang sangat tinggi.\n\nBerkat sistem kontrol otomatis yang stabil, mesin ini sangat ideal untuk memproduksi berbagai komponen rumit secara konsisten dan efisien dalam skala produksi massal industri otomotif, permesinan presisi, dan komponen medis.",
-    "thumbnail_url": "/images/catalog/pdf_img_p7_0_453.png",
+    "thumbnail_url": "/images/catalog/mesin-cnc-turning.png",
     "gallery": [
+      "/images/catalog/mesin-cnc-turning.png",
       "/images/catalog/pdf_img_p7_0_453.png"
     ],
     "harga_tipe": "starting_at",
@@ -132,8 +135,9 @@
     "tagline": "Platform Keuangan Digital Standarisasi Pembukuan UMKM Transparan & Real-Time",
     "deskripsi_singkat": "Platform keuangan digital untuk menstandarisasi pembukuan UMKM secara otomatis, akurat, dan transparan terhubung pengawas Pemda.",
     "deskripsi_lengkap": "Platform keuangan digital untuk menstandarisasi pembukuan UMKM secara otomatis, akurat, dan transparan. Sistem ini mempermudah pemerintah daerah dan pembina UMKM dalam mengawasi transaksi usaha lokal secara langsung.\n\nMOFIN UMKM menghasilkan laporan keuangan berstandar SAK EMKM lengkap: Laporan Laba Rugi, Posisi Keuangan, Arus Kas, dan Catatan Atas Laporan Keuangan secara instan.",
-    "thumbnail_url": "/images/catalog/pdf_img_p9_0_848.png",
+    "thumbnail_url": "/images/catalog/mofin-umkm.png",
     "gallery": [
+      "/images/catalog/mofin-umkm.png",
       "/images/catalog/pdf_img_p9_0_848.png"
     ],
     "harga_tipe": "starting_at",
@@ -168,8 +172,9 @@
     "tagline": "Kendalikan Bisnis Tanpa Batas dengan Solusi ERP Cloud Terpadu",
     "deskripsi_singkat": "Solusi ERP all-in-one berbasis cloud yang mengintegrasikan rantai pasok logistik, SDM, penggajian, kalkulasi HPP, dan faktur penjualan.",
     "deskripsi_lengkap": "Solusi ERP all-in-one berbasis cloud yang mengintegrasikan rantai pasok logistik, manajemen SDM, penggajian, kalkulasi HPP produksi, dan faktur penjualan dalam satu dashboard modern.\n\nDirancang untuk mengakselerasi transformasi digital industri manufaktur kecil, rintisan bisnis mahasiswa, dan UMKM berkembang.",
-    "thumbnail_url": "/images/catalog/pdf_img_p9_1_851.png",
+    "thumbnail_url": "/images/catalog/rintisku-id.png",
     "gallery": [
+      "/images/catalog/rintisku-id.png",
       "/images/catalog/pdf_img_p9_1_851.png"
     ],
     "harga_tipe": "starting_at",
@@ -204,8 +209,9 @@
     "tagline": "Platform Perdagangan Digital Hiperlokal Tingkat Kelurahan",
     "deskripsi_singkat": "Sistem marketplace yang fokus pada digitalisasi produk UMKM pada suatu wilayah kelurahan secara mandiri.",
     "deskripsi_lengkap": "Sistem marketplace yang fokus pada promosi dan transaksi UMKM pada suatu wilayah kelurahan. Menghubungkan langsung warga kelurahan dengan produsen lokal, mendukung ekosistem belanja lokal (buy local), serta memudahkan pendataan potensi ekonomi kawasan.",
-    "thumbnail_url": "/images/catalog/pdf_img_p10_0_858.png",
+    "thumbnail_url": "/images/catalog/marketplace-umkm.png",
     "gallery": [
+      "/images/catalog/marketplace-umkm.png",
       "/images/catalog/pdf_img_p10_0_858.png"
     ],
     "harga_tipe": "starting_at",
@@ -240,8 +246,9 @@
     "tagline": "Sistem Ticketing & Manajemen Pengunjung Wisata Edukasi Berbasis QR Code",
     "deskripsi_singkat": "Sistem yang mengatur penjualan tiket masuk dan manajemen kuota pengunjung pada Museum Tahir Foundation.",
     "deskripsi_lengkap": "Sistem yang mengatur penjualan tiket masuk pada museum Tahir Foundation secara daring dan luring. Terintegrasi dengan turnstile gate barrier otomatis, scanner QR code instan, dan modul analitik arus pengunjung harian untuk optimalisasi kenyamanan destinasi budaya.",
-    "thumbnail_url": "/images/catalog/pdf_img_p10_2_864.png",
+    "thumbnail_url": "/images/catalog/tiket-museum-tahir.png",
     "gallery": [
+      "/images/catalog/tiket-museum-tahir.png",
       "/images/catalog/pdf_img_p10_2_864.png"
     ],
     "harga_tipe": "contact_us",
@@ -276,8 +283,9 @@
     "tagline": "Digitalisasi Tabungan Sampah, Konversi Saldo & Sirkular Ekonomi Warga",
     "deskripsi_singkat": "Sistem Informasi Manajemen Bank Sampah untuk digitalisasi penimbangan, saldo nasabah, dan logistik daur ulang.",
     "deskripsi_lengkap": "Sistem Informasi Manajemen Bank Sampah untuk Rakyat yang dikembangkan untuk mempercepat pengelolaan sirkular ekonomi lingkungan. Mengelola pendaftaran nasabah warga, pencatatan timbangan sampah terpilah per kategori, konversi nominal saldo, serta integrasi penjualan ke pengepul daur ulang secara akuntabel.",
-    "thumbnail_url": "/images/catalog/pdf_img_p10_3_867.png",
+    "thumbnail_url": "/images/catalog/bank-sampah-rakyat.png",
     "gallery": [
+      "/images/catalog/bank-sampah-rakyat.png",
       "/images/catalog/pdf_img_p10_3_867.png"
     ],
     "harga_tipe": "starting_at",
@@ -312,8 +320,9 @@
     "tagline": "Transformasi Layanan Administrasi Kependudukan Terstruktur Bebas Spreadsheet",
     "deskripsi_singkat": "Sistem internal digitalisasi layanan administrasi pencatatan sipil dan pendaftaran penduduk terstruktur dan mudah dipantau.",
     "deskripsi_lengkap": "Sistem internal yang dikembangkan untuk mendigitalisasi pencatatan layanan pada administrasi pencatatan sipil dan pendaftaran penduduk. Sistem ini menjadi solusi atas pengelolaan data berbasis spreadsheet agar proses pencatatan lebih terstruktur, efisien, aman, dan mudah dipantau oleh aparatur pemerintahan setempat.",
-    "thumbnail_url": "/images/catalog/pdf_img_p11_0_480.png",
+    "thumbnail_url": "/images/catalog/sim-pencatatan-sipil.png",
     "gallery": [
+      "/images/catalog/sim-pencatatan-sipil.png",
       "/images/catalog/pdf_img_p11_0_480.png"
     ],
     "harga_tipe": "starting_at",
@@ -348,8 +357,9 @@
     "tagline": "Otomasi Transformasi, Integrasi, & Data Cleaning Survei Hierarkis Cepat",
     "deskripsi_singkat": "Sistem otomasi data survei berbasis aturan yang mendukung modul integrasi, transformasi, dan pembersihan data survei hierarkis Root-Roster.",
     "deskripsi_lengkap": "Sistem otomasi data survei berbasis aturan (rule-based system) yang mendukung modul integrasi, transformasi, dan pembersihan data survei berstruktur hierarkis Root-Roster secara lebih cepat, akurat, dan terstruktur.\n\nMeminimalkan kesalahan manusia dalam pemrosesan data sensus dan survei lapangan berskala masif.",
-    "thumbnail_url": "/images/catalog/pdf_img_p11_1_481.png",
+    "thumbnail_url": "/images/catalog/rootroster-otomasi-survei.png",
     "gallery": [
+      "/images/catalog/rootroster-otomasi-survei.png",
       "/images/catalog/pdf_img_p11_1_481.png"
     ],
     "harga_tipe": "starting_at",
@@ -384,8 +394,9 @@
     "tagline": "Inovasi Smart Farming IoT untuk Deteksi Dini & Pengendalian Serangan Hama Otomatis",
     "deskripsi_singkat": "Inovasi pertanian pintar berbasis IoT yang mendeteksi dan mengendalikan hama tanaman secara otomatis untuk produktivitas pangan.",
     "deskripsi_lengkap": "Smart Pest Control System merupakan inovasi pertanian pintar (smart farming) berbasis IoT hasil rancangan D3 Teknik Informatika SV UNS yang berfungsi mendeteksi serta mengendalikan serangan hama tanaman secara otomatis dan efisien demi meningkatkan produktivitas pangan lokal.\n\nDilengkapi dengan lampu pemikat ultraviolet frekuensi khusus, jaring perangkap elektrik terkendali, dan sensor telemetry kelembapan udara.",
-    "thumbnail_url": "/images/catalog/pdf_img_p11_2_482.png",
+    "thumbnail_url": "/images/catalog/smart-pest-control.png",
     "gallery": [
+      "/images/catalog/smart-pest-control.png",
       "/images/catalog/pdf_img_p11_2_482.png"
     ],
     "harga_tipe": "starting_at",
@@ -420,8 +431,9 @@
     "tagline": "Kombinasi Alami Spirulina Kaya Antioksidan & Tamanu Oil dengan Proteksi UV SPF 6-14",
     "deskripsi_singkat": "Serum minyak alami kaya antioksidan dan perlindungan UV alami untuk merawat kulit berjerawat dan mencerahkan wajah.",
     "deskripsi_lengkap": "Kombinasi alami spirulina kaya antioksidan dan tamanu oil yang memiliki proteksi UV alami (SPF 6-14). Berfungsi merawat kulit berjerawat, menangkal radikal bebas, serta mencerahkan wajah tanpa memicu iritasi.\n\nDiproduksi melalui standar CPKB (Cara Pembuatan Kosmetika yang Baik) di bawah bimbingan apoteker dan dosen farmasi Sekolah Vokasi UNS.",
-    "thumbnail_url": "/images/catalog/pdf_img_p12_0_490.png",
+    "thumbnail_url": "/images/catalog/pico-natural-magic-oil.png",
     "gallery": [
+      "/images/catalog/pico-natural-magic-oil.png",
       "/images/catalog/pdf_img_p12_0_490.png"
     ],
     "harga_tipe": "fixed",
@@ -456,8 +468,9 @@
     "tagline": "Minuman Relaksasi Botanical Lokal Detoksifikasi Alami Tubuh & Pereda Stres",
     "deskripsi_singkat": "Minuman relaksasi botanical berbahan bunga telang dan sereh lokal untuk detoksifikasi alami dan daya tahan tubuh.",
     "deskripsi_lengkap": "Herbliss Purple Breeze adalah minuman relaksasi berbahan botanical lokal untuk detoksifikasi alami tubuh, membantu meningkatkan daya tahan tubuh, serta meredakan stres harian lewat aroma sereh yang menenangkan dan visual alami bunga telang yang menawan.",
-    "thumbnail_url": "/images/catalog/pdf_img_p12_1_491.png",
+    "thumbnail_url": "/images/catalog/herbliss-purple-breeze.png",
     "gallery": [
+      "/images/catalog/herbliss-purple-breeze.png",
       "/images/catalog/pdf_img_p12_1_491.png"
     ],
     "harga_tipe": "fixed",
@@ -492,8 +505,9 @@
     "tagline": "Minyak Balur Herbal Multifungsi Menghangatkan Tubuh & Meredakan Pegal",
     "deskripsi_singkat": "Minyak balur herbal multifungsi dengan sensasi aromaterapi menenangkan untuk menghangatkan tubuh dan meredakan pegal.",
     "deskripsi_lengkap": "Minyak balur herbal multifungsi dengan sensasi aromaterapi menenangkan. Cocok untuk menghangatkan tubuh, meredakan pegal linu, melancarkan peredaran darah perifer, serta memberikan efek relaksasi otot mendalam setelah aktivitas fisik berat.",
-    "thumbnail_url": "/images/catalog/pdf_img_p12_2_492.png",
+    "thumbnail_url": "/images/catalog/ellevacare-oil.png",
     "gallery": [
+      "/images/catalog/ellevacare-oil.png",
       "/images/catalog/pdf_img_p12_2_492.png"
     ],
     "harga_tipe": "fixed",
@@ -528,8 +542,9 @@
     "tagline": "Formulasi Herbal Modern Cepat Larut Menjaga Kebugaran Kardiovaskular",
     "deskripsi_singkat": "Formulasi tablet larut air praktis dari ekstrak rimpang jahe dan kunyit terstandar untuk membantu menjaga kadar lipid darah.",
     "deskripsi_lengkap": "Formulasi herbal modern teruji laboratorium yang praktis diseduh. Memberikan rasa segar alami tanpa endapan sekaligus mendukung kebugaran kardiovaskular secara berkelanjutan lewat aksi kurkuminoid dan gingerol terstandarisasi.",
-    "thumbnail_url": "/images/catalog/pdf_img_p12_3_881.png",
+    "thumbnail_url": "/images/catalog/tablet-effervescent.png",
     "gallery": [
+      "/images/catalog/tablet-effervescent.png",
       "/images/catalog/pdf_img_p12_3_881.png"
     ],
     "harga_tipe": "fixed",
@@ -564,8 +579,9 @@
     "tagline": "Ramuan Fitofarmaka Lokal Peningkat Imunitas & Konsentrasi Kognitif",
     "deskripsi_singkat": "Kapsul herbal ekstrak curcuma dan pegagan untuk daya tahan tubuh, konsentrasi, dan pemulihan stamina harian.",
     "deskripsi_lengkap": "Ramuan fitofarmaka lokal untuk membantu memelihara daya tahan tubuh, meningkatkan konsentrasi kognitif, dan mempercepat pemulihan stamina tubuh harian. Formulasi sinergis antara asiatikosida pegagan dan antioksidan temulawak.",
-    "thumbnail_url": "/images/catalog/pdf_img_p12_4_884.png",
+    "thumbnail_url": "/images/catalog/kapsul-sehati.png",
     "gallery": [
+      "/images/catalog/kapsul-sehati.png",
       "/images/catalog/pdf_img_p12_4_884.png"
     ],
     "harga_tipe": "fixed",
@@ -600,8 +616,9 @@
     "tagline": "Beras Ciherang Pulen & Bergizi Hasil Teaching Factory Agribisnis SV UNS",
     "deskripsi_singkat": "Beras berkualitas hasil hilirisasi riset terapan budidaya presisi Jajar Legowo Klaten kemasan higienis 5 kg.",
     "deskripsi_lengkap": "Beras Premium Prima merupakan beras berkualitas hasil hilirisasi riset terapan dan praktik budi daya Teaching Factory Program Studi D3 Agribisnis Sekolah Vokasi UNS. Dihasilkan dari varietas padi Ciherang unggulan dengan penerapan sistem tanam presisi Jajar Legowo di lahan pertanian Klaten.\n\nDiproses dan dikemas secara higienis dalam ukuran praktis 5 kg untuk menghadirkan nasi pulen dan bergizi di meja makan Anda.",
-    "thumbnail_url": "/images/catalog/pdf_img_p13_0_498.png",
+    "thumbnail_url": "/images/catalog/beras-premium-prima.png",
     "gallery": [
+      "/images/catalog/beras-premium-prima.png",
       "/images/catalog/pdf_img_p13_0_498.png"
     ],
     "harga_tipe": "fixed",
@@ -641,8 +658,9 @@
     "tagline": "Inovasi Camilan Padat Mikronutrien Pencegah Anemia Remaja & Ibu Hamil",
     "deskripsi_singkat": "Inovasi kukis renyah berbahan dasar olahan biji nangka kaya kalsium dan zat besi untuk kesehatan ibu dan remaja.",
     "deskripsi_lengkap": "Inovasi kukis renyah bergizi berbahan dasar olahan biji nangka yang kaya nutrisi. Diformulasikan khusus sebagai camilan sehat padat mikronutrien, sangat baik untuk mendukung pemenuhan kalsium harian serta membantu pencegahan anemia pada remaja putri maupun ibu hamil.",
-    "thumbnail_url": "/images/catalog/pdf_img_p14_0_504.png",
+    "thumbnail_url": "/images/catalog/vookies-cookies.png",
     "gallery": [
+      "/images/catalog/vookies-cookies.png",
       "/images/catalog/pdf_img_p14_0_504.png"
     ],
     "harga_tipe": "fixed",
@@ -677,8 +695,9 @@
     "tagline": "Lauk Sehat Gurih Renyah Hasil Diversifikasi Limbah Pangan Kaya Zat Besi",
     "deskripsi_singkat": "Alternatif lauk serundeng gurih dan renyah hasil diversifikasi limbah pangan lokal biji nangka berbalut balado.",
     "deskripsi_lengkap": "Alternatif lauk serundeng gurih dan renyah hasil diversifikasi limbah pangan lokal (biji nangka). Menghadirkan perpaduan rasa balado yang sedap sekaligus menjadi sumber asupan zat besi alami untuk melengkapi kebutuhan gizi keluarga sehari-hari.",
-    "thumbnail_url": "/images/catalog/pdf_img_p14_1_505.png",
+    "thumbnail_url": "/images/catalog/snazzle-serundeng.png",
     "gallery": [
+      "/images/catalog/snazzle-serundeng.png",
       "/images/catalog/pdf_img_p14_1_505.png"
     ],
     "harga_tipe": "fixed",
@@ -713,8 +732,9 @@
     "tagline": "Kehangatan Jahe Alami, Serai, Pandan & Krimer Nabati Legit Pereda Mual",
     "deskripsi_singkat": "Minuman kebugaran tradisional sentuhan rasa modern untuk meredakan mual, melancarkan sirkulasi darah dan imun.",
     "deskripsi_lengkap": "Minuman kebugaran tradisional dengan sentuhan rasa modern. Menghadirkan kehangatan jahe alami, wangi serai-pandan, serta kelembutan krimer nabati yang manis legit. Bermanfaat untuk meredakan mual bagi ibu hamil trimester pertama, melancarkan sirkulasi darah, menghangatkan tubuh, dan menjaga imunitas harian.",
-    "thumbnail_url": "/images/catalog/pdf_img_p14_2_506.png",
+    "thumbnail_url": "/images/catalog/jahe-latte-umza.png",
     "gallery": [
+      "/images/catalog/jahe-latte-umza.png",
       "/images/catalog/pdf_img_p14_2_506.png"
     ],
     "harga_tipe": "fixed",
@@ -749,8 +769,9 @@
     "tagline": "Film Animasi Tematik Kearifan Lokal Canthik Rajamala Surakarta",
     "deskripsi_singkat": "Produksi film animasi tematik mengangkat kearifan lokal maskot budaya Surakarta Canthik Rajamala.",
     "deskripsi_lengkap": "Produksi film animasi tematik yang mengangkat kearifan lokal maskot budaya Surakarta, Canthik Rajamala. Dikerjakan oleh studio animasi SV UNS sebagai media edukasi publik, promosi pariwisata daerah, serta hiburan keluarga nusantara berstandar sinematik tinggi.",
-    "thumbnail_url": "/images/catalog/pdf_img_p15_0_511.png",
+    "thumbnail_url": "/images/catalog/animasi-rajamala.png",
     "gallery": [
+      "/images/catalog/animasi-rajamala.png",
       "/images/catalog/pdf_img_p15_0_511.png"
     ],
     "harga_tipe": "contact_us",
@@ -785,8 +806,9 @@
     "tagline": "Material Presipitasi Kimia untuk Bahan Baku Baterai, Katalis & Pigmen Industri",
     "deskripsi_singkat": "Material campuran hidroksida logam hasil proses presipitasi kimia untuk bahan baku baterai dan elektroplating.",
     "deskripsi_lengkap": "Mixed Hydroxide Precipitate (MHP) Powder adalah material yang terdiri dari campuran hidroksida logam yang dihasilkan melalui proses presipitasi kimia terpadu. Produk ini digunakan dalam berbagai aplikasi sebagai bahan baku prekursor baterai kendaraan listrik (EV Battery), katalis kimia, pigmen industri, dan pelapisan elektroplating.",
-    "thumbnail_url": "/images/catalog/pdf_img_p16_0_516.png",
+    "thumbnail_url": "/images/catalog/mhp-powder.png",
     "gallery": [
+      "/images/catalog/mhp-powder.png",
       "/images/catalog/pdf_img_p16_0_516.png"
     ],
     "harga_tipe": "starting_at",
@@ -821,8 +843,9 @@
     "tagline": "Pelatihan & Sertifikasi Internasional Building Information Modelling (BIM) 5D",
     "deskripsi_singkat": "Pelatihan dan sertifikasi keahlian pemodelan digital konstruksi berbasis BIM 5D bagi kontraktor dan profesional.",
     "deskripsi_lengkap": "Pelatihan dan sertifikasi keahlian pemodelan digital konstruksi berbasis Building Information Modelling (BIM) 5D bagi profesional industri, kontraktor, dan mahasiswa bekerjasama resmi dengan Glodon Authorized Training Center (GATC).\n\nMengintegrasikan desain 3D arsitektural, schedule timeline waktu 4D, dan estimasi biaya quantity takeoff (QTO) 5D presisi.",
-    "thumbnail_url": "/images/catalog/pdf_img_p18_0_529.png",
+    "thumbnail_url": "/images/catalog/bim-gatc-konstruksi.png",
     "gallery": [
+      "/images/catalog/bim-gatc-konstruksi.png",
       "/images/catalog/pdf_img_p18_0_529.png"
     ],
     "harga_tipe": "starting_at",
@@ -857,8 +880,9 @@
     "tagline": "Layanan Pendampingan SPT, Pembukuan UMKM & Konsultasi Kepatuhan Pajak",
     "deskripsi_singkat": "Unit layanan terapan Teaching Factory pendampingan pelaporan SPT berkala, pembukuan keuangan, dan konsultasi pajak.",
     "deskripsi_lengkap": "Merupakan unit layanan terapan berbasis Teaching Factory dari Program Studi Perpajakan Sekolah Vokasi UNS. Hadir sebagai jembatan sinergi akademisi dan dunia usaha, klinik ini menyediakan pendampingan profesional mulai dari asistensi pelaporan SPT berkala, pembukuan keuangan UMKM yang terstandarisasi, hingga konsultasi kepatuhan pajak secara transparan, akuntabel, dan terpercaya.",
-    "thumbnail_url": "/images/catalog/pdf_img_p19_0_535.png",
+    "thumbnail_url": "/images/catalog/klinik-akuntansi-perpajakan.png",
     "gallery": [
+      "/images/catalog/klinik-akuntansi-perpajakan.png",
       "/images/catalog/pdf_img_p19_0_535.png"
     ],
     "harga_tipe": "starting_at",
@@ -893,8 +917,9 @@
     "tagline": "Kursus Intensif Regulasi PPh, PPN, e-SPT & Praktik Perpajakan Korporasi Terkini",
     "deskripsi_singkat": "Program kursus intensif dan sertifikasi kompetensi Brevet Pajak AB bersama Tax Academy Indonesia.",
     "deskripsi_lengkap": "Program kursus intensif dan sertifikasi kompetensi Brevet Pajak AB yang diselenggarakan oleh Klinik Akuntansi & Pajak SV UNS bersama Tax Academy Indonesia. Membekali peserta dengan pemahaman regulasi PPh, PPN, pemotongan/pemungutan pajak, hingga praktik pengisian e-SPT dan tata laksana perpajakan korporasi terkini.",
-    "thumbnail_url": "/images/catalog/pdf_img_p20_0_945.png",
+    "thumbnail_url": "/images/catalog/brevet-pajak-ab.png",
     "gallery": [
+      "/images/catalog/brevet-pajak-ab.png",
       "/images/catalog/pdf_img_p20_0_945.png"
     ],
     "harga_tipe": "starting_at",
@@ -929,8 +954,9 @@
     "tagline": "Pengujian Mutu Material Presisi Tanpa Merusak Standar ASME / AWS / ASTM",
     "deskripsi_singkat": "Layanan Non-Destructive Test pengujian material dan inspeksi mutu presisi tanpa merusak struktur benda uji.",
     "deskripsi_lengkap": "Layanan Non-Destructive Test (NDT) dari Program Studi Teknologi Rekayasa Manufaktur SV UNS merupakan solusi pengujian material dan inspeksi mutu presisi tanpa merusak struktur benda uji (non-destructive). Didukung tenaga ahli bersertifikasi dan fasilitas laboratorium terintegrasi yang mengacu pada standar global (ASME/AWS/ASTM), layanan ini menjamin keselamatan, keandalan, dan umur pakai aset manufaktur maupun konstruksi Anda.",
-    "thumbnail_url": "/images/catalog/pdf_img_p21_0_547.png",
+    "thumbnail_url": "/images/catalog/jasa-ndt-material.png",
     "gallery": [
+      "/images/catalog/jasa-ndt-material.png",
       "/images/catalog/pdf_img_p21_0_547.png"
     ],
     "harga_tipe": "starting_at",
@@ -965,8 +991,9 @@
     "tagline": "Preservasi Naskah Kuno, Buku Langka & Dokumen Bersejarah ke Format Digital",
     "deskripsi_singkat": "Layanan alih media naskah kuno, buku langka, dan arsip bersejarah berstandar preservasi nasional.",
     "deskripsi_lengkap": "Layanan alih media profesional untuk naskah kuno, buku langka, dokumen bersejarah, dan arsip ke format digital berstandar preservasi. Menggunakan alur terstruktur meliputi pemeriksaan fisik, restorasi pemulihan awal, pemindaian berkualitas tinggi, hingga pengayaan metadata guna melindungi fisik dokumen asli sekaligus memperluas akses riset dan edukasi.",
-    "thumbnail_url": "/images/catalog/pdf_img_p22_0_553.png",
+    "thumbnail_url": "/images/catalog/alih-media-naskah-kuno.png",
     "gallery": [
+      "/images/catalog/alih-media-naskah-kuno.png",
       "/images/catalog/pdf_img_p22_0_553.png"
     ],
     "harga_tipe": "starting_at",
@@ -997,12 +1024,13 @@
     "nama_item": "Pengembangan Sistem Perpustakaan Terpadu (RFID & Otomasi)",
     "slug": "pengembangan-sistem-perpustakaan-terpadu-rfid",
     "prodi_code": "D3-PUS",
-    "category_id": 1,
+    "category_id": 3,
     "tagline": "Solusi Menyeluruh Ekosistem Perpustakaan Modern Otomasi Koleksi & RFID",
     "deskripsi_singkat": "Pembangunan ekosistem perpustakaan modern terintegrasi katalogisasi, sirkulasi mandiri, dan pelacakan RFID.",
     "deskripsi_lengkap": "Solusi menyeluruh pembangunan ekosistem perpustakaan modern yang mengintegrasikan otomasi koleksi fisik dan layanan digital. Membantu lembaga, sekolah, dan instansi mengelola katalogisasi, pengadaan, otomasi sirkulasi, hingga pelacakan koleksi berbasis RFID secara efektif melalui satu sistem terpadu.",
-    "thumbnail_url": "/images/catalog/pdf_img_p22_1_555.png",
+    "thumbnail_url": "/images/catalog/sistem-perpustakaan-terpadu.png",
     "gallery": [
+      "/images/catalog/sistem-perpustakaan-terpadu.png",
       "/images/catalog/pdf_img_p22_1_555.png"
     ],
     "harga_tipe": "starting_at",
@@ -1037,8 +1065,9 @@
     "tagline": "Pelatihan Resmi SAP Overview, Financial & Management Accounting Berstandar SAP Hub",
     "deskripsi_singkat": "Pelatihan dan sertifikasi SAP Overview, SAP Financial Accounting, dan SAP Management Accounting kurikulum resmi.",
     "deskripsi_lengkap": "SAP University Partnership Program Training menyelenggarakan pelatihan intensif untuk modul SAP Overview / Fundamental, SAP Financial Accounting (FI), dan SAP Management Accounting (CO) menggunakan kurikulum resmi SAP Learning Hub.\n\nMelatih mahasiswa dan praktisi industri menguasai sistem enterprise resource planning (ERP) global yang digunakan oleh mayoritas perusahaan multinasional.",
-    "thumbnail_url": "/images/catalog/pdf_img_p23_0_561.png",
+    "thumbnail_url": "/images/catalog/sap-training-program.png",
     "gallery": [
+      "/images/catalog/sap-training-program.png",
       "/images/catalog/pdf_img_p23_0_561.png"
     ],
     "harga_tipe": "starting_at",
@@ -1073,8 +1102,9 @@
     "tagline": "Pembibitan Benih Kedelai Komersial, Smart Farming & Sentra Tempe/Susu Kedelai",
     "deskripsi_singkat": "Layanan pembibitan kedelai komersial, budi daya smart farming, dan sentra produksi tempe higienis serta susu kedelai.",
     "deskripsi_lengkap": "Bank Benih & Sentra Olahan Kedelai Terpadu menyediakan pembibitan benih kedelai komersial unggul, bimbingan budi daya smart farming agribisnis, serta unit Sentra Pembuatan Tempe higienis dan olahan susu kedelai bernutrisi tinggi berbasis Teaching Factory ramah lingkungan.",
-    "thumbnail_url": "/images/catalog/pdf_img_p24_0_567.png",
+    "thumbnail_url": "/images/catalog/bank-benih-kedelai.png",
     "gallery": [
+      "/images/catalog/bank-benih-kedelai.png",
       "/images/catalog/pdf_img_p24_0_567.png"
     ],
     "harga_tipe": "starting_at",
@@ -1109,8 +1139,9 @@
     "tagline": "Paket Wisata Holistik Terapi Tradisional Jawa, Yoga, Relaksasi & Edukasi Jamu",
     "deskripsi_singkat": "Paket layanan wisata kebugaran holistik mengintegrasikan terapi Jawa, yoga, aromaterapi, dan racikan jamu herbal.",
     "deskripsi_lengkap": "Paket layanan wisata kebugaran holistik yang mengintegrasikan terapi tradisional Jawa, yoga, relaksasi aromaterapi, dan edukasi racikan jamu herbal nusantara. Dirancang untuk pasar wisatawan rekreasi dan korporasi yang mendambakan pemulihan fisik dan ketenangan mental di tengah pesona budaya Kota Solo.",
-    "thumbnail_url": "/images/catalog/pdf_img_p25_0_573.png",
+    "thumbnail_url": "/images/catalog/wellness-tourism.png",
     "gallery": [
+      "/images/catalog/wellness-tourism.png",
       "/images/catalog/pdf_img_p25_0_573.png",
       "/images/catalog/pdf_img_p25_1_574.png"
     ],
