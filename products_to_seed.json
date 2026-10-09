@@ -1,0 +1,1141 @@
+[
+  {
+    "nama_item": "Rabuk Apps - Sistem Presisi Pemupukan & Pertanian Cerdas",
+    "slug": "rabuk-apps-pertanian-cerdas",
+    "prodi_code": "D3-TIF-MDN",
+    "category_id": 1,
+    "tagline": "Aplikasi Pertanian Presisi Berbasis Analisis Hara Tanah & Prediksi Iklim",
+    "deskripsi_singkat": "Aplikasi pertanian cerdas yang dirancang untuk mendukung keberlanjutan sektor pemupukan melalui pendekatan presisi berbasis IoT dan analisis hara tanah.",
+    "deskripsi_lengkap": "Rabuk Apps adalah aplikasi pertanian cerdas yang dirancang untuk mendukung keberlanjutan sektor pemupukan melalui pendekatan presisi. Berbasis analisis unsur hara tanah dan prediksi anomali iklim, sistem ini membantu petani mengoptimalkan dosis pupuk secara akurat, menjaga efisiensi biaya, serta mendorong kesadaran petani yang selama ini belum melakukan pemupukan secara teratur.\n\nSebagai bentuk dukungan konkret bagi komoditas lokal, aplikasi ini difokuskan untuk meningkatkan produktivitas dan kualitas panen salak Magelang. Dengan hasil panen yang konsisten dan memenuhi standar mutu internasional, Rabuk Apps siap memperkuat daya saing dan potensi ekspor salak Magelang ke pasar global.",
+    "thumbnail_url": "/images/catalog/pdf_img_p5_0_437.png",
+    "gallery": [
+      "/images/catalog/pdf_img_p5_0_437.png",
+      "/images/catalog/pdf_img_p5_1_438.png",
+      "/images/catalog/pdf_img_p5_2_439.png"
+    ],
+    "harga_tipe": "contact_us",
+    "harga_nominal": 0,
+    "live_demo_url": "https://katalog.unsmadiun.id",
+    "pic_nama": "Tim Riset Smart Agriculture D3 TIF Madiun",
+    "pic_kontak": "6281234567890",
+    "pic_laboratorium": "Lab Komputasi Terapan & IoT Kampus Madiun",
+    "specs": [
+      {
+        "group_name": "Fitur Utama",
+        "spec_key": "Analisis Tanah",
+        "spec_value": "Deteksi NPK & pH tanah real-time via sensor lapangan"
+      },
+      {
+        "group_name": "Fitur Utama",
+        "spec_key": "Prediksi Iklim",
+        "spec_value": "Model anomali cuaca berbasis machine learning"
+      },
+      {
+        "group_name": "Komoditas",
+        "spec_key": "Fokus Komoditas",
+        "spec_value": "Salak Magelang & Hortikultura Unggulan"
+      },
+      {
+        "group_name": "Platform",
+        "spec_key": "Aksesibilitas",
+        "spec_value": "Mobile Android & Web Dashboard"
+      }
+    ]
+  },
+  {
+    "nama_item": "Mesin Double Column CNC Milling 3-Axis",
+    "slug": "mesin-double-column-cnc-milling-3-axis",
+    "prodi_code": "D4-TRM",
+    "category_id": 2,
+    "tagline": "Permesinan Industri Kokoh & Berdaya Tahan Tinggi untuk Manufaktur Skala Presisi",
+    "deskripsi_singkat": "Solusi permesinan industri berdaya tahan tinggi berstruktur gantry dua kolom kaku untuk manufaktur presisi skala menengah hingga besar.",
+    "deskripsi_lengkap": "Mesin Double Column CNC Milling 3-Axis merupakan solusi permesinan industri berdaya tahan tinggi yang dirancang untuk kebutuhan manufaktur presisi skala menengah hingga besar. Dengan struktur dua kolom (gantry) yang sangat kokoh dan kaku, mesin ini memberikan kestabilan optimal serta mampu meredam getaran (vibration resistant) secara efektif selama proses pemotongan intensif.\n\nDilengkapi dengan spindle torsi tinggi dan sistem kontrol otomatis presisi, mesin ini mampu melakukan pemesinan berbagai material logam keras, cetakan mold & die, serta komponen struktural presisi dengan toleransi mikron.",
+    "thumbnail_url": "/images/catalog/pdf_img_p6_0_446.png",
+    "gallery": [
+      "/images/catalog/pdf_img_p6_0_446.png"
+    ],
+    "harga_tipe": "starting_at",
+    "harga_nominal": 85000000,
+    "live_demo_url": null,
+    "pic_nama": "Laboratorium Manufaktur & CNC SV UNS",
+    "pic_kontak": "6281234567805",
+    "pic_laboratorium": "Lab Fabrikasi Logam & Mesin Perkakas TRM",
+    "specs": [
+      {
+        "group_name": "Mekanik",
+        "spec_key": "Struktur Rangka",
+        "spec_value": "Double Column Gantry High Rigidity Cast Iron"
+      },
+      {
+        "group_name": "Kapasitas",
+        "spec_key": "Sumbu Kerja",
+        "spec_value": "3-Axis (X, Y, Z) dengan Lead Screw Presisi"
+      },
+      {
+        "group_name": "Kontrol",
+        "spec_key": "Controller System",
+        "spec_value": "Industrial CNC Controller Open-Loop & Closed-Loop Compatible"
+      },
+      {
+        "group_name": "Aplikasi",
+        "spec_key": "Bidang Kerja",
+        "spec_value": "Mold & Dies, Komponen Dirgantara, Alat Pertanian"
+      }
+    ]
+  },
+  {
+    "nama_item": "Mesin CNC Turning (Mesin Bubut Otomatis Presisi)",
+    "slug": "mesin-cnc-turning-presisi",
+    "prodi_code": "D4-TRM",
+    "category_id": 2,
+    "tagline": "Solusi Pembubutan Silindris Otomatis Skala Industri dengan Akurasi Repetisi Tinggi",
+    "deskripsi_singkat": "Mesin bubut otomatis presisi untuk membentuk benda kerja silindris dengan repetisi tinggi dan toleransi mikro.",
+    "deskripsi_lengkap": "Inovasi Mesin CNC Turning merupakan solusi presisi untuk mengoptimalkan efisiensi proses manufaktur modern. Mesin ini dirancang khusus untuk membentuk benda kerja silindris melalui proses pembubutan otomatis dengan akurasi dan repetisi yang sangat tinggi.\n\nBerkat sistem kontrol otomatis yang stabil, mesin ini sangat ideal untuk memproduksi berbagai komponen rumit secara konsisten dan efisien dalam skala produksi massal industri otomotif, permesinan presisi, dan komponen medis.",
+    "thumbnail_url": "/images/catalog/pdf_img_p7_0_453.png",
+    "gallery": [
+      "/images/catalog/pdf_img_p7_0_453.png"
+    ],
+    "harga_tipe": "starting_at",
+    "harga_nominal": 65000000,
+    "live_demo_url": null,
+    "pic_nama": "Tim Rekayasa Mesin Perkakas TRM",
+    "pic_kontak": "6281234567805",
+    "pic_laboratorium": "Lab Otomasi Manufaktur SV UNS",
+    "specs": [
+      {
+        "group_name": "Spesifikasi",
+        "spec_key": "Tipe Kerja",
+        "spec_value": "Turning Lathe Otomatis 2-Axis"
+      },
+      {
+        "group_name": "Presisi",
+        "spec_key": "Repeatability",
+        "spec_value": "±0.005 mm"
+      },
+      {
+        "group_name": "Material",
+        "spec_key": "Kesesuaian Material",
+        "spec_value": "Baja Karbon, Stainless Steel, Aluminium, Kuningan"
+      },
+      {
+        "group_name": "Kapasitas",
+        "spec_key": "Maksimal Diameter Kerja",
+        "spec_value": "Up to 250 mm"
+      }
+    ]
+  },
+  {
+    "nama_item": "MOFIN UMKM (Modern Finance) - Sistem Informasi Akuntansi & Keuangan",
+    "slug": "mofin-umkm-akuntansi-keuangan-web",
+    "prodi_code": "D3-AKT-MDN",
+    "category_id": 1,
+    "tagline": "Platform Keuangan Digital Standarisasi Pembukuan UMKM Transparan & Real-Time",
+    "deskripsi_singkat": "Platform keuangan digital untuk menstandarisasi pembukuan UMKM secara otomatis, akurat, dan transparan terhubung pengawas Pemda.",
+    "deskripsi_lengkap": "Platform keuangan digital untuk menstandarisasi pembukuan UMKM secara otomatis, akurat, dan transparan. Sistem ini mempermudah pemerintah daerah dan pembina UMKM dalam mengawasi transaksi usaha lokal secara langsung.\n\nMOFIN UMKM menghasilkan laporan keuangan berstandar SAK EMKM lengkap: Laporan Laba Rugi, Posisi Keuangan, Arus Kas, dan Catatan Atas Laporan Keuangan secara instan.",
+    "thumbnail_url": "/images/catalog/pdf_img_p9_0_848.png",
+    "gallery": [
+      "/images/catalog/pdf_img_p9_0_848.png"
+    ],
+    "harga_tipe": "starting_at",
+    "harga_nominal": 3000000,
+    "live_demo_url": "https://katalog.unsmadiun.id",
+    "pic_nama": "Tim Riset Terapan D3 Akuntansi Madiun",
+    "pic_kontak": "6281234567801",
+    "pic_laboratorium": "Lab Komputerisasi Akuntansi SV UNS",
+    "specs": [
+      {
+        "group_name": "Standar",
+        "spec_key": "Standar Akuntansi",
+        "spec_value": "SAK EMKM (Entitas Mikro, Kecil, dan Menengah)"
+      },
+      {
+        "group_name": "Fitur",
+        "spec_key": "Pelaporan",
+        "spec_value": "Laba Rugi, Neraca, Buku Besar, Jurnal Otomatis"
+      },
+      {
+        "group_name": "Integrasi",
+        "spec_key": "Modul Pemda",
+        "spec_value": "Dashboard agregasi pembinaan Dinas Koperasi & UMKM"
+      }
+    ]
+  },
+  {
+    "nama_item": "RINTISKU.ID (Software ERP Cloud UMKM & Startup)",
+    "slug": "rintisku-id-software-erp-cloud",
+    "prodi_code": "D3-TIF",
+    "category_id": 1,
+    "tagline": "Kendalikan Bisnis Tanpa Batas dengan Solusi ERP Cloud Terpadu",
+    "deskripsi_singkat": "Solusi ERP all-in-one berbasis cloud yang mengintegrasikan rantai pasok logistik, SDM, penggajian, kalkulasi HPP, dan faktur penjualan.",
+    "deskripsi_lengkap": "Solusi ERP all-in-one berbasis cloud yang mengintegrasikan rantai pasok logistik, manajemen SDM, penggajian, kalkulasi HPP produksi, dan faktur penjualan dalam satu dashboard modern.\n\nDirancang untuk mengakselerasi transformasi digital industri manufaktur kecil, rintisan bisnis mahasiswa, dan UMKM berkembang.",
+    "thumbnail_url": "/images/catalog/pdf_img_p9_1_851.png",
+    "gallery": [
+      "/images/catalog/pdf_img_p9_1_851.png"
+    ],
+    "harga_tipe": "starting_at",
+    "harga_nominal": 5000000,
+    "live_demo_url": "https://rintisku-demo.vokasi.uns.ac.id",
+    "pic_nama": "Studio Software Engineering D3 TIF",
+    "pic_kontak": "6281234567890",
+    "pic_laboratorium": "Lab Rekayasa Perangkat Lunak SV UNS",
+    "specs": [
+      {
+        "group_name": "Modul",
+        "spec_key": "Rantai Pasok & Inventory",
+        "spec_value": "Multi-Warehouse & Barcode Scanner Tracking"
+      },
+      {
+        "group_name": "Modul",
+        "spec_key": "Keuangan & HPP",
+        "spec_value": "Kalkulasi HPP Real-time & e-Invoicing"
+      },
+      {
+        "group_name": "Modul",
+        "spec_key": "SDM & Payroll",
+        "spec_value": "Presensi GPS & Slip Gaji Otomatis"
+      }
+    ]
+  },
+  {
+    "nama_item": "E-Marketplace UMKM Kelurahan",
+    "slug": "e-marketplace-umkm-kelurahan",
+    "prodi_code": "D3-TIF",
+    "category_id": 1,
+    "tagline": "Platform Perdagangan Digital Hiperlokal Tingkat Kelurahan",
+    "deskripsi_singkat": "Sistem marketplace yang fokus pada digitalisasi produk UMKM pada suatu wilayah kelurahan secara mandiri.",
+    "deskripsi_lengkap": "Sistem marketplace yang fokus pada promosi dan transaksi UMKM pada suatu wilayah kelurahan. Menghubungkan langsung warga kelurahan dengan produsen lokal, mendukung ekosistem belanja lokal (buy local), serta memudahkan pendataan potensi ekonomi kawasan.",
+    "thumbnail_url": "/images/catalog/pdf_img_p10_0_858.png",
+    "gallery": [
+      "/images/catalog/pdf_img_p10_0_858.png"
+    ],
+    "harga_tipe": "starting_at",
+    "harga_nominal": 4000000,
+    "live_demo_url": "https://katalog.unsmadiun.id",
+    "pic_nama": "Tim Pengabdian IT Vokasi UNS",
+    "pic_kontak": "6281234567890",
+    "pic_laboratorium": "Lab Rekayasa Web & Komputasi Awan",
+    "specs": [
+      {
+        "group_name": "Kategori",
+        "spec_key": "Cakupan",
+        "spec_value": "Hyperlocal Kelurahan & Desa"
+      },
+      {
+        "group_name": "Fitur",
+        "spec_key": "Pembayaran & Logistik",
+        "spec_value": "COD & Integrasi Payment Gateway QRIS"
+      },
+      {
+        "group_name": "Admin",
+        "spec_key": "Manajemen",
+        "spec_value": "Multi-Merchant Dashboard untuk Pengurus RW/Kelurahan"
+      }
+    ]
+  },
+  {
+    "nama_item": "Sistem Tiket Terpadu Museum Tahir Foundation",
+    "slug": "sistem-tiket-museum-tahir-foundation",
+    "prodi_code": "D3-TIF",
+    "category_id": 1,
+    "tagline": "Sistem Ticketing & Manajemen Pengunjung Wisata Edukasi Berbasis QR Code",
+    "deskripsi_singkat": "Sistem yang mengatur penjualan tiket masuk dan manajemen kuota pengunjung pada Museum Tahir Foundation.",
+    "deskripsi_lengkap": "Sistem yang mengatur penjualan tiket masuk pada museum Tahir Foundation secara daring dan luring. Terintegrasi dengan turnstile gate barrier otomatis, scanner QR code instan, dan modul analitik arus pengunjung harian untuk optimalisasi kenyamanan destinasi budaya.",
+    "thumbnail_url": "/images/catalog/pdf_img_p10_2_864.png",
+    "gallery": [
+      "/images/catalog/pdf_img_p10_2_864.png"
+    ],
+    "harga_tipe": "contact_us",
+    "harga_nominal": 0,
+    "live_demo_url": "https://katalog.unsmadiun.id",
+    "pic_nama": "Tim Implementasi Industri D3 TIF",
+    "pic_kontak": "6281234567890",
+    "pic_laboratorium": "Studio Digital Terapan Vokasi",
+    "specs": [
+      {
+        "group_name": "Fitur",
+        "spec_key": "Validasi",
+        "spec_value": "QR Code Scanner Barrier Gate Integration"
+      },
+      {
+        "group_name": "Kapasitas",
+        "spec_key": "Throughput",
+        "spec_value": "Dukungan hingga ribuan transaksi tiket per hari"
+      },
+      {
+        "group_name": "Laporan",
+        "spec_key": "Statistik Pengunjung",
+        "spec_value": "Rekapitulasi demografi & jam sibuk pengunjung"
+      }
+    ]
+  },
+  {
+    "nama_item": "SIM Bank Sampah untuk Rakyat",
+    "slug": "sim-bank-sampah-untuk-rakyat",
+    "prodi_code": "D3-TIF",
+    "category_id": 1,
+    "tagline": "Digitalisasi Tabungan Sampah, Konversi Saldo & Sirkular Ekonomi Warga",
+    "deskripsi_singkat": "Sistem Informasi Manajemen Bank Sampah untuk digitalisasi penimbangan, saldo nasabah, dan logistik daur ulang.",
+    "deskripsi_lengkap": "Sistem Informasi Manajemen Bank Sampah untuk Rakyat yang dikembangkan untuk mempercepat pengelolaan sirkular ekonomi lingkungan. Mengelola pendaftaran nasabah warga, pencatatan timbangan sampah terpilah per kategori, konversi nominal saldo, serta integrasi penjualan ke pengepul daur ulang secara akuntabel.",
+    "thumbnail_url": "/images/catalog/pdf_img_p10_3_867.png",
+    "gallery": [
+      "/images/catalog/pdf_img_p10_3_867.png"
+    ],
+    "harga_tipe": "starting_at",
+    "harga_nominal": 3500000,
+    "live_demo_url": "https://katalog.unsmadiun.id",
+    "pic_nama": "Tim Smart Environment D3 TIF",
+    "pic_kontak": "6281234567890",
+    "pic_laboratorium": "Lab Sistem Informasi Komunitas SV UNS",
+    "specs": [
+      {
+        "group_name": "Fungsi",
+        "spec_key": "Kategori Sampah",
+        "spec_value": "Organik, Anorganik, Logam, Kertas, Plastik"
+      },
+      {
+        "group_name": "Akuntansi",
+        "spec_key": "Buku Tabungan",
+        "spec_value": "Buku Tabungan Digital Nasabah via Mobile/Web"
+      },
+      {
+        "group_name": "Dampak",
+        "spec_key": "Target Pengguna",
+        "spec_value": "Pengurus Bank Sampah RW, Desa, dan Komunitas Penggiat"
+      }
+    ]
+  },
+  {
+    "nama_item": "Sistem Digitalisasi Adminduk & Pencatatan Sipil",
+    "slug": "sistem-digitalisasi-adminduk-pencatatan-sipil",
+    "prodi_code": "D3-TIF",
+    "category_id": 1,
+    "tagline": "Transformasi Layanan Administrasi Kependudukan Terstruktur Bebas Spreadsheet",
+    "deskripsi_singkat": "Sistem internal digitalisasi layanan administrasi pencatatan sipil dan pendaftaran penduduk terstruktur dan mudah dipantau.",
+    "deskripsi_lengkap": "Sistem internal yang dikembangkan untuk mendigitalisasi pencatatan layanan pada administrasi pencatatan sipil dan pendaftaran penduduk. Sistem ini menjadi solusi atas pengelolaan data berbasis spreadsheet agar proses pencatatan lebih terstruktur, efisien, aman, dan mudah dipantau oleh aparatur pemerintahan setempat.",
+    "thumbnail_url": "/images/catalog/pdf_img_p11_0_480.png",
+    "gallery": [
+      "/images/catalog/pdf_img_p11_0_480.png"
+    ],
+    "harga_tipe": "starting_at",
+    "harga_nominal": 6000000,
+    "live_demo_url": "https://katalog.unsmadiun.id",
+    "pic_nama": "Divisi E-Government D3 TIF UNS",
+    "pic_kontak": "6281234567890",
+    "pic_laboratorium": "Lab Tata Kelola Data & Keamanan Informasi",
+    "specs": [
+      {
+        "group_name": "Layanan",
+        "spec_key": "Modul Layanan",
+        "spec_value": "Surat Keterangan Domisili, Kelahiran, Kematian, Pindah"
+      },
+      {
+        "group_name": "Keamanan",
+        "spec_key": "Hak Akses",
+        "spec_value": "RBAC (Admin Desa, Operator Loket, Kepala Desa Validasi TTE)"
+      },
+      {
+        "group_name": "Database",
+        "spec_key": "Struktur Data",
+        "spec_value": "Relational MySQL dengan Audit Trail Aktivitas"
+      }
+    ]
+  },
+  {
+    "nama_item": "Sistem Otomasi Data Survei Rule-Based (Root-Roster)",
+    "slug": "sistem-otomasi-data-survei-rule-based",
+    "prodi_code": "D3-TIF",
+    "category_id": 1,
+    "tagline": "Otomasi Transformasi, Integrasi, & Data Cleaning Survei Hierarkis Cepat",
+    "deskripsi_singkat": "Sistem otomasi data survei berbasis aturan yang mendukung modul integrasi, transformasi, dan pembersihan data survei hierarkis Root-Roster.",
+    "deskripsi_lengkap": "Sistem otomasi data survei berbasis aturan (rule-based system) yang mendukung modul integrasi, transformasi, dan pembersihan data survei berstruktur hierarkis Root-Roster secara lebih cepat, akurat, dan terstruktur.\n\nMeminimalkan kesalahan manusia dalam pemrosesan data sensus dan survei lapangan berskala masif.",
+    "thumbnail_url": "/images/catalog/pdf_img_p11_1_481.png",
+    "gallery": [
+      "/images/catalog/pdf_img_p11_1_481.png"
+    ],
+    "harga_tipe": "starting_at",
+    "harga_nominal": 7500000,
+    "live_demo_url": "https://katalog.unsmadiun.id",
+    "pic_nama": "Tim Sains Data Terapan Vokasi",
+    "pic_kontak": "6281234567890",
+    "pic_laboratorium": "Lab Data Science & Kecerdasan Artifisial",
+    "specs": [
+      {
+        "group_name": "Algoritma",
+        "spec_key": "Rule Engine",
+        "spec_value": "Rule-Based Logic Pipeline untuk Hierarki Root-Roster"
+      },
+      {
+        "group_name": "Format",
+        "spec_key": "Dukungan Format",
+        "spec_value": "CSV, XLSX, Stata (DTA), SPSS (SAV)"
+      },
+      {
+        "group_name": "Efisiensi",
+        "spec_key": "Kecepatan",
+        "spec_value": "Pembersihan 50.000+ baris data survei dalam hitungan menit"
+      }
+    ]
+  },
+  {
+    "nama_item": "Smart Pest Control System (IoT Pembasmi & Pemantau Hama Pertanian)",
+    "slug": "smart-pest-control-iot-pertanian",
+    "prodi_code": "D3-TIF",
+    "category_id": 2,
+    "tagline": "Inovasi Smart Farming IoT untuk Deteksi Dini & Pengendalian Serangan Hama Otomatis",
+    "deskripsi_singkat": "Inovasi pertanian pintar berbasis IoT yang mendeteksi dan mengendalikan hama tanaman secara otomatis untuk produktivitas pangan.",
+    "deskripsi_lengkap": "Smart Pest Control System merupakan inovasi pertanian pintar (smart farming) berbasis IoT hasil rancangan D3 Teknik Informatika SV UNS yang berfungsi mendeteksi serta mengendalikan serangan hama tanaman secara otomatis dan efisien demi meningkatkan produktivitas pangan lokal.\n\nDilengkapi dengan lampu pemikat ultraviolet frekuensi khusus, jaring perangkap elektrik terkendali, dan sensor telemetry kelembapan udara.",
+    "thumbnail_url": "/images/catalog/pdf_img_p11_2_482.png",
+    "gallery": [
+      "/images/catalog/pdf_img_p11_2_482.png"
+    ],
+    "harga_tipe": "starting_at",
+    "harga_nominal": 4200000,
+    "live_demo_url": null,
+    "pic_nama": "Tim IoT Embedded TIF UNS",
+    "pic_kontak": "6281234567890",
+    "pic_laboratorium": "Lab IoT & Mikrokontroler SV UNS",
+    "specs": [
+      {
+        "group_name": "Hardware",
+        "spec_key": "Mikrokontroler",
+        "spec_value": "ESP32 dengan Panel Surya Mandiri (Solar Powered)"
+      },
+      {
+        "group_name": "Aktuator",
+        "spec_key": "Perangkap",
+        "spec_value": "Dual-Band UV Trap & Solar-powered Electric Discharger"
+      },
+      {
+        "group_name": "Konektivitas",
+        "spec_key": "Jaringan",
+        "spec_value": "LoRa & GSM Telemetry"
+      }
+    ]
+  },
+  {
+    "nama_item": "PICO Natural Magic Oil (Blue Spirulina Anti-Acne & UV Shield)",
+    "slug": "pico-natural-magic-oil-blue-spirulina",
+    "prodi_code": "D3-FAR",
+    "category_id": 2,
+    "tagline": "Kombinasi Alami Spirulina Kaya Antioksidan & Tamanu Oil dengan Proteksi UV SPF 6-14",
+    "deskripsi_singkat": "Serum minyak alami kaya antioksidan dan perlindungan UV alami untuk merawat kulit berjerawat dan mencerahkan wajah.",
+    "deskripsi_lengkap": "Kombinasi alami spirulina kaya antioksidan dan tamanu oil yang memiliki proteksi UV alami (SPF 6-14). Berfungsi merawat kulit berjerawat, menangkal radikal bebas, serta mencerahkan wajah tanpa memicu iritasi.\n\nDiproduksi melalui standar CPKB (Cara Pembuatan Kosmetika yang Baik) di bawah bimbingan apoteker dan dosen farmasi Sekolah Vokasi UNS.",
+    "thumbnail_url": "/images/catalog/pdf_img_p12_0_490.png",
+    "gallery": [
+      "/images/catalog/pdf_img_p12_0_490.png"
+    ],
+    "harga_tipe": "fixed",
+    "harga_nominal": 65000,
+    "live_demo_url": null,
+    "pic_nama": "Teaching Factory Farmasi Terapan SV UNS",
+    "pic_kontak": "6281234567810",
+    "pic_laboratorium": "Lab Formulasi Kosmetika & Bahan Alam D3 Farmasi",
+    "specs": [
+      {
+        "group_name": "Komposisi",
+        "spec_key": "Bahan Utama",
+        "spec_value": "Blue Spirulina Extract, Cold-Pressed Tamanu Oil, Vitamin E"
+      },
+      {
+        "group_name": "Indikasi",
+        "spec_key": "Manfaat Kulit",
+        "spec_value": "Anti-Acne, Antioksidan Tinggi, Proteksi Sinar UV Alami"
+      },
+      {
+        "group_name": "Kemasan",
+        "spec_key": "Volume",
+        "spec_value": "Botol Pipet Dropper Kaca Gelap 20 ml"
+      }
+    ]
+  },
+  {
+    "nama_item": "Herbliss Purple Breeze (Minuman Relaksasi Botanical)",
+    "slug": "herbliss-purple-breeze",
+    "prodi_code": "D3-FAR",
+    "category_id": 2,
+    "tagline": "Minuman Relaksasi Botanical Lokal Detoksifikasi Alami Tubuh & Pereda Stres",
+    "deskripsi_singkat": "Minuman relaksasi botanical berbahan bunga telang dan sereh lokal untuk detoksifikasi alami dan daya tahan tubuh.",
+    "deskripsi_lengkap": "Herbliss Purple Breeze adalah minuman relaksasi berbahan botanical lokal untuk detoksifikasi alami tubuh, membantu meningkatkan daya tahan tubuh, serta meredakan stres harian lewat aroma sereh yang menenangkan dan visual alami bunga telang yang menawan.",
+    "thumbnail_url": "/images/catalog/pdf_img_p12_1_491.png",
+    "gallery": [
+      "/images/catalog/pdf_img_p12_1_491.png"
+    ],
+    "harga_tipe": "fixed",
+    "harga_nominal": 25000,
+    "live_demo_url": null,
+    "pic_nama": "Tim Riset Herbal D3 Farmasi",
+    "pic_kontak": "6281234567810",
+    "pic_laboratorium": "Lab Farmakognosi & Fitokimia",
+    "specs": [
+      {
+        "group_name": "Komposisi",
+        "spec_key": "Bahan Aktif",
+        "spec_value": "Clitoria Ternatea (Bunga Telang), Cymbopogon (Sereh), Madu Hutan"
+      },
+      {
+        "group_name": "Khasiat",
+        "spec_key": "Manfaat",
+        "spec_value": "Calming Sensation, Kaya Antosianin, Detoks Alami"
+      },
+      {
+        "group_name": "Kemasan",
+        "spec_key": "Isi Bersih",
+        "spec_value": "Botol Siap Minum 250 ml / Tea Bag Box"
+      }
+    ]
+  },
+  {
+    "nama_item": "Ellevacare Oil (Minyak Balur Aromaterapi Relaksasi Otot)",
+    "slug": "ellevacare-oil-aromaterapi",
+    "prodi_code": "D3-FAR",
+    "category_id": 2,
+    "tagline": "Minyak Balur Herbal Multifungsi Menghangatkan Tubuh & Meredakan Pegal",
+    "deskripsi_singkat": "Minyak balur herbal multifungsi dengan sensasi aromaterapi menenangkan untuk menghangatkan tubuh dan meredakan pegal.",
+    "deskripsi_lengkap": "Minyak balur herbal multifungsi dengan sensasi aromaterapi menenangkan. Cocok untuk menghangatkan tubuh, meredakan pegal linu, melancarkan peredaran darah perifer, serta memberikan efek relaksasi otot mendalam setelah aktivitas fisik berat.",
+    "thumbnail_url": "/images/catalog/pdf_img_p12_2_492.png",
+    "gallery": [
+      "/images/catalog/pdf_img_p12_2_492.png"
+    ],
+    "harga_tipe": "fixed",
+    "harga_nominal": 45000,
+    "live_demo_url": null,
+    "pic_nama": "Tim Riset Farmasi Bahan Alam UNS",
+    "pic_kontak": "6281234567810",
+    "pic_laboratorium": "Lab Galenika & Teknologi Farmasi D3 Farmasi",
+    "specs": [
+      {
+        "group_name": "Bahan",
+        "spec_key": "Kandungan",
+        "spec_value": "Oleum Cajuputi, Minyak Adas, Peppermint Oil, Virgin Coconut Oil"
+      },
+      {
+        "group_name": "Sensasi",
+        "spec_key": "Efek Hangat",
+        "spec_value": "Hangat Lembut Tidak Lengket di Kulit"
+      },
+      {
+        "group_name": "Ukuran",
+        "spec_key": "Kemasan",
+        "spec_value": "Botol Roll-On / Flip Top 60 ml"
+      }
+    ]
+  },
+  {
+    "nama_item": "Tablet Effervescent Ekstrak Jahe & Kunyit (Antihiperlipidemia)",
+    "slug": "tablet-effervescent-jahe-kunyit",
+    "prodi_code": "D3-FAR",
+    "category_id": 2,
+    "tagline": "Formulasi Herbal Modern Cepat Larut Menjaga Kebugaran Kardiovaskular",
+    "deskripsi_singkat": "Formulasi tablet larut air praktis dari ekstrak rimpang jahe dan kunyit terstandar untuk membantu menjaga kadar lipid darah.",
+    "deskripsi_lengkap": "Formulasi herbal modern teruji laboratorium yang praktis diseduh. Memberikan rasa segar alami tanpa endapan sekaligus mendukung kebugaran kardiovaskular secara berkelanjutan lewat aksi kurkuminoid dan gingerol terstandarisasi.",
+    "thumbnail_url": "/images/catalog/pdf_img_p12_3_881.png",
+    "gallery": [
+      "/images/catalog/pdf_img_p12_3_881.png"
+    ],
+    "harga_tipe": "fixed",
+    "harga_nominal": 55000,
+    "live_demo_url": null,
+    "pic_nama": "Laboratorium Farmasetika & Teknologi Sediaan Padat",
+    "pic_kontak": "6281234567810",
+    "pic_laboratorium": "Lab Formulasi Solid D3 Farmasi",
+    "specs": [
+      {
+        "group_name": "Bentuk",
+        "spec_key": "Sediaan",
+        "spec_value": "Tablet Effervescent Larut Cepat (< 2 Menit)"
+      },
+      {
+        "group_name": "Ekstrak",
+        "spec_key": "Bahan Aktif",
+        "spec_value": "Ekstrak Temulawak / Kunyit (Curcuminoid) & Jahe Merah"
+      },
+      {
+        "group_name": "Kemasan",
+        "spec_key": "Isi per Tube",
+        "spec_value": "Tube Kedap Udara isi 10 Tablet"
+      }
+    ]
+  },
+  {
+    "nama_item": "Suplemen Kapsul Herbal SEHATI (Herbal Curcuma & Pegagan)",
+    "slug": "suplemen-kapsul-herbal-sehati",
+    "prodi_code": "D3-FAR",
+    "category_id": 2,
+    "tagline": "Ramuan Fitofarmaka Lokal Peningkat Imunitas & Konsentrasi Kognitif",
+    "deskripsi_singkat": "Kapsul herbal ekstrak curcuma dan pegagan untuk daya tahan tubuh, konsentrasi, dan pemulihan stamina harian.",
+    "deskripsi_lengkap": "Ramuan fitofarmaka lokal untuk membantu memelihara daya tahan tubuh, meningkatkan konsentrasi kognitif, dan mempercepat pemulihan stamina tubuh harian. Formulasi sinergis antara asiatikosida pegagan dan antioksidan temulawak.",
+    "thumbnail_url": "/images/catalog/pdf_img_p12_4_884.png",
+    "gallery": [
+      "/images/catalog/pdf_img_p12_4_884.png"
+    ],
+    "harga_tipe": "fixed",
+    "harga_nominal": 60000,
+    "live_demo_url": null,
+    "pic_nama": "Teaching Factory Farmasi SV UNS",
+    "pic_kontak": "6281234567810",
+    "pic_laboratorium": "Lab Farmasi Bahan Alam UNS",
+    "specs": [
+      {
+        "group_name": "Komposisi",
+        "spec_key": "Ekstrak Terstandar",
+        "spec_value": "Centella Asiatica (Pegagan) & Curcuma Xanthorrhiza"
+      },
+      {
+        "group_name": "Dosis",
+        "spec_key": "Aturan Pakai",
+        "spec_value": "2 x 1 Kapsul Sehari Sesudah Makan"
+      },
+      {
+        "group_name": "Kemasan",
+        "spec_key": "Botol",
+        "spec_value": "Botol Plastik Farmasi 30 Kapsul"
+      }
+    ]
+  },
+  {
+    "nama_item": "Beras Premium Prima (Sistem Tanam Presisi Jajar Legowo 5 Kg)",
+    "slug": "beras-premium-prima-jajar-legowo",
+    "prodi_code": "D3-AGR",
+    "category_id": 2,
+    "tagline": "Beras Ciherang Pulen & Bergizi Hasil Teaching Factory Agribisnis SV UNS",
+    "deskripsi_singkat": "Beras berkualitas hasil hilirisasi riset terapan budidaya presisi Jajar Legowo Klaten kemasan higienis 5 kg.",
+    "deskripsi_lengkap": "Beras Premium Prima merupakan beras berkualitas hasil hilirisasi riset terapan dan praktik budi daya Teaching Factory Program Studi D3 Agribisnis Sekolah Vokasi UNS. Dihasilkan dari varietas padi Ciherang unggulan dengan penerapan sistem tanam presisi Jajar Legowo di lahan pertanian Klaten.\n\nDiproses dan dikemas secara higienis dalam ukuran praktis 5 kg untuk menghadirkan nasi pulen dan bergizi di meja makan Anda.",
+    "thumbnail_url": "/images/catalog/pdf_img_p13_0_498.png",
+    "gallery": [
+      "/images/catalog/pdf_img_p13_0_498.png"
+    ],
+    "harga_tipe": "fixed",
+    "harga_nominal": 75000,
+    "live_demo_url": null,
+    "pic_nama": "Teaching Factory D3 Agribisnis SV UNS",
+    "pic_kontak": "6281234567812",
+    "pic_laboratorium": "Lahan Praktik & Sentra Agribisnis Klaten",
+    "specs": [
+      {
+        "group_name": "Karakteristik",
+        "spec_key": "Varietas Padi",
+        "spec_value": "Ciherang Pilihan Berkualitas Tinggi"
+      },
+      {
+        "group_name": "Budidaya",
+        "spec_key": "Metode Tanam",
+        "spec_value": "Presisi Jajar Legowo 2:1"
+      },
+      {
+        "group_name": "Kualitas",
+        "spec_key": "Derajat Sosoh",
+        "spec_value": "95% Bebas Pemutih & Pengawet Kimia"
+      },
+      {
+        "group_name": "Kemasan",
+        "spec_key": "Berat Bersih",
+        "spec_value": "Karung Higienis 5 Kg"
+      }
+    ]
+  },
+  {
+    "nama_item": "VOOKIES (Cookies Bergizi Olahan Biji Nangka)",
+    "slug": "vookies-cookies-biji-nangka",
+    "prodi_code": "D3-KEB",
+    "category_id": 2,
+    "tagline": "Inovasi Camilan Padat Mikronutrien Pencegah Anemia Remaja & Ibu Hamil",
+    "deskripsi_singkat": "Inovasi kukis renyah berbahan dasar olahan biji nangka kaya kalsium dan zat besi untuk kesehatan ibu dan remaja.",
+    "deskripsi_lengkap": "Inovasi kukis renyah bergizi berbahan dasar olahan biji nangka yang kaya nutrisi. Diformulasikan khusus sebagai camilan sehat padat mikronutrien, sangat baik untuk mendukung pemenuhan kalsium harian serta membantu pencegahan anemia pada remaja putri maupun ibu hamil.",
+    "thumbnail_url": "/images/catalog/pdf_img_p14_0_504.png",
+    "gallery": [
+      "/images/catalog/pdf_img_p14_0_504.png"
+    ],
+    "harga_tipe": "fixed",
+    "harga_nominal": 20000,
+    "live_demo_url": null,
+    "pic_nama": "Tim Riset Gizi D3 Kebidanan SV UNS",
+    "pic_kontak": "6281234567815",
+    "pic_laboratorium": "Laboratorium Praktik Asuhan Gizi Kebidanan",
+    "specs": [
+      {
+        "group_name": "Bahan",
+        "spec_key": "Tepung Alternatif",
+        "spec_value": "Tepung Biji Nangka Terfermentasi Higienis"
+      },
+      {
+        "group_name": "Nutrisi",
+        "spec_key": "Keunggulan Nutrisi",
+        "spec_value": "Tinggi Zat Besi (Fe), Kalsium, & Serat Pangan"
+      },
+      {
+        "group_name": "Kemasan",
+        "spec_key": "Netto",
+        "spec_value": "Pouch Papper Stand-up 120 gram"
+      }
+    ]
+  },
+  {
+    "nama_item": "SNAZZLE (Serundeng Biji Nangka Balado Gurih)",
+    "slug": "snazzle-serundeng-biji-nangka",
+    "prodi_code": "D3-KEB",
+    "category_id": 2,
+    "tagline": "Lauk Sehat Gurih Renyah Hasil Diversifikasi Limbah Pangan Kaya Zat Besi",
+    "deskripsi_singkat": "Alternatif lauk serundeng gurih dan renyah hasil diversifikasi limbah pangan lokal biji nangka berbalut balado.",
+    "deskripsi_lengkap": "Alternatif lauk serundeng gurih dan renyah hasil diversifikasi limbah pangan lokal (biji nangka). Menghadirkan perpaduan rasa balado yang sedap sekaligus menjadi sumber asupan zat besi alami untuk melengkapi kebutuhan gizi keluarga sehari-hari.",
+    "thumbnail_url": "/images/catalog/pdf_img_p14_1_505.png",
+    "gallery": [
+      "/images/catalog/pdf_img_p14_1_505.png"
+    ],
+    "harga_tipe": "fixed",
+    "harga_nominal": 18000,
+    "live_demo_url": null,
+    "pic_nama": "Tim Inovasi Nutrisi D3 Kebidanan",
+    "pic_kontak": "6281234567815",
+    "pic_laboratorium": "Lab Gizi Terapan Kebidanan",
+    "specs": [
+      {
+        "group_name": "Varian",
+        "spec_key": "Cita Rasa",
+        "spec_value": "Balado Manis Gurih Renyah"
+      },
+      {
+        "group_name": "Kandungan",
+        "spec_key": "Kelebihan",
+        "spec_value": "Sumber Asupan Zat Besi & Bebas Kolesterol Jahat"
+      },
+      {
+        "group_name": "Kemasan",
+        "spec_key": "Isi",
+        "spec_value": "Toples Jar Kedap Udara 100 gram"
+      }
+    ]
+  },
+  {
+    "nama_item": "Jahe Latte UmZa (Minuman Kebugaran Jahe Rempah Modern)",
+    "slug": "jahe-latte-umza",
+    "prodi_code": "D3-KEB",
+    "category_id": 2,
+    "tagline": "Kehangatan Jahe Alami, Serai, Pandan & Krimer Nabati Legit Pereda Mual",
+    "deskripsi_singkat": "Minuman kebugaran tradisional sentuhan rasa modern untuk meredakan mual, melancarkan sirkulasi darah dan imun.",
+    "deskripsi_lengkap": "Minuman kebugaran tradisional dengan sentuhan rasa modern. Menghadirkan kehangatan jahe alami, wangi serai-pandan, serta kelembutan krimer nabati yang manis legit. Bermanfaat untuk meredakan mual bagi ibu hamil trimester pertama, melancarkan sirkulasi darah, menghangatkan tubuh, dan menjaga imunitas harian.",
+    "thumbnail_url": "/images/catalog/pdf_img_p14_2_506.png",
+    "gallery": [
+      "/images/catalog/pdf_img_p14_2_506.png"
+    ],
+    "harga_tipe": "fixed",
+    "harga_nominal": 22000,
+    "live_demo_url": null,
+    "pic_nama": "Unit Produksi Asuhan Holistik D3 Kebidanan",
+    "pic_kontak": "6281234567815",
+    "pic_laboratorium": "Lab Holistik Herbal Kebidanan",
+    "specs": [
+      {
+        "group_name": "Komposisi",
+        "spec_key": "Rempah",
+        "spec_value": "Jahe Emprit, Ekstrak Pandan, Serai Wangi, Krimer Nabati"
+      },
+      {
+        "group_name": "Khasiat",
+        "spec_key": "Kesehatan",
+        "spec_value": "Anti-Emetik (Anti-Mual), Relaksasi, Imunomodulator"
+      },
+      {
+        "group_name": "Sajian",
+        "spec_key": "Kemasan",
+        "spec_value": "Sachet Siap Seduh (5 sachet @25g per box)"
+      }
+    ]
+  },
+  {
+    "nama_item": "Produksi Film Animasi Maskot Kota Solo \"RAJAMALA\"",
+    "slug": "produksi-film-animasi-rajamala",
+    "prodi_code": "D4-DMD",
+    "category_id": 2,
+    "tagline": "Film Animasi Tematik Kearifan Lokal Canthik Rajamala Surakarta",
+    "deskripsi_singkat": "Produksi film animasi tematik mengangkat kearifan lokal maskot budaya Surakarta Canthik Rajamala.",
+    "deskripsi_lengkap": "Produksi film animasi tematik yang mengangkat kearifan lokal maskot budaya Surakarta, Canthik Rajamala. Dikerjakan oleh studio animasi SV UNS sebagai media edukasi publik, promosi pariwisata daerah, serta hiburan keluarga nusantara berstandar sinematik tinggi.",
+    "thumbnail_url": "/images/catalog/pdf_img_p15_0_511.png",
+    "gallery": [
+      "/images/catalog/pdf_img_p15_0_511.png"
+    ],
+    "harga_tipe": "contact_us",
+    "harga_nominal": 0,
+    "live_demo_url": "https://katalog.unsmadiun.id",
+    "pic_nama": "Studio Animasi & Multimedia DMD SV UNS",
+    "pic_kontak": "6281234567818",
+    "pic_laboratorium": "Studio Digital Media & Render Farm Vokasi",
+    "specs": [
+      {
+        "group_name": "Format",
+        "spec_key": "Kualitas Render",
+        "spec_value": "4K UHD Digital Animation 24fps"
+      },
+      {
+        "group_name": "Pipeline",
+        "spec_key": "Software Tools",
+        "spec_value": "Blender 3D, Maya, Adobe After Effects"
+      },
+      {
+        "group_name": "Karya",
+        "spec_key": "Hak Cipta",
+        "spec_value": "HAKI Terdaftar Kementerian Hukum & HAM RI"
+      }
+    ]
+  },
+  {
+    "nama_item": "Mixed Hydroxide Precipitate (MHP) Powder",
+    "slug": "mixed-hydroxide-precipitate-mhp-powder",
+    "prodi_code": "D3-TKIM",
+    "category_id": 2,
+    "tagline": "Material Presipitasi Kimia untuk Bahan Baku Baterai, Katalis & Pigmen Industri",
+    "deskripsi_singkat": "Material campuran hidroksida logam hasil proses presipitasi kimia untuk bahan baku baterai dan elektroplating.",
+    "deskripsi_lengkap": "Mixed Hydroxide Precipitate (MHP) Powder adalah material yang terdiri dari campuran hidroksida logam yang dihasilkan melalui proses presipitasi kimia terpadu. Produk ini digunakan dalam berbagai aplikasi sebagai bahan baku prekursor baterai kendaraan listrik (EV Battery), katalis kimia, pigmen industri, dan pelapisan elektroplating.",
+    "thumbnail_url": "/images/catalog/pdf_img_p16_0_516.png",
+    "gallery": [
+      "/images/catalog/pdf_img_p16_0_516.png"
+    ],
+    "harga_tipe": "starting_at",
+    "harga_nominal": 1500000,
+    "live_demo_url": null,
+    "pic_nama": "Laboratorium Rekayasa Proses Kimia Terapan",
+    "pic_kontak": "6281234567820",
+    "pic_laboratorium": "Lab Kimia Terapan & Pengujian Material D3 Kimia",
+    "specs": [
+      {
+        "group_name": "Kimiawi",
+        "spec_key": "Bentuk Fisik",
+        "spec_value": "Serbuk Halus Homogen (Powder)"
+      },
+      {
+        "group_name": "Kemurnian",
+        "spec_key": "Purity Level",
+        "spec_value": "High Purity Teruji X-Ray Fluorescence (XRF)"
+      },
+      {
+        "group_name": "Aplikasi",
+        "spec_key": "Industri Sasaran",
+        "spec_value": "Energy Storage, Battery Cell Component, Katalisis"
+      }
+    ]
+  },
+  {
+    "nama_item": "Glodon Authorized Training Center (GATC) - BIM 5D Konstruksi",
+    "slug": "gatc-bim-5d-konstruksi-pelatihan",
+    "prodi_code": "D3-TS",
+    "category_id": 3,
+    "tagline": "Pelatihan & Sertifikasi Internasional Building Information Modelling (BIM) 5D",
+    "deskripsi_singkat": "Pelatihan dan sertifikasi keahlian pemodelan digital konstruksi berbasis BIM 5D bagi kontraktor dan profesional.",
+    "deskripsi_lengkap": "Pelatihan dan sertifikasi keahlian pemodelan digital konstruksi berbasis Building Information Modelling (BIM) 5D bagi profesional industri, kontraktor, dan mahasiswa bekerjasama resmi dengan Glodon Authorized Training Center (GATC).\n\nMengintegrasikan desain 3D arsitektural, schedule timeline waktu 4D, dan estimasi biaya quantity takeoff (QTO) 5D presisi.",
+    "thumbnail_url": "/images/catalog/pdf_img_p18_0_529.png",
+    "gallery": [
+      "/images/catalog/pdf_img_p18_0_529.png"
+    ],
+    "harga_tipe": "starting_at",
+    "harga_nominal": 2500000,
+    "live_demo_url": "https://katalog.unsmadiun.id",
+    "pic_nama": "GATC SV UNS & Tim D3 Teknik Sipil",
+    "pic_kontak": "6281234567822",
+    "pic_laboratorium": "Studio Komputasi BIM & Struktur Sipil",
+    "specs": [
+      {
+        "group_name": "Sertifikasi",
+        "spec_key": "Penerbit Sertifikat",
+        "spec_value": "Sertifikasi Resmi Glodon International"
+      },
+      {
+        "group_name": "Kompetensi",
+        "spec_key": "Modul Pelatihan",
+        "spec_value": "BIM Modeling 3D, Quantity Takeoff (QTO) 5D, Cost Estimation"
+      },
+      {
+        "group_name": "Durasi",
+        "spec_key": "Jadwal Kursus",
+        "spec_value": "32 Jam Pertemuan Teori & Praktik Studio"
+      }
+    ]
+  },
+  {
+    "nama_item": "Klinik Akuntansi dan Perpajakan SV UNS",
+    "slug": "klinik-akuntansi-dan-perpajakan-sv-uns",
+    "prodi_code": "D3-PJK",
+    "category_id": 3,
+    "tagline": "Layanan Pendampingan SPT, Pembukuan UMKM & Konsultasi Kepatuhan Pajak",
+    "deskripsi_singkat": "Unit layanan terapan Teaching Factory pendampingan pelaporan SPT berkala, pembukuan keuangan, dan konsultasi pajak.",
+    "deskripsi_lengkap": "Merupakan unit layanan terapan berbasis Teaching Factory dari Program Studi Perpajakan Sekolah Vokasi UNS. Hadir sebagai jembatan sinergi akademisi dan dunia usaha, klinik ini menyediakan pendampingan profesional mulai dari asistensi pelaporan SPT berkala, pembukuan keuangan UMKM yang terstandarisasi, hingga konsultasi kepatuhan pajak secara transparan, akuntabel, dan terpercaya.",
+    "thumbnail_url": "/images/catalog/pdf_img_p19_0_535.png",
+    "gallery": [
+      "/images/catalog/pdf_img_p19_0_535.png"
+    ],
+    "harga_tipe": "starting_at",
+    "harga_nominal": 500000,
+    "live_demo_url": "https://katalog.unsmadiun.id",
+    "pic_nama": "Klinik Pajak D3 Perpajakan SV UNS",
+    "pic_kontak": "6281234567825",
+    "pic_laboratorium": "Klinik Akuntansi & Pajak Terapan SV UNS",
+    "specs": [
+      {
+        "group_name": "Layanan",
+        "spec_key": "Asistensi SPT",
+        "spec_value": "Pelaporan SPT Tahunan Orang Pribadi & Badan (e-Form / e-Filing)"
+      },
+      {
+        "group_name": "Layanan",
+        "spec_key": "Pendampingan UMKM",
+        "spec_value": "Penyusunan Laporan Keuangan Fiskal & Rekonsiliasi"
+      },
+      {
+        "group_name": "Konsultasi",
+        "spec_key": "Kepatuhan",
+        "spec_value": "Perencanaan Pajak Legal (Tax Planning) Sesuai Regulasi Terkini"
+      }
+    ]
+  },
+  {
+    "nama_item": "Pelatihan & Sertifikasi Brevet Pajak AB (Akselerasi)",
+    "slug": "pelatihan-sertifikasi-brevet-pajak-ab",
+    "prodi_code": "D3-PJK",
+    "category_id": 3,
+    "tagline": "Kursus Intensif Regulasi PPh, PPN, e-SPT & Praktik Perpajakan Korporasi Terkini",
+    "deskripsi_singkat": "Program kursus intensif dan sertifikasi kompetensi Brevet Pajak AB bersama Tax Academy Indonesia.",
+    "deskripsi_lengkap": "Program kursus intensif dan sertifikasi kompetensi Brevet Pajak AB yang diselenggarakan oleh Klinik Akuntansi & Pajak SV UNS bersama Tax Academy Indonesia. Membekali peserta dengan pemahaman regulasi PPh, PPN, pemotongan/pemungutan pajak, hingga praktik pengisian e-SPT dan tata laksana perpajakan korporasi terkini.",
+    "thumbnail_url": "/images/catalog/pdf_img_p20_0_945.png",
+    "gallery": [
+      "/images/catalog/pdf_img_p20_0_945.png"
+    ],
+    "harga_tipe": "starting_at",
+    "harga_nominal": 1850000,
+    "live_demo_url": "https://katalog.unsmadiun.id",
+    "pic_nama": "Sekretariat Brevet Pajak Vokasi UNS",
+    "pic_kontak": "6281234567825",
+    "pic_laboratorium": "Tax Center Sekolah Vokasi UNS",
+    "specs": [
+      {
+        "group_name": "Materi",
+        "spec_key": "Kurikulum",
+        "spec_value": "KUP, PPh Pasal 21/22/23/25/26/4(2), PPN & PPnBM, Akuntansi Pajak"
+      },
+      {
+        "group_name": "Sertifikat",
+        "spec_key": "Legalitas",
+        "spec_value": "Sertifikat Brevet Pajak AB Terakreditasi"
+      },
+      {
+        "group_name": "Metode",
+        "spec_key": "Pelaksanaan",
+        "spec_value": "Hybrid (Tatap Muka & Praktikum Lab Komputer Akuntansi)"
+      }
+    ]
+  },
+  {
+    "nama_item": "Jasa Layanan Non-Destructive Test (NDT) Material Manufaktur",
+    "slug": "jasa-layanan-non-destructive-test-ndt",
+    "prodi_code": "D4-TRM",
+    "category_id": 3,
+    "tagline": "Pengujian Mutu Material Presisi Tanpa Merusak Standar ASME / AWS / ASTM",
+    "deskripsi_singkat": "Layanan Non-Destructive Test pengujian material dan inspeksi mutu presisi tanpa merusak struktur benda uji.",
+    "deskripsi_lengkap": "Layanan Non-Destructive Test (NDT) dari Program Studi Teknologi Rekayasa Manufaktur SV UNS merupakan solusi pengujian material dan inspeksi mutu presisi tanpa merusak struktur benda uji (non-destructive). Didukung tenaga ahli bersertifikasi dan fasilitas laboratorium terintegrasi yang mengacu pada standar global (ASME/AWS/ASTM), layanan ini menjamin keselamatan, keandalan, dan umur pakai aset manufaktur maupun konstruksi Anda.",
+    "thumbnail_url": "/images/catalog/pdf_img_p21_0_547.png",
+    "gallery": [
+      "/images/catalog/pdf_img_p21_0_547.png"
+    ],
+    "harga_tipe": "starting_at",
+    "harga_nominal": 3500000,
+    "live_demo_url": null,
+    "pic_nama": "Tim NDT Lab Logam & Pengujian TRM",
+    "pic_kontak": "6281234567805",
+    "pic_laboratorium": "Laboratorium NDT & Metalurgi SV UNS",
+    "specs": [
+      {
+        "group_name": "Metode",
+        "spec_key": "Cakupan Uji",
+        "spec_value": "Ultrasonic Testing (UT), Magnetic Particle (MT), Liquid Penetrant (PT)"
+      },
+      {
+        "group_name": "Standar",
+        "spec_key": "Acuan Mutu",
+        "spec_value": "ASME Sec V, AWS D1.1, ASTM Standards"
+      },
+      {
+        "group_name": "Output",
+        "spec_key": "Dokumentasi",
+        "spec_value": "Laporan Inspeksi Resmi Certified NDT Level II Inspector"
+      }
+    ]
+  },
+  {
+    "nama_item": "Jasa Alih Media Digital (Preservasi Dokumen & Naskah Kuno)",
+    "slug": "jasa-alih-media-digital-naskah-kuno",
+    "prodi_code": "D3-PUS",
+    "category_id": 3,
+    "tagline": "Preservasi Naskah Kuno, Buku Langka & Dokumen Bersejarah ke Format Digital",
+    "deskripsi_singkat": "Layanan alih media naskah kuno, buku langka, dan arsip bersejarah berstandar preservasi nasional.",
+    "deskripsi_lengkap": "Layanan alih media profesional untuk naskah kuno, buku langka, dokumen bersejarah, dan arsip ke format digital berstandar preservasi. Menggunakan alur terstruktur meliputi pemeriksaan fisik, restorasi pemulihan awal, pemindaian berkualitas tinggi, hingga pengayaan metadata guna melindungi fisik dokumen asli sekaligus memperluas akses riset dan edukasi.",
+    "thumbnail_url": "/images/catalog/pdf_img_p22_0_553.png",
+    "gallery": [
+      "/images/catalog/pdf_img_p22_0_553.png"
+    ],
+    "harga_tipe": "starting_at",
+    "harga_nominal": 5000000,
+    "live_demo_url": "https://katalog.unsmadiun.id",
+    "pic_nama": "Unit Preservasi D3 Perpustakaan SV UNS",
+    "pic_kontak": "6281234567830",
+    "pic_laboratorium": "Studio Digitalisasi Arsip & Naskah Kuno",
+    "specs": [
+      {
+        "group_name": "Peralatan",
+        "spec_key": "Scanner",
+        "spec_value": "Overhead Book Scanner Resolusi Optik Tinggi (Non-Destructive)"
+      },
+      {
+        "group_name": "Standar",
+        "spec_key": "Metadata",
+        "spec_value": "Dublin Core Standard & OCR Text Retrieval"
+      },
+      {
+        "group_name": "Hasil",
+        "spec_key": "Format Master",
+        "spec_value": "TIFF Uncompressed 600 DPI & PDF/A Searchable"
+      }
+    ]
+  },
+  {
+    "nama_item": "Pengembangan Sistem Perpustakaan Terpadu (RFID & Otomasi)",
+    "slug": "pengembangan-sistem-perpustakaan-terpadu-rfid",
+    "prodi_code": "D3-PUS",
+    "category_id": 1,
+    "tagline": "Solusi Menyeluruh Ekosistem Perpustakaan Modern Otomasi Koleksi & RFID",
+    "deskripsi_singkat": "Pembangunan ekosistem perpustakaan modern terintegrasi katalogisasi, sirkulasi mandiri, dan pelacakan RFID.",
+    "deskripsi_lengkap": "Solusi menyeluruh pembangunan ekosistem perpustakaan modern yang mengintegrasikan otomasi koleksi fisik dan layanan digital. Membantu lembaga, sekolah, dan instansi mengelola katalogisasi, pengadaan, otomasi sirkulasi, hingga pelacakan koleksi berbasis RFID secara efektif melalui satu sistem terpadu.",
+    "thumbnail_url": "/images/catalog/pdf_img_p22_1_555.png",
+    "gallery": [
+      "/images/catalog/pdf_img_p22_1_555.png"
+    ],
+    "harga_tipe": "starting_at",
+    "harga_nominal": 8000000,
+    "live_demo_url": "https://katalog.unsmadiun.id",
+    "pic_nama": "Tim Otomasi Sistem Perpustakaan",
+    "pic_kontak": "6281234567830",
+    "pic_laboratorium": "Lab Otomasi & Informasi Perpustakaan",
+    "specs": [
+      {
+        "group_name": "Integrasi",
+        "spec_key": "Teknologi",
+        "spec_value": "RFID Gate, Self-Check Machine, Barcode Scanner"
+      },
+      {
+        "group_name": "Software",
+        "spec_key": "Basis Sistem",
+        "spec_value": "Web-Based Integrated Library System (ILS)"
+      },
+      {
+        "group_name": "Fitur",
+        "spec_key": "OPAC Online",
+        "spec_value": "Online Public Access Catalog Responsif & Mobile Friendly"
+      }
+    ]
+  },
+  {
+    "nama_item": "SAP University Partnership Program Training",
+    "slug": "sap-university-partnership-program-training",
+    "prodi_code": "D3-AKT",
+    "category_id": 3,
+    "tagline": "Pelatihan Resmi SAP Overview, Financial & Management Accounting Berstandar SAP Hub",
+    "deskripsi_singkat": "Pelatihan dan sertifikasi SAP Overview, SAP Financial Accounting, dan SAP Management Accounting kurikulum resmi.",
+    "deskripsi_lengkap": "SAP University Partnership Program Training menyelenggarakan pelatihan intensif untuk modul SAP Overview / Fundamental, SAP Financial Accounting (FI), dan SAP Management Accounting (CO) menggunakan kurikulum resmi SAP Learning Hub.\n\nMelatih mahasiswa dan praktisi industri menguasai sistem enterprise resource planning (ERP) global yang digunakan oleh mayoritas perusahaan multinasional.",
+    "thumbnail_url": "/images/catalog/pdf_img_p23_0_561.png",
+    "gallery": [
+      "/images/catalog/pdf_img_p23_0_561.png"
+    ],
+    "harga_tipe": "starting_at",
+    "harga_nominal": 1750000,
+    "live_demo_url": "https://katalog.unsmadiun.id",
+    "pic_nama": "Koordinator SAP Alliance D3 Akuntansi",
+    "pic_kontak": "6281234567801",
+    "pic_laboratorium": "Lab SAP ERP & Komputasi Finansial SV UNS",
+    "specs": [
+      {
+        "group_name": "Modul",
+        "spec_key": "Pilihan Modul",
+        "spec_value": "SAP Fundamental, SAP FI (Financial), SAP CO (Controlling)"
+      },
+      {
+        "group_name": "Akreditasi",
+        "spec_key": "Partner Resmi",
+        "spec_value": "SAP University Alliances Member"
+      },
+      {
+        "group_name": "Fasilitas",
+        "spec_key": "Akun Akses",
+        "spec_value": "Akses Langsung ke Sistem Live SAP S/4HANA Cloud"
+      }
+    ]
+  },
+  {
+    "nama_item": "Bank Benih & Sentra Olahan Kedelai Terpadu",
+    "slug": "bank-benih-sentra-olahan-kedelai-terpadu",
+    "prodi_code": "D3-BDT",
+    "category_id": 3,
+    "tagline": "Pembibitan Benih Kedelai Komersial, Smart Farming & Sentra Tempe/Susu Kedelai",
+    "deskripsi_singkat": "Layanan pembibitan kedelai komersial, budi daya smart farming, dan sentra produksi tempe higienis serta susu kedelai.",
+    "deskripsi_lengkap": "Bank Benih & Sentra Olahan Kedelai Terpadu menyediakan pembibitan benih kedelai komersial unggul, bimbingan budi daya smart farming agribisnis, serta unit Sentra Pembuatan Tempe higienis dan olahan susu kedelai bernutrisi tinggi berbasis Teaching Factory ramah lingkungan.",
+    "thumbnail_url": "/images/catalog/pdf_img_p24_0_567.png",
+    "gallery": [
+      "/images/catalog/pdf_img_p24_0_567.png"
+    ],
+    "harga_tipe": "starting_at",
+    "harga_nominal": 1000000,
+    "live_demo_url": null,
+    "pic_nama": "Teaching Factory D3 Budidaya Ternak & Olahan Pangan",
+    "pic_kontak": "6281234567833",
+    "pic_laboratorium": "Sentra Pengolahan Pakan & Pangan Terpadu",
+    "specs": [
+      {
+        "group_name": "Bibit",
+        "spec_key": "Varietas Kedelai",
+        "spec_value": "Anjasmoro & Grobogan Bersertifikasi BPSB"
+      },
+      {
+        "group_name": "Produksi",
+        "spec_key": "Sentra Tempe",
+        "spec_value": "Tempe Higienis Ragi Murni Bebas Formalin"
+      },
+      {
+        "group_name": "Layanan",
+        "spec_key": "Pelatihan",
+        "spec_value": "Workshop Budi Daya & Pengolahan Hasil Kedelai UMKM"
+      }
+    ]
+  },
+  {
+    "nama_item": "Layanan & Paket Wisata Kebugaran (Wellness Tourism SV UNS)",
+    "slug": "wellness-tourism-sv-uns",
+    "prodi_code": "D3-UPW",
+    "category_id": 3,
+    "tagline": "Paket Wisata Holistik Terapi Tradisional Jawa, Yoga, Relaksasi & Edukasi Jamu",
+    "deskripsi_singkat": "Paket layanan wisata kebugaran holistik mengintegrasikan terapi Jawa, yoga, aromaterapi, dan racikan jamu herbal.",
+    "deskripsi_lengkap": "Paket layanan wisata kebugaran holistik yang mengintegrasikan terapi tradisional Jawa, yoga, relaksasi aromaterapi, dan edukasi racikan jamu herbal nusantara. Dirancang untuk pasar wisatawan rekreasi dan korporasi yang mendambakan pemulihan fisik dan ketenangan mental di tengah pesona budaya Kota Solo.",
+    "thumbnail_url": "/images/catalog/pdf_img_p25_0_573.png",
+    "gallery": [
+      "/images/catalog/pdf_img_p25_0_573.png",
+      "/images/catalog/pdf_img_p25_1_574.png"
+    ],
+    "harga_tipe": "starting_at",
+    "harga_nominal": 750000,
+    "live_demo_url": "https://katalog.unsmadiun.id",
+    "pic_nama": "Unit Travel & Hospitality D3 UPW",
+    "pic_kontak": "6281234567835",
+    "pic_laboratorium": "Tour & Travel Lab D3 Usaha Perjalanan Wisata",
+    "specs": [
+      {
+        "group_name": "Paket",
+        "spec_key": "Aktivitas Utama",
+        "spec_value": "Traditional Javanese Herbal Spa, Mindfulness Yoga, Jamu Blending Workshop"
+      },
+      {
+        "group_name": "Durasi",
+        "spec_key": "Pilihan Durasi",
+        "spec_value": "Half Day (4 Jam), Full Day (8 Jam), 2D1N Retreat"
+      },
+      {
+        "group_name": "Pemandu",
+        "spec_key": "Tour Leader",
+        "spec_value": "Pemandu Wisata Bersertifikasi BNSP & Terapis Berpengalaman"
+      }
+    ]
+  }
+]

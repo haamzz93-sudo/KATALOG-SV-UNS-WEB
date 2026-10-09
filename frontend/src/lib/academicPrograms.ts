@@ -27,9 +27,13 @@ export const OFFICIAL_ACADEMIC_PROGRAMS = {
     { name: "Teknologi Rekayasa Otomasi", code: "D4-TRO", degree: "D4" as const },
     { name: "Teknologi Rekayasa Informasi dan Komunikasi Terapan (TIKA)", code: "D4-TIKA", degree: "D4" as const },
     { name: "Teknologi Rekayasa Pangan (TRP)", code: "D4-TRP", degree: "D4" as const },
+    { name: "Teknologi Rekayasa Manufaktur", code: "D4-TRM", degree: "D4" as const },
+    { name: "Desain Media Digital", code: "D4-DMD", degree: "D4" as const },
+    { name: "Manajemen Konstruksi", code: "D4-MK", degree: "D4" as const },
   ],
   diplomaTiga: [
     { name: "Akuntansi", code: "D3-AKT", degree: "D3" as const },
+    { name: "Akuntansi (Kampus Madiun)", code: "D3-AKT-MDN", degree: "D3" as const },
     { name: "Bahasa Inggris", code: "D3-BING", degree: "D3" as const },
     { name: "Bahasa Mandarin", code: "D3-BMAND", degree: "D3" as const },
     { name: "Budidaya Ternak", code: "D3-BDT", degree: "D3" as const },
@@ -45,8 +49,13 @@ export const OFFICIAL_ACADEMIC_PROGRAMS = {
     { name: "Teknik Mesin", code: "D3-TM", degree: "D3" as const },
     { name: "Teknik Sipil", code: "D3-TS", degree: "D3" as const },
     { name: "Teknik Informatika", code: "D3-TIF", degree: "D3" as const },
+    { name: "Teknik Informatika (Kampus Madiun)", code: "D3-TIF-MDN", degree: "D3" as const },
     { name: "Teknologi Hasil Pertanian", code: "D3-THP", degree: "D3" as const },
     { name: "Komunikasi Terapan", code: "D3-KT", degree: "D3" as const },
+    { name: "Teknik Kimia", code: "D3-TKIM", degree: "D3" as const },
+    { name: "Perpustakaan", code: "D3-PUS", degree: "D3" as const },
+    { name: "Agribisnis", code: "D3-AGR", degree: "D3" as const },
+    { name: "Usaha Perjalanan Wisata", code: "D3-UPW", degree: "D3" as const },
   ]
 };
 
