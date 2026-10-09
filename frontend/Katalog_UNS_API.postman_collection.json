@@ -1,0 +1,157 @@
+{
+  "info": {
+    "_postman_id": "sv-uns-katalog-api-2026",
+    "name": "Katalog SV UNS - API Verification Collection",
+    "description": "Koleksi pengujian resmi API Backend (Laravel), Frontend (Next.js), dan Database (MySQL) untuk Sekolah Vokasi UNS.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "1. [GET] Public Settings (Landing Page CMS, Hero, Partners, Footer)",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "https://katalog.unsmadiun.id/api/v1/public/settings",
+          "protocol": "https",
+          "host": [
+            "katalog",
+            "unsmadiun",
+            "id"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "public",
+            "settings"
+          ]
+        },
+        "description": "Mengambil seluruh konfigurasi landing page: hero video, transparansi (hero_bg_opacity), teks bilingual (ID/EN), 6 slot mitra, FAQs, system services, dan portal info dari MySQL."
+      }
+    },
+    {
+      "name": "2. [POST] Update Settings (Simpan CMS Langsung ke Database MySQL)",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          },
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"hero_bg_opacity\": 25,\n  \"hero_badge\": \"Katalog Produk Unggulan dan Jasa\",\n  \"hero_badge_en\": \"Premier Products & Services Catalog\",\n  \"bg_hero_url\": \"/videos/WEB-RONAL.mp4\"\n}"
+        },
+        "url": {
+          "raw": "https://katalog.unsmadiun.id/api/v1/settings",
+          "protocol": "https",
+          "host": [
+            "katalog",
+            "unsmadiun",
+            "id"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "settings"
+          ]
+        },
+        "description": "Menguji persistensi simpan pengaturan CMS langsung ke database MySQL. Menghasilkan response status 200 dan message sukses."
+      }
+    },
+    {
+      "name": "3. [GET] Public Catalog Innovations (Karya Inovasi Vokasi Terpublikasi)",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "https://katalog.unsmadiun.id/api/v1/public/catalog",
+          "protocol": "https",
+          "host": [
+            "katalog",
+            "unsmadiun",
+            "id"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "public",
+            "catalog"
+          ]
+        },
+        "description": "Mengambil daftar produk inovasi terpublikasi beserta detail live demo, model 3D, kategori, dan prodi."
+      }
+    },
+    {
+      "name": "4. [GET] 3 Lini Layanan (Categories Taxonomy)",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "https://katalog.unsmadiun.id/api/v1/public/categories",
+          "protocol": "https",
+          "host": [
+            "katalog",
+            "unsmadiun",
+            "id"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "public",
+            "categories"
+          ]
+        },
+        "description": "Mengambil 3 kategori taksonomi layanan: Teknologi & SaaS, Produk Fisik & IoT, dan Jasa Software House."
+      }
+    },
+    {
+      "name": "5. [GET] Direktori Program Studi SV UNS",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Accept",
+            "value": "application/json"
+          }
+        ],
+        "url": {
+          "raw": "https://katalog.unsmadiun.id/api/v1/public/prodis",
+          "protocol": "https",
+          "host": [
+            "katalog",
+            "unsmadiun",
+            "id"
+          ],
+          "path": [
+            "api",
+            "v1",
+            "public",
+            "prodis"
+          ]
+        },
+        "description": "Mengambil daftar prodi resmi SV UNS yang terhubung dengan karya inovasi di katalog."
+      }
+    }
+  ]
+}

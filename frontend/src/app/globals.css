@@ -1,0 +1,466 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:is(.dark, .dark *));
+
+:root {
+  /* BIRU INSTITUSIONAL UNS */
+  --uns-blue-primary: #0A2540;
+  --uns-blue-deep: #07192C;
+  --uns-blue-accent: #0F4C81;
+  --uns-blue-subtle: #EBF4FC;
+
+  /* PUTIH & SURFACE KANVAS */
+  --uns-white: #FFFFFF;
+  --uns-bg-surface: #F8FAFC;
+  --uns-border: #E2E8F0;
+  --uns-text-dark: #0F172A;
+  --uns-text-muted: #64748B;
+
+  /* EMAS PRESTASI VOKASI */
+  --uns-gold-primary: #C5A059;
+  --uns-gold-light: #F5E8C7;
+  --uns-gold-glow: #D4AF37;
+
+  --background: #F8FAFC;
+  --foreground: #0F172A;
+}
+
+.dark {
+  --background: #07192C;
+  --foreground: #FFFFFF;
+}
+
+/* Global Reset to eliminate Bootstrap default blue links and card overrides */
+a {
+  text-decoration: none;
+  color: inherit;
+}
+a:hover, a:focus, a:visited {
+  text-decoration: none;
+  color: inherit;
+}
+
+/* Neutralize Bootstrap .card background and border resets */
+.card {
+  background-color: transparent !important;
+  border: none !important;
+  color: inherit !important;
+}
+
+button:focus {
+  outline: none !important;
+  box-shadow: none !important;
+}
+
+/* Force 100% Bundar / Circular Buttons */
+.bundar-btn {
+  border-radius: 9999px !important;
+  width: 36px !important;
+  height: 36px !important;
+  min-width: 36px !important;
+  min-height: 36px !important;
+  aspect-ratio: 1 / 1 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  overflow: hidden !important;
+}
+
+/* Force true rounded classes on buttons, inputs, and links against Bootstrap reboot rules */
+button.rounded-none { border-radius: 0px !important; }
+button.rounded-sm { border-radius: 0.125rem !important; }
+button.rounded { border-radius: 0.25rem !important; }
+button.rounded-md { border-radius: 0.375rem !important; }
+button.rounded-lg { border-radius: 0.5rem !important; }
+button.rounded-xl { border-radius: 0.75rem !important; }
+button.rounded-2xl { border-radius: 1rem !important; }
+button.rounded-3xl { border-radius: 1.5rem !important; }
+button.rounded-full,
+a.rounded-full,
+input.rounded-full,
+select.rounded-full,
+div.rounded-full,
+span.rounded-full,
+.rounded-full,
+.spring-btn {
+  border-radius: 9999px !important;
+}
+textarea.rounded-2xl {
+  border-radius: 1rem !important;
+}
+textarea.rounded-3xl {
+  border-radius: 1.5rem !important;
+}
+
+/* True Luxury Pill Buttons (Apple / vivo OriginOS Tactile) */
+.luxury-pill-primary {
+  border-radius: 9999px !important;
+  background: linear-gradient(135deg, #0F4C81 0%, #0A2540 60%, #07192C 100%) !important;
+  color: #FFFFFF !important;
+  border: 1px solid rgba(255, 255, 255, 0.28) !important;
+  box-shadow: 0 12px 35px -5px rgba(15, 76, 129, 0.55), inset 0 1px 1px rgba(255, 255, 255, 0.45) !important;
+  text-decoration: none !important;
+}
+
+.luxury-pill-primary:hover {
+  background: linear-gradient(135deg, #135c9b 0%, #0c2d4d 60%, #08213b 100%) !important;
+  box-shadow: 0 16px 40px -5px rgba(15, 76, 129, 0.7), inset 0 1px 1px rgba(255, 255, 255, 0.55) !important;
+  color: #FFFFFF !important;
+}
+
+.luxury-pill-gold {
+  border-radius: 9999px !important;
+  background: linear-gradient(135deg, #C5A059 0%, #E5C785 50%, #C5A059 100%) !important;
+  color: #07192C !important;
+  border: 1px solid rgba(255, 241, 197, 0.8) !important;
+  box-shadow: 0 12px 35px -5px rgba(197, 160, 89, 0.5), inset 0 1px 1px rgba(255, 255, 255, 0.75) !important;
+  text-decoration: none !important;
+}
+
+.luxury-pill-gold:hover {
+  background: linear-gradient(135deg, #d4af62 0%, #ebd296 50%, #d4af62 100%) !important;
+  box-shadow: 0 16px 40px -5px rgba(197, 160, 89, 0.65), inset 0 1px 1px rgba(255, 255, 255, 0.85) !important;
+  color: #07192C !important;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-outfit), var(--font-jakarta), system-ui, -apple-system, sans-serif;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 9999px;
+}
+
+.dark ::-webkit-scrollbar-thumb {
+  background: #1e293b;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Gold & Blue glow utilities */
+.glow-gold {
+  box-shadow: 0 0 25px rgba(197, 160, 89, 0.25);
+}
+
+.glow-blue {
+  box-shadow: 0 0 25px rgba(15, 76, 129, 0.25);
+}
+
+/* Shimmer Light-Ray Keyframes & Animations (from 21st.dev benchmark) */
+@keyframes shimmer-sweep {
+  0% {
+    transform: translateX(-150%) skewX(-20deg);
+  }
+  100% {
+    transform: translateX(250%) skewX(-20deg);
+  }
+}
+
+.animate-shimmer-btn {
+  position: relative;
+  overflow: hidden;
+}
+
+.animate-shimmer-btn::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.35), transparent);
+  transform: translateX(-150%) skewX(-20deg);
+  animation: shimmer-sweep 3.5s infinite cubic-bezier(0.4, 0, 0.2, 1);
+  pointer-events: none;
+}
+
+.animate-shimmer-gold {
+  position: relative;
+  overflow: hidden;
+}
+
+.animate-shimmer-gold::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 50%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.45), transparent);
+  transform: translateX(-150%) skewX(-20deg);
+  animation: shimmer-sweep 3s infinite cubic-bezier(0.4, 0, 0.2, 1);
+  pointer-events: none;
+}
+
+/* Signature Apple Dynamic Island Floating Shadow & Glassmorphism */
+.apple-island-shadow {
+  box-shadow: 
+    0 25px 60px -15px rgba(0, 0, 0, 0.45),
+    0 12px 25px -6px rgba(0, 0, 0, 0.25),
+    0 0 0 1px rgba(255, 255, 255, 0.25),
+    inset 0 1px 1px 0 rgba(255, 255, 255, 0.8);
+}
+
+.dark .apple-island-shadow {
+  box-shadow: 
+    0 30px 70px -15px rgba(0, 0, 0, 0.85),
+    0 12px 30px -8px rgba(0, 0, 0, 0.7),
+    0 0 0 1px rgba(197, 160, 89, 0.4),
+    0 0 35px -5px rgba(197, 160, 89, 0.25),
+    inset 0 1px 1px 0 rgba(255, 255, 255, 0.15);
+}
+
+/* Liquid Glass Capsule with Specular Reflection & Tactile Sheen */
+.liquid-glass-capsule {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  border-radius: 9999px !important;
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(56, 189, 248, 0.35);
+  box-shadow:
+    0 4px 18px -2px rgba(15, 76, 129, 0.12),
+    inset 0 1px 1.5px 0 rgba(255, 255, 255, 0.95);
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.liquid-glass-capsule:hover {
+  border-color: rgba(14, 165, 233, 0.65);
+  transform: translateY(-1px) scale(1.02);
+  box-shadow:
+    0 8px 25px -4px rgba(15, 76, 129, 0.22),
+    inset 0 1px 1.5px 0 rgba(255, 255, 255, 1);
+}
+
+.dark .liquid-glass-capsule {
+  background: rgba(10, 37, 64, 0.65);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow:
+    0 6px 24px -2px rgba(0, 0, 0, 0.5),
+    inset 0 1px 1.5px 0 rgba(255, 255, 255, 0.25);
+}
+
+.liquid-glass-capsule-dark {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  border-radius: 9999px !important;
+  background: rgba(7, 25, 44, 0.82);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  box-shadow:
+    0 10px 32px -4px rgba(0, 0, 0, 0.6),
+    inset 0 1px 1.5px 0 rgba(255, 255, 255, 0.35);
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.liquid-glass-capsule-dark:hover {
+  border-color: rgba(197, 160, 89, 0.6);
+  transform: translateY(-1px) scale(1.02);
+  box-shadow:
+    0 14px 38px -4px rgba(197, 160, 89, 0.3),
+    inset 0 1px 1.5px 0 rgba(255, 255, 255, 0.5);
+}
+
+/* Hero Metric Cards Depth & Ambient Shadow */
+.hero-metric-card {
+  box-shadow:
+    0 20px 40px -10px rgba(0, 0, 0, 0.6),
+    0 8px 16px -4px rgba(0, 0, 0, 0.4),
+    0 0 0 1px rgba(255, 255, 255, 0.12),
+    inset 0 1px 2px rgba(255, 255, 255, 0.2);
+  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.4s ease, border-color 0.3s ease;
+}
+
+.hero-metric-card:hover {
+  box-shadow:
+    0 30px 60px -10px rgba(197, 160, 89, 0.35),
+    0 12px 24px -4px rgba(0, 0, 0, 0.6),
+    0 0 0 1px rgba(197, 160, 89, 0.7),
+    inset 0 1px 2px rgba(255, 255, 255, 0.4);
+}
+
+/* Tactile Glass Card Shadow & Colors for Services & Products */
+.tactile-glass-card {
+  background-color: #FFFFFF !important;
+  color: #0F172A !important;
+  box-shadow:
+    0 20px 45px -12px rgba(15, 23, 42, 0.08),
+    0 4px 16px -2px rgba(15, 23, 42, 0.04),
+    0 0 0 1px rgba(226, 232, 240, 0.9),
+    inset 0 1px 1px rgba(255, 255, 255, 0.9);
+}
+
+.dark .tactile-glass-card {
+  background-color: #0B1E33 !important;
+  color: #FFFFFF !important;
+  box-shadow:
+    0 25px 55px -15px rgba(0, 0, 0, 0.75),
+    0 8px 24px -5px rgba(0, 0, 0, 0.5),
+    0 0 0 1px rgba(255, 255, 255, 0.12),
+    inset 0 1px 1px rgba(255, 255, 255, 0.08);
+}
+
+/* Ensure crisp contrast for card typography in both modes */
+.tactile-glass-card .apple-headline,
+.tactile-glass-card h3,
+.tactile-glass-card h4 {
+  color: #0F172A !important;
+}
+
+.dark .tactile-glass-card .apple-headline,
+.dark .tactile-glass-card h3,
+.dark .tactile-glass-card h4 {
+  color: #FFFFFF !important;
+}
+
+.tactile-glass-card .apple-subhead,
+.tactile-glass-card p {
+  color: #475569 !important;
+}
+
+.dark .tactile-glass-card .apple-subhead,
+.dark .tactile-glass-card p {
+  color: #CBD5E1 !important;
+}
+
+/* Card Tilt & Smooth Lift */
+.smooth-lift {
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.35s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.35s ease;
+}
+.smooth-lift:hover {
+  transform: translateY(-8px);
+}
+
+/* Apple Pro Typography System */
+.apple-headline {
+  letter-spacing: -0.04em !important;
+  font-weight: 800;
+  line-height: 1.08;
+}
+
+.apple-subhead {
+  letter-spacing: -0.015em !important;
+  font-weight: 500;
+  line-height: 1.5;
+}
+
+.apple-kicker {
+  letter-spacing: 0.18em !important;
+  text-transform: uppercase;
+  font-weight: 800;
+  font-size: 0.75rem;
+}
+
+/* vivo OriginOS 7 Spring Physics ("Animasi Pegas") */
+/* Natural elastic curve: moves briskly on trigger, settles with a silky rebound */
+.spring-interactive {
+  transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.4s ease, border-color 0.3s ease;
+}
+
+.spring-interactive:hover {
+  transform: translateY(-8px) scale(1.012);
+}
+
+.spring-interactive:active {
+  transform: translateY(-2px) scale(0.98);
+  transition-duration: 0.15s;
+}
+
+.spring-btn {
+  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease;
+}
+
+.spring-btn:hover {
+  transform: scale(1.05) translateY(-2px);
+}
+
+.spring-btn:active {
+  transform: scale(0.96);
+  transition-duration: 0.12s;
+}
+
+/* ==========================================================================
+   ROCK-SOLID DARK MODE SECTION ARCHITECTURE & TYPOGRAPHY
+   Guarantees 100% deep navy canvas (#07192C) and high-contrast text across all landing page sections
+   ========================================================================== */
+.dark section#layanan,
+.dark #hardware-lab,
+.dark #software-house,
+.dark #katalog-unggulan,
+.dark #faq-section,
+.dark .dark-section-canvas,
+.dark .campus-showcase-wrapper {
+  background-color: #07192C !important;
+  color: #FFFFFF !important;
+}
+
+.dark section#layanan h2,
+.dark #hardware-lab h3,
+.dark #software-house h3,
+.dark #katalog-unggulan h2,
+.dark #faq-section h2,
+.dark .dark-section-canvas h2,
+.dark .dark-section-canvas h3 {
+  color: #FFFFFF !important;
+}
+
+.dark section#layanan p,
+.dark #hardware-lab p,
+.dark #software-house p,
+.dark #faq-section p,
+.dark .dark-section-canvas p {
+  color: #CBD5E1 !important;
+}
+
+/* Architectural background gradient masks in dark mode (prevent white washout) */
+.dark .architectural-gradient-mask {
+  background: linear-gradient(to right, #07192C 0%, transparent 50%, #07192C 100%) !important;
+}
+
+.dark .architectural-gradient-mask-v {
+  background: linear-gradient(to bottom, #07192C 0%, transparent 50%, #07192C 100%) !important;
+}
+
+/* Force perfectly circular shape on utility buttons (ID switcher & Theme toggle) */
+.bundar-btn,
+button.bundar-btn,
+a.bundar-btn {
+  border-radius: 9999px !important;
+  -webkit-border-radius: 9999px !important;
+  -moz-border-radius: 9999px !important;
+  aspect-ratio: 1 / 1 !important;
+  overflow: hidden !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+}
+
+
+
