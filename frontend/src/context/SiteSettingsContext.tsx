@@ -432,6 +432,11 @@ export const DEFAULT_SITE_SETTINGS: SiteSettings = {
   catalog_tab_produk_en: "Applied Products",
   catalog_tab_jasa_id: "Layanan & Jasa",
   catalog_tab_jasa_en: "Expert Services",
+
+  // Setting Prompt AI Studio & Gemini API
+  gemini_api_key: process.env.NEXT_PUBLIC_GEMINI_API_KEY || "",
+  ai_default_domain: "spsbu.unsmadiun.id",
+  ai_default_prompt: "Tolong buatkan gambar dinamis ukuran landscape (1280x720 pixel), produk untuk display katalog produk pada marketplace. Pastikan hasilnya menjadi produk bagus, dinamis, kualitas HD, layak jual. Desain clean, tidak terlalu banyak kalimat.",
 };
 
 interface SiteSettingsContextType {

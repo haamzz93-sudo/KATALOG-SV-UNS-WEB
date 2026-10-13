@@ -53,6 +53,9 @@ export default function HomePage() {
   const [selectedProdi, setSelectedProdi] = useState<string>("");
   const [searchKeyword, setSearchKeyword] = useState<string>("");
   const [selectedSort, setSelectedSort] = useState<string>("latest");
+  const [showAllItems, setShowAllItems] = useState<boolean>(false);
+
+  const INITIAL_VISIBLE_COUNT = 9; // Batas 3 baris x 3 kolom desktop agar tidak makan tempat
 
   // Modals state
   const [selectedDemoItem, setSelectedDemoItem] = useState<CatalogItem | null>(null);
@@ -109,6 +112,12 @@ export default function HomePage() {
 
     return list;
   }, [items, selectedCategory, selectedProdi, searchKeyword, selectedSort]);
+
+  // Batas 3 baris (9 item pada desktop) dengan opsi See More
+  const visibleItems = useMemo(() => {
+    if (showAllItems) return filteredItems;
+    return filteredItems.slice(0, INITIAL_VISIBLE_COUNT);
+  }, [filteredItems, showAllItems]);
 
   const handleOpenLiveDemo = (item: CatalogItem) => {
     api.logDemoClick(item.id);
@@ -736,16 +745,48 @@ export default function HomePage() {
             </button>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {filteredItems.map((item) => (
-              <ProductCard
-                key={item.id}
-                item={item}
-                onOpenLiveDemo={handleOpenLiveDemo}
-                onOpenVideoDemo={handleOpenVideoDemo}
-              />
-            ))}
-          </div>
+          <>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {visibleItems.map((item) => (
+                <ProductCard
+                  key={item.id}
+                  item={item}
+                  onOpenLiveDemo={handleOpenLiveDemo}
+                  onOpenVideoDemo={handleOpenVideoDemo}
+                />
+              ))}
+            </div>
+
+            {/* Tombol See More / Muat Lebih Banyak jika inovasi lebih dari 3 baris */}
+            {filteredItems.length > INITIAL_VISIBLE_COUNT && (
+              <div className="mt-10 sm:mt-12 text-center flex flex-col sm:flex-row items-center justify-center gap-3.5">
+                <button
+                  type="button"
+                  onClick={() => setShowAllItems(!showAllItems)}
+                  style={{ borderRadius: "9999px" }}
+                  className="w-full sm:w-auto px-8 py-3.5 rounded-full bg-[#0F4C81] hover:bg-[#0c3c66] dark:bg-sky-600 dark:hover:bg-sky-500 text-white font-extrabold text-xs sm:text-sm shadow-md hover:shadow-xl transition-all duration-300 flex items-center justify-center gap-2.5 cursor-pointer group"
+                >
+                  <span>
+                    {showAllItems
+                      ? (isEn ? "Show Less (3 Rows Limit)" : "Sembunyikan (Kembali ke 3 Baris)")
+                      : (isEn 
+                          ? `See More Innovations (+${filteredItems.length - INITIAL_VISIBLE_COUNT} More)`
+                          : `Lihat Lebih Banyak Inovasi (+${filteredItems.length - INITIAL_VISIBLE_COUNT} Karya)`)}
+                  </span>
+                  <ChevronDown className={`w-4 h-4 transition-transform duration-300 ${showAllItems ? "rotate-180" : "group-hover:translate-y-0.5"}`} />
+                </button>
+
+                <Link
+                  href="/katalog"
+                  style={{ borderRadius: "9999px" }}
+                  className="w-full sm:w-auto px-6 py-3.5 rounded-full bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold text-xs sm:text-sm border border-slate-200 dark:border-slate-700 transition flex items-center justify-center gap-2"
+                >
+                  <span>{isEn ? "Browse Complete Archive" : "Buka Semua Arsip Katalog"}</span>
+                  <ArrowRight className="w-4 h-4" />
+                </Link>
+              </div>
+            )}
+          </>
         )}
         </div>
       </section>

@@ -10,7 +10,7 @@ import {
   Globe, Palette, Settings2, UploadCloud, Key, Search, Lock, Award, Laptop,
   Briefcase, Handshake, ExternalLink, ExternalLink as ExtLink, TrendingUp, Box, Cpu, Wrench, Building2, Package,
   GraduationCap, Navigation, X, LayoutGrid, SlidersHorizontal, AlignLeft, AlignRight,
-  Star, Quote, Camera, Image as ImageIcon
+  Star, Quote, Camera, Image as ImageIcon, Wand2, Bot
 } from "lucide-react";
 import { api } from "../../../lib/api";
 import { CatalogItem } from "../../../types/catalog";
@@ -37,15 +37,15 @@ function AdminDashboardContent() {
   const tabParam = searchParams ? searchParams.get("tab") : null;
   const toast = useToast();
   const { settings, updateSettings, resetSettings } = useSiteSettings();
-  const [activeTab, setActiveTab] = useState<"users" | "moderation" | "showcase" | "faqs" | "site_cms" | "partners" | "prodis">("users");
+  const [activeTab, setActiveTab] = useState<"users" | "moderation" | "showcase" | "faqs" | "site_cms" | "partners" | "prodis" | "ai_prompt">("users");
 
   useEffect(() => {
-    if (tabParam && ["users", "moderation", "showcase", "faqs", "site_cms", "partners", "prodis"].includes(tabParam)) {
+    if (tabParam && ["users", "moderation", "showcase", "faqs", "site_cms", "partners", "prodis", "ai_prompt"].includes(tabParam)) {
       setActiveTab(tabParam as any);
     }
   }, [tabParam]);
 
-  const handleTabChange = (newTab: "users" | "moderation" | "showcase" | "faqs" | "site_cms" | "partners" | "prodis") => {
+  const handleTabChange = (newTab: "users" | "moderation" | "showcase" | "faqs" | "site_cms" | "partners" | "prodis" | "ai_prompt") => {
     setActiveTab(newTab);
     router.replace(`/dashboard/admin?tab=${newTab}`, { scroll: false });
   };
@@ -78,6 +78,63 @@ function AdminDashboardContent() {
       setCmsForm(settings);
     }
   }, [settings, isCmsSaving]);
+
+  // AI Prompt Studio Setting State
+  const [aiApiKey, setAiApiKey] = useState(settings.gemini_api_key || process.env.NEXT_PUBLIC_GEMINI_API_KEY || "");
+  const [aiDomain, setAiDomain] = useState(settings.ai_default_domain || "spsbu.unsmadiun.id");
+  const [aiPromptTemplate, setAiPromptTemplate] = useState(
+    settings.ai_default_prompt || "Tolong buatkan gambar dinamis ukuran landscape (1280x720 pixel), produk untuk display katalog produk pada marketplace. Pastikan hasilnya menjadi produk bagus, dinamis, kualitas HD, layak jual. Desain clean, tidak terlalu banyak kalimat."
+  );
+  const [isAiTesting, setIsAiTesting] = useState(false);
+  const [aiTestResult, setAiTestResult] = useState<{ success: boolean; message: string } | null>(null);
+  const [isAiSaving, setIsAiSaving] = useState(false);
+
+  useEffect(() => {
+    if (settings.gemini_api_key) setAiApiKey(settings.gemini_api_key);
+    if (settings.ai_default_domain) setAiDomain(settings.ai_default_domain);
+    if (settings.ai_default_prompt) setAiPromptTemplate(settings.ai_default_prompt);
+  }, [settings]);
+
+  const handleTestGeminiKey = async () => {
+    setIsAiTesting(true);
+    setAiTestResult(null);
+    try {
+      const res = await fetch("/api/ai/test-key", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ apiKey: aiApiKey }),
+      });
+      const data = await res.json();
+      if (res.ok && data.success) {
+        setAiTestResult({ success: true, message: data.message + ` (${data.model})` });
+        toast.success("Koneksi Gemini Berhasil", data.message);
+      } else {
+        setAiTestResult({ success: false, message: data.message || "Gagal menghubungi Gemini API" });
+        toast.error("Gagal Koneksi", data.message);
+      }
+    } catch (e: any) {
+      setAiTestResult({ success: false, message: e.message || "Kesalahan jaringan" });
+      toast.error("Error", e.message);
+    } finally {
+      setIsAiTesting(false);
+    }
+  };
+
+  const handleSaveAiSettings = async () => {
+    setIsAiSaving(true);
+    try {
+      await updateSettings({
+        gemini_api_key: aiApiKey.trim(),
+        ai_default_domain: aiDomain.trim(),
+        ai_default_prompt: aiPromptTemplate.trim(),
+      });
+      toast.success("Pengaturan AI Disimpan", "Kunci API & template prompt berhasil disimpan ke sistem!");
+    } catch (e: any) {
+      toast.error("Gagal Menyimpan", e.message);
+    } finally {
+      setIsAiSaving(false);
+    }
+  };
 
   // Showcase Video Management State (Fleksibel: Video, Detik Maksimal, Kata-kata Kiri & Kanan)
   const [showcaseProjects, setShowcaseProjects] = useState<ShowcaseProject[]>(DEFAULT_SHOWCASE_PROJECTS);
@@ -1607,6 +1664,20 @@ function AdminDashboardContent() {
         >
           <Handshake className="w-4 h-4 shrink-0" />
           <span>Mitra Industri & Running Logo ({partnerList.length})</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => handleTabChange("ai_prompt")}
+          style={{ borderRadius: "9999px" }}
+          className={`flex items-center gap-2 px-4 sm:px-5 py-2 sm:py-2.5 rounded-full text-xs sm:text-sm font-bold transition-all cursor-pointer shrink-0 whitespace-nowrap ${
+            activeTab === "ai_prompt"
+              ? "bg-gradient-to-r from-amber-500 to-amber-600 text-white shadow-md font-black ring-2 ring-amber-300/40"
+              : "text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-white/50 dark:hover:bg-white/10"
+          }`}
+        >
+          <Wand2 className="w-4 h-4 shrink-0 text-amber-300" />
+          <span>Setting Prompt AI Studio</span>
         </button>
       </div>
 
@@ -5684,6 +5755,166 @@ function AdminDashboardContent() {
                   </div>
                 );
               })}
+          </div>
+        </div>
+      )}
+
+      {/* 8. SETTING PROMPT AI STUDIO (GEMINI API) */}
+      {activeTab === "ai_prompt" && (
+        <div className="space-y-6 text-left">
+          {/* Header Card */}
+          <div className="p-6 rounded-3xl bg-white dark:bg-[#07192C] border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div>
+              <span className="text-xs font-bold uppercase tracking-wider text-amber-500 flex items-center gap-1.5">
+                <Wand2 className="w-4 h-4 text-amber-500" />
+                <span>Google Gemini 2.5 Flash Studio & AI Editor</span>
+              </span>
+              <h3 className="font-extrabold text-xl text-slate-900 dark:text-white mt-0.5">
+                Setting Prompt AI Edit Foto Katalog
+              </h3>
+              <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1">
+                Kelola API Key Google Gemini, domain display marketplace hilirisasi, serta konfigurasi prompt dinamis untuk generator 3 foto katalog (Tampak Depan, Tampak Samping, & Display Komersial).
+              </p>
+            </div>
+
+            <button
+              type="button"
+              onClick={handleSaveAiSettings}
+              disabled={isAiSaving}
+              style={{ borderRadius: "9999px" }}
+              className="px-6 py-2.5 rounded-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-extrabold text-xs sm:text-sm shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 shrink-0"
+            >
+              <Save className="w-4 h-4" />
+              <span>{isAiSaving ? "Menyimpan..." : "Simpan Pengaturan AI"}</span>
+            </button>
+          </div>
+
+          {/* Setting Form Grid */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="lg:col-span-2 space-y-6">
+              {/* API Key Card */}
+              <div className="p-6 rounded-3xl bg-white dark:bg-[#07192C] border border-slate-200 dark:border-slate-800 shadow-sm space-y-4">
+                <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+                  <h4 className="font-bold text-sm sm:text-base text-slate-900 dark:text-white flex items-center gap-2">
+                    <Key className="w-4 h-4 text-[#0F4C81] dark:text-sky-400" />
+                    <span>1. Google Gemini API Key</span>
+                  </h4>
+                  <span className="text-xs font-mono px-2.5 py-1 rounded-full bg-emerald-100 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-300 font-bold border border-emerald-200 dark:border-emerald-800">
+                    Model: gemini-2.5-flash
+                  </span>
+                </div>
+
+                <div>
+                  <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block mb-1.5">
+                    Kunci Akses API (Google AI Studio)
+                  </label>
+                  <div className="flex flex-col sm:flex-row items-stretch gap-2.5">
+                    <input
+                      type="text"
+                      value={aiApiKey}
+                      onChange={(e) => setAiApiKey(e.target.value)}
+                      placeholder="Masukkan Google Gemini API Key (AI Studio)..."
+                      className="flex-1 px-4 py-2.5 text-xs sm:text-sm font-mono rounded-xl sm:rounded-full border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-white focus:outline-none focus:border-[#C5A059]"
+                    />
+                    <button
+                      type="button"
+                      onClick={handleTestGeminiKey}
+                      disabled={isAiTesting || !aiApiKey.trim()}
+                      style={{ borderRadius: "9999px" }}
+                      className="px-5 py-2.5 rounded-full bg-[#0F4C81] hover:bg-[#135996] text-white text-xs font-bold shadow-xs transition flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-50 shrink-0"
+                    >
+                      <RefreshCw className={`w-3.5 h-3.5 ${isAiTesting ? "animate-spin" : ""}`} />
+                      <span>{isAiTesting ? "Menguji..." : "Uji Koneksi"}</span>
+                    </button>
+                  </div>
+                </div>
+
+                {aiTestResult && (
+                  <div className={`p-3.5 rounded-2xl text-xs font-medium flex items-center gap-2.5 border ${
+                    aiTestResult.success
+                      ? "bg-emerald-50 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-200 border-emerald-200 dark:border-emerald-800"
+                      : "bg-rose-50 dark:bg-rose-950/60 text-rose-800 dark:text-rose-200 border-rose-200 dark:border-rose-800"
+                  }`}>
+                    {aiTestResult.success ? (
+                      <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                    ) : (
+                      <ShieldAlert className="w-4 h-4 text-rose-600 shrink-0" />
+                    )}
+                    <span>{aiTestResult.message}</span>
+                  </div>
+                )}
+              </div>
+
+              {/* Prompt Template & Target Domain */}
+              <div className="p-6 rounded-3xl bg-white dark:bg-[#07192C] border border-slate-200 dark:border-slate-800 shadow-sm space-y-4">
+                <div className="border-b border-slate-100 dark:border-slate-800 pb-3">
+                  <h4 className="font-bold text-sm sm:text-base text-slate-900 dark:text-white flex items-center gap-2">
+                    <SlidersHorizontal className="w-4 h-4 text-[#C5A059]" />
+                    <span>2. Konfigurasi Prompt Dinamis & Target Domain</span>
+                  </h4>
+                </div>
+
+                <div>
+                  <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block mb-1.5">
+                    Target Domain Marketplace Display
+                  </label>
+                  <input
+                    type="text"
+                    value={aiDomain}
+                    onChange={(e) => setAiDomain(e.target.value)}
+                    placeholder="spsbu.unsmadiun.id"
+                    className="w-full px-4 py-2.5 text-xs sm:text-sm font-medium rounded-full border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-white focus:outline-none focus:border-[#C5A059]"
+                  />
+                  <p className="text-[11px] text-slate-400 mt-1">
+                    Domain resmi hilirisasi bisnis (misal: <code>spsbu.unsmadiun.id</code> atau <code>katalog.unsmadiun.id</code>).
+                  </p>
+                </div>
+
+                <div>
+                  <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block mb-1.5">
+                    Template Prompt Dinamis (Instruksi Standar Dosen)
+                  </label>
+                  <textarea
+                    rows={4}
+                    value={aiPromptTemplate}
+                    onChange={(e) => setAiPromptTemplate(e.target.value)}
+                    style={{ borderRadius: "18px" }}
+                    className="w-full p-4 text-xs sm:text-sm rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-white focus:outline-none focus:border-[#C5A059] leading-relaxed font-sans"
+                  />
+                  <p className="text-[11px] text-slate-400 mt-1">
+                    Prompt default ini akan otomatis dimuat di formulir input setiap admin prodi saat mengunggah foto produk mentah.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Sidebar Guide & Multi-Angle Output Preview */}
+            <div className="space-y-6">
+              <div className="p-6 rounded-3xl bg-gradient-to-br from-amber-500/10 via-amber-500/5 to-transparent border border-amber-500/20 shadow-sm space-y-4">
+                <h4 className="font-extrabold text-sm sm:text-base text-amber-700 dark:text-amber-300 flex items-center gap-2">
+                  <Bot className="w-5 h-5 text-amber-500" />
+                  <span>Spesifikasi Output AI Studio</span>
+                </h4>
+                <div className="space-y-3 text-xs text-slate-600 dark:text-slate-300">
+                  <div className="p-3 rounded-2xl bg-white/70 dark:bg-slate-900/70 border border-amber-500/20">
+                    <strong className="block font-bold text-slate-900 dark:text-white mb-0.5">📸 1. Tampak Depan (Front View)</strong>
+                    <span>Foto sudut depan lurus simetris dengan pencahayaan studio lembut.</span>
+                  </div>
+                  <div className="p-3 rounded-2xl bg-white/70 dark:bg-slate-900/70 border border-amber-500/20">
+                    <strong className="block font-bold text-slate-900 dark:text-white mb-0.5">📸 2. Tampak Samping (Isometric 45°)</strong>
+                    <span>Menampilkan kedalaman dimensi produk, sudut samping, dan tekstur material.</span>
+                  </div>
+                  <div className="p-3 rounded-2xl bg-white/70 dark:bg-slate-900/70 border border-amber-500/20">
+                    <strong className="block font-bold text-slate-900 dark:text-white mb-0.5">📸 3. Display Marketplace HD</strong>
+                    <span>Mockup landscape komersial 1280x720 pixel siap pajang di marketplace.</span>
+                  </div>
+                </div>
+
+                <div className="pt-2 border-t border-amber-500/20 text-[11px] text-slate-500 dark:text-slate-400 leading-relaxed">
+                  ✓ Fitur ini otomatis aktif di formulir <strong>Tambah Inovasi</strong> bagi seluruh 39 Program Studi Sekolah Vokasi UNS.
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       )}

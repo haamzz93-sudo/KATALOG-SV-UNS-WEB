@@ -7,7 +7,7 @@ import {
   LayoutDashboard, PlusCircle, BarChart3, Users, 
   LogOut, Sun, Moon, ArrowLeft, Shield, Building2,
   ExternalLink, Bell, Search, CheckCircle2, ChevronRight,
-  Menu, X, Pin, PinOff, Globe, Film, HelpCircle, ShieldCheck, Handshake, GraduationCap
+  Menu, X, Pin, PinOff, Globe, Film, HelpCircle, ShieldCheck, Handshake, GraduationCap, Wand2
 } from "lucide-react";
 import { useApp } from "../../context/AppContext";
 import { useToast } from "../../context/ToastContext";
@@ -98,6 +98,12 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
                     src={settings.brand_logo_color_url || settings.brand_logo_url || "/images/brand/logo-sv-uns-official-new.png"}
                     alt={settings.brand_site_title || "Logo SV UNS"}
                     className="w-full h-full object-contain"
+                    onError={(e) => {
+                      const target = e.currentTarget;
+                      if (!target.src.includes("logo-sv-uns-official-color.png")) {
+                        target.src = "/images/brand/logo-sv-uns-official-color.png";
+                      }
+                    }}
                   />
                 </div>
                 {isExpanded && (
@@ -438,6 +444,29 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
                       {isExpanded && <span className="whitespace-nowrap !text-white font-semibold">Mitra Industri & Logo</span>}
                     </div>
                     {isExpanded && pathname === "/dashboard/admin" && activeAdminTab === "partners" && (
+                      <ChevronRight className="w-3.5 h-3.5 text-sky-300 shrink-0" />
+                    )}
+                  </Link>
+
+                  {/* 4.8 Setting Prompt AI */}
+                  <Link
+                    href="/dashboard/admin?tab=ai_prompt"
+                    onClick={() => setMobileMenuOpen(false)}
+                    title="Setting Prompt AI (Gemini Studio)"
+                    style={{ borderRadius: "9999px" }}
+                    className={`flex items-center transition-all ${
+                      isExpanded ? "justify-between px-3.5 py-2.5 rounded-full" : "justify-center w-11 h-11 rounded-2xl mx-auto"
+                    } ${
+                      pathname === "/dashboard/admin" && activeAdminTab === "ai_prompt"
+                        ? "bg-[#0F4C81] !text-white border border-sky-400/40 shadow-[0_4px_16px_rgba(15,76,129,0.5)] font-black"
+                        : "!text-white/90 hover:!text-white hover:bg-white/10"
+                    }`}
+                  >
+                    <div className="flex items-center gap-3">
+                      <Wand2 className="w-4 h-4 text-amber-400 shrink-0" />
+                      {isExpanded && <span className="whitespace-nowrap !text-white font-semibold">Setting Prompt AI</span>}
+                    </div>
+                    {isExpanded && pathname === "/dashboard/admin" && activeAdminTab === "ai_prompt" && (
                       <ChevronRight className="w-3.5 h-3.5 text-sky-300 shrink-0" />
                     )}
                   </Link>

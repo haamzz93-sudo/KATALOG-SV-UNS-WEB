@@ -194,6 +194,12 @@ export const DynamicIslandHeader: React.FC = () => {
                   src={settings.brand_logo_color_url || settings.brand_logo_url || "/images/brand/logo-sv-uns-official-new.png"}
                   alt="Logo Resmi Sekolah Vokasi UNS"
                   className="w-full h-full object-contain"
+                  onError={(e) => {
+                    const target = e.currentTarget;
+                    if (!target.src.includes("logo-sv-uns-official-color.png")) {
+                      target.src = "/images/brand/logo-sv-uns-official-color.png";
+                    }
+                  }}
                 />
               </div>
 

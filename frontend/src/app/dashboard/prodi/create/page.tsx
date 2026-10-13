@@ -5,11 +5,13 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { 
   ArrowLeft, Plus, Trash2, CheckCircle2, 
-  Laptop, Cpu, Wrench, Save, GraduationCap 
+  Laptop, Cpu, Wrench, Save, GraduationCap,
+  Wand2, Bot, RefreshCw, Eye, Download, Check, UploadCloud, ChevronDown
 } from "lucide-react";
 import { api } from "../../../../lib/api";
 import { useToast } from "../../../../context/ToastContext";
 import { useApp } from "../../../../context/AppContext";
+import { useSiteSettings } from "../../../../context/SiteSettingsContext";
 import { MediaUploader } from "../../../../components/ui/MediaUploader";
 import { SearchableProdiDropdown } from "../../../../components/ui/CustomCatalogSelect";
 import { Prodi } from "../../../../types/catalog";
@@ -18,6 +20,7 @@ export default function CreateProdiItem() {
   const router = useRouter();
   const toast = useToast();
   const { currentUser } = useApp();
+  const { settings } = useSiteSettings();
 
   const [prodis, setProdis] = useState<Prodi[]>([]);
   const [prodiId, setProdiId] = useState<number>(1);
@@ -28,13 +31,25 @@ export default function CreateProdiItem() {
   const [deskripsiLengkap, setDeskripsiLengkap] = useState("");
   const [liveDemoUrl, setLiveDemoUrl] = useState("");
   const [model3dUrl, setModel3dUrl] = useState("");
-  const [thumbnailUrl, setThumbnailUrl] = useState("/images/catalog/rintisku-saas-showcase.jpg");
+  const [thumbnailUrl, setThumbnailUrl] = useState("");
   const [statusPublikasi, setStatusPublikasi] = useState<"draft" | "published">("published");
   const [hargaTipe, setHargaTipe] = useState<"starting_at" | "fixed" | "contact_us">("starting_at");
-  const [hargaNominal, setHargaNominal] = useState<number>(5000000);
+  const [hargaNominal, setHargaNominal] = useState<number>(0);
   const [picNama, setPicNama] = useState("");
-  const [picKontak, setPicKontak] = useState("6281234567890");
-  const [picLaboratorium, setPicLaboratorium] = useState("Laboratorium Rekayasa Perangkat Lunak");
+  const [picKontak, setPicKontak] = useState("");
+  const [picLaboratorium, setPicLaboratorium] = useState("");
+
+  // AI Studio Edit Foto State (Gemini AI)
+  const [isAiStudioOpen, setIsAiStudioOpen] = useState(false);
+  const [aiJenis, setAiJenis] = useState<"produk" | "teknologi" | "layanan">("produk");
+  const [aiSubJenis, setAiSubJenis] = useState("Makanan");
+  const [aiPrompt, setAiPrompt] = useState(
+    settings.ai_default_prompt ||
+      "Tolong buatkan gambar dinamis ukuran landscape (1280x720 pixel), produk untuk display katalog produk pada marketplace. Pastikan hasilnya menjadi produk bagus, dinamis, kualitas HD, layak jual. Desain clean, tidak terlalu banyak kalimat."
+  );
+  const [aiRawPhoto, setAiRawPhoto] = useState<string>("");
+  const [aiLoading, setAiLoading] = useState(false);
+  const [aiPhotos, setAiPhotos] = useState<any[]>([]);
 
   useEffect(() => {
     async function fetchProdis() {
@@ -50,10 +65,9 @@ export default function CreateProdiItem() {
     fetchProdis();
   }, [currentUser]);
 
-  // Dynamic specs
+  // Clean dynamic specs (Bebas dari data dummy)
   const [specs, setSpecs] = useState([
-    { group_name: "Tech Stack", spec_key: "Frontend", spec_value: "Next.js 14, Tailwind CSS" },
-    { group_name: "Tech Stack", spec_key: "Backend API", spec_value: "Laravel 11 REST API" },
+    { group_name: "Spesifikasi Umum", spec_key: "", spec_value: "" }
   ]);
 
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -72,6 +86,37 @@ export default function CreateProdiItem() {
     const updated = [...specs];
     (updated[index] as any)[field] = val;
     setSpecs(updated);
+  };
+
+  const handleGenerateAiPhotos = async () => {
+    setAiLoading(true);
+    try {
+      const res = await fetch("/api/ai/catalog-photo", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          apiKey: settings.gemini_api_key,
+          jenis: aiJenis,
+          subJenis: aiSubJenis,
+          rawImageBase64: aiRawPhoto || thumbnailUrl || undefined,
+          customPrompt: aiPrompt,
+          namaItem: namaItem.trim() || "Produk Inovasi Vokasi UNS",
+          domain: settings.ai_default_domain || "spsbu.unsmadiun.id",
+        }),
+      });
+
+      const data = await res.json();
+      if (res.ok && data.success && data.data?.photos) {
+        setAiPhotos(data.data.photos);
+        toast.success("Foto AI Siap", "3 sudut foto produk katalog kualitas HD berhasil dihasilkan!");
+      } else {
+        toast.error("Gagal AI Studio", data.message || "Gagal memproses gambar");
+      }
+    } catch (e: any) {
+      toast.error("Error AI Studio", e.message || "Terjadi kesalahan koneksi");
+    } finally {
+      setAiLoading(false);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -310,32 +355,229 @@ export default function CreateProdiItem() {
                   if (url) setThumbnailUrl(url);
                 }}
               />
-              <div className="flex flex-wrap items-center gap-1.5 pt-1">
-                <span className="text-[11px] font-bold text-slate-500">Pintasan Contoh:</span>
+              {/* AI STUDIO EDIT FOTO KATALOG (GEMINI AI) */}
+              <div className="pt-2">
                 <button
                   type="button"
-                  onClick={() => setThumbnailUrl("/images/catalog/rintisku-saas-showcase.jpg")}
+                  onClick={() => setIsAiStudioOpen(!isAiStudioOpen)}
                   style={{ borderRadius: "9999px" }}
-                  className="text-[11px] px-3 py-1 rounded-full bg-slate-100 dark:bg-slate-800 hover:text-[#C5A059] font-bold border border-slate-200 dark:border-slate-700 transition cursor-pointer"
+                  className="w-full py-2.5 px-4 rounded-full bg-gradient-to-r from-amber-500/15 to-[#0F4C81]/15 hover:from-amber-500/25 hover:to-[#0F4C81]/25 text-[#0F4C81] dark:text-amber-300 font-extrabold text-xs border border-amber-400/40 dark:border-amber-500/30 flex items-center justify-between transition cursor-pointer shadow-xs"
                 >
-                  Mockup SaaS
+                  <div className="flex items-center gap-2">
+                    <Wand2 className="w-4 h-4 text-amber-500" />
+                    <span>✨ AI Studio: Edit & Generate Foto Katalog (Gemini AI)</span>
+                  </div>
+                  <ChevronDown className={`w-4 h-4 text-slate-500 transition-transform duration-200 ${isAiStudioOpen ? "rotate-180" : ""}`} />
                 </button>
-                <button
-                  type="button"
-                  onClick={() => setThumbnailUrl("/images/sequence/robot-frame-01.jpg")}
-                  style={{ borderRadius: "9999px" }}
-                  className="text-[11px] px-3 py-1 rounded-full bg-slate-100 dark:bg-slate-800 hover:text-[#C5A059] font-bold border border-slate-200 dark:border-slate-700 transition cursor-pointer"
-                >
-                  Mockup Robot
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setThumbnailUrl("/images/catalog/software-house-showcase.jpg")}
-                  style={{ borderRadius: "9999px" }}
-                  className="text-[11px] px-3 py-1 rounded-full bg-slate-100 dark:bg-slate-800 hover:text-[#C5A059] font-bold border border-slate-200 dark:border-slate-700 transition cursor-pointer"
-                >
-                  Mockup Jasa
-                </button>
+
+                {isAiStudioOpen && (
+                  <div className="mt-3 p-4 sm:p-5 rounded-2xl bg-slate-50 dark:bg-slate-900/90 border border-amber-400/30 dark:border-amber-500/20 space-y-4 text-left shadow-inner">
+                    <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-2">
+                      <span className="text-xs font-bold text-amber-600 dark:text-amber-400 flex items-center gap-1.5">
+                        <Bot className="w-4 h-4" />
+                        <span>Generator 3 Foto Multi-Sudut (HD Landscape)</span>
+                      </span>
+                      <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-amber-100 dark:bg-amber-950/80 text-amber-800 dark:text-amber-300 font-bold">
+                        Domain: {settings.ai_default_domain || "spsbu.unsmadiun.id"}
+                      </span>
+                    </div>
+
+                    {/* 1. Tambah Foto Mentah (Raw Photo) */}
+                    <div>
+                      <MediaUploader
+                        label="1. Tambah Foto Mentah Produk (Opsional untuk AI Visual Enhancer)"
+                        description="Upload foto produk asli/mentah dari lab atau handphone"
+                        acceptedType="image"
+                        maxSizeMb={5}
+                        currentUrl={aiRawPhoto}
+                        onUploadSuccess={(url) => {
+                          if (url) setAiRawPhoto(url);
+                        }}
+                      />
+                    </div>
+
+                    {/* 2. Pilihan Jenis */}
+                    <div>
+                      <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block mb-1.5">
+                        2. Pilih Jenis Inovasi:
+                      </label>
+                      <div className="grid grid-cols-3 gap-2">
+                        {(["produk", "teknologi", "layanan"] as const).map((j) => (
+                          <button
+                            key={j}
+                            type="button"
+                            onClick={() => {
+                              setAiJenis(j);
+                              if (j === "produk") setAiSubJenis("Makanan");
+                              else if (j === "teknologi") setAiSubJenis("Mesin");
+                              else setAiSubJenis("Konsultasi");
+                            }}
+                            style={{ borderRadius: "9999px" }}
+                            className={`py-1.5 px-3 rounded-full text-xs font-bold capitalize transition border cursor-pointer ${
+                              aiJenis === j
+                                ? "bg-[#0F4C81] text-white border-[#0F4C81] shadow-xs"
+                                : "bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:bg-slate-100"
+                            }`}
+                          >
+                            {j}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* 3. Pilihan Sub-Jenis Sesuai Instruksi Dosen */}
+                    <div>
+                      <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block mb-1.5">
+                        3. Kategori Spesifik ({aiJenis}):
+                      </label>
+                      <div className="flex flex-wrap gap-1.5">
+                        {aiJenis === "produk" && (
+                          ["Makanan", "Minuman", "Obat", "Kosmetik", "Hasil Pertanian", "Animasi"].map((sub) => (
+                            <button
+                              key={sub}
+                              type="button"
+                              onClick={() => setAiSubJenis(sub)}
+                              style={{ borderRadius: "9999px" }}
+                              className={`py-1 px-3 rounded-full text-[11px] font-bold transition border cursor-pointer ${
+                                aiSubJenis === sub
+                                  ? "bg-amber-500 text-white border-amber-500 shadow-xs"
+                                  : "bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:bg-slate-100"
+                              }`}
+                            >
+                              {sub}
+                            </button>
+                          ))
+                        )}
+
+                        {aiJenis === "teknologi" && (
+                          ["Mesin", "IoT", "Software As A Service"].map((sub) => (
+                            <button
+                              key={sub}
+                              type="button"
+                              onClick={() => setAiSubJenis(sub)}
+                              style={{ borderRadius: "9999px" }}
+                              className={`py-1 px-3 rounded-full text-[11px] font-bold transition border cursor-pointer ${
+                                aiSubJenis === sub
+                                  ? "bg-blue-600 text-white border-blue-600 shadow-xs"
+                                  : "bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:bg-slate-100"
+                              }`}
+                            >
+                              {sub}
+                            </button>
+                          ))
+                        )}
+
+                        {aiJenis === "layanan" && (
+                          ["Konsultasi", "Pelatihan", "Uji Lab", "Preservasi"].map((sub) => (
+                            <button
+                              key={sub}
+                              type="button"
+                              onClick={() => setAiSubJenis(sub)}
+                              style={{ borderRadius: "9999px" }}
+                              className={`py-1 px-3 rounded-full text-[11px] font-bold transition border cursor-pointer ${
+                                aiSubJenis === sub
+                                  ? "bg-emerald-600 text-white border-emerald-600 shadow-xs"
+                                  : "bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:bg-slate-100"
+                              }`}
+                            >
+                              {sub}
+                            </button>
+                          ))
+                        )}
+                      </div>
+                    </div>
+
+                    {/* 4. Prompt Dinamis (Editable) */}
+                    <div>
+                      <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block mb-1">
+                        4. Prompt Dinamis (Dapat Diedit):
+                      </label>
+                      <textarea
+                        rows={3}
+                        value={aiPrompt}
+                        onChange={(e) => setAiPrompt(e.target.value)}
+                        style={{ borderRadius: "14px" }}
+                        className="w-full p-2.5 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:border-amber-400 leading-relaxed font-sans"
+                      />
+                    </div>
+
+                    {/* 5. Tombol Generate */}
+                    <button
+                      type="button"
+                      onClick={handleGenerateAiPhotos}
+                      disabled={aiLoading}
+                      style={{ borderRadius: "9999px" }}
+                      className="w-full py-2.5 rounded-full bg-gradient-to-r from-amber-500 to-[#0F4C81] hover:from-amber-600 hover:to-[#135996] text-white font-black text-xs shadow-md transition flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+                    >
+                      <RefreshCw className={`w-3.5 h-3.5 ${aiLoading ? "animate-spin" : ""}`} />
+                      <span>{aiLoading ? "Memproses 3 Foto AI..." : "Proses AI: Hasilkan 3 Foto HD (Tampak Depan, Samping & Display)"}</span>
+                    </button>
+
+                    {/* 6. Hasil 3 Foto Produk */}
+                    {aiPhotos.length > 0 && (
+                      <div className="pt-2 space-y-3">
+                        <span className="text-xs font-black text-slate-900 dark:text-white block border-b border-slate-200 dark:border-slate-800 pb-1">
+                          📸 Hasil Foto AI (Klik untuk Memilih Mockup Utama):
+                        </span>
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                          {aiPhotos.map((photo) => (
+                            <div
+                              key={photo.id}
+                              className={`rounded-2xl p-2 border transition ${
+                                thumbnailUrl === photo.url
+                                  ? "border-emerald-500 bg-emerald-50/50 dark:bg-emerald-950/40 ring-2 ring-emerald-500/30"
+                                  : "border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:border-amber-400"
+                              }`}
+                            >
+                              <div className="relative aspect-video rounded-xl overflow-hidden bg-slate-100 dark:bg-slate-900 mb-2">
+                                <img
+                                  src={photo.url}
+                                  alt={photo.title}
+                                  className="w-full h-full object-cover"
+                                />
+                                <span className="absolute top-1.5 left-1.5 px-2 py-0.5 rounded-full bg-slate-950/80 text-[10px] font-bold text-white">
+                                  {photo.angle}
+                                </span>
+                              </div>
+                              <h5 className="font-bold text-[11px] text-slate-900 dark:text-white truncate mb-2">
+                                {photo.title}
+                              </h5>
+                              <div className="flex items-center gap-1.5">
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    setThumbnailUrl(photo.url);
+                                    toast.success("Foto Dipilih", `Foto "${photo.title}" dijadikan sebagai mockup produk.`);
+                                  }}
+                                  style={{ borderRadius: "9999px" }}
+                                  className={`flex-1 py-1 px-2 rounded-full text-[10px] font-bold transition flex items-center justify-center gap-1 cursor-pointer ${
+                                    thumbnailUrl === photo.url
+                                      ? "bg-emerald-600 text-white"
+                                      : "bg-[#0F4C81] text-white hover:bg-[#135996]"
+                                  }`}
+                                >
+                                  <Check className="w-3 h-3" />
+                                  <span>{thumbnailUrl === photo.url ? "Terpilih" : "Gunakan"}</span>
+                                </button>
+                                <a
+                                  href={photo.url}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  download
+                                  style={{ borderRadius: "9999px" }}
+                                  className="p-1 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:text-amber-500"
+                                  title="Buka / Unduh HD"
+                                >
+                                  <Download className="w-3 h-3" />
+                                </a>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
             </div>
 
