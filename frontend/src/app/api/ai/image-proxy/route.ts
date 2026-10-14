@@ -8,8 +8,8 @@ export async function GET(req: NextRequest) {
     const targetUrl = searchParams.get("url");
     const prompt = searchParams.get("prompt");
     const seed = searchParams.get("seed") || "42";
-    const width = searchParams.get("width") || "1280";
-    const height = searchParams.get("height") || "720";
+    const width = searchParams.get("width") || "960";
+    const height = searchParams.get("height") || "1280";
 
     let fetchUrl = "";
     if (targetUrl && targetUrl.startsWith("http")) {
@@ -70,12 +70,12 @@ export async function GET(req: NextRequest) {
     
     // Return SVG Placeholder on error so UI never breaks
     const svgPlaceholder = `
-      <svg width="1280" height="720" viewBox="0 0 1280 720" xmlns="http://www.w3.org/2000/svg">
+      <svg width="960" height="1280" viewBox="0 0 960 1280" xmlns="http://www.w3.org/2000/svg">
         <rect width="100%" height="100%" fill="#07192C"/>
-        <circle cx="640" cy="320" r="80" fill="#0F4C81"/>
-        <text x="640" y="335" font-family="system-ui, sans-serif" font-size="48" fill="#C5A059" text-anchor="middle">📸</text>
-        <text x="640" y="440" font-family="system-ui, sans-serif" font-size="28" font-weight="bold" fill="#FFFFFF" text-anchor="middle">Katalog Foto Marketplace Vokasi UNS</text>
-        <text x="640" y="480" font-family="system-ui, sans-serif" font-size="18" fill="#94A3B8" text-anchor="middle">Resolusi HD 1280x720 • Standar Komersial</text>
+        <circle cx="480" cy="560" r="80" fill="#0F4C81"/>
+        <text x="480" y="575" font-family="system-ui, sans-serif" font-size="28" font-weight="bold" fill="#C5A059" text-anchor="middle">UNS</text>
+        <text x="480" y="690" font-family="system-ui, sans-serif" font-size="28" font-weight="bold" fill="#FFFFFF" text-anchor="middle">Katalog Foto Marketplace Vokasi UNS</text>
+        <text x="480" y="730" font-family="system-ui, sans-serif" font-size="18" fill="#94A3B8" text-anchor="middle">Format Portrait 3:4 (960x1280) • Standar Komersial</text>
       </svg>
     `;
 

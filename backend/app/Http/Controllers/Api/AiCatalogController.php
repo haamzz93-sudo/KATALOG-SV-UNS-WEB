@@ -144,7 +144,7 @@ class AiCatalogController extends Controller
                         (!empty($detailLabels) ? "Features/Tags to highlight on macro shot: {$detailLabels}.\n" : "") .
                         "Infographic headline: \"{$benefitHeadline}\".\n\n" .
                         "=== USER EXTRA INSTRUCTION ===\n" . ($customPrompt ?: 'Jaga agar produk tampak tajam, profesional, layak jual, konsisten di seluruh 4 foto.') . "\n\n" .
-                        "Generate 4 specialized English photography prompts for a commercial image generator (16:9 landscape aspect ratio, photorealistic 8k commercial photoshoot):\n" .
+                        "Generate 4 specialized English photography prompts for a commercial image generator (3:4 portrait aspect ratio, 960x1280 resolution, photorealistic 8k commercial photoshoot):\n" .
                         "- 'hero_prompt': High-end commercial hero product photography of [EXACT PHYSICAL ITEM WITH ITS EXACT COLORS AND LABELS], centered on a clean minimalist white studio pedestal, soft studio rim lighting, crisp focus, clean white/light grey studio background, photorealistic 8k, product packaging only.\n" .
                         "- 'detail_prompt': Editorial macro close-up photography of [EXACT PHYSICAL ITEM WITH ITS EXACT COLORS], capturing extreme close-up of [{$detailLabels}], material craftsmanship, surface texture, precision print and seams, soft studio lighting, shallow depth of field, 8k.\n" .
                         "- 'benefit_prompt': Clean aesthetic commercial infographic presentation of [EXACT PHYSICAL ITEM WITH ITS EXACT COLORS], modern minimalist feature highlight layout with headline '{$benefitHeadline}', studio lighting, crisp typography, 8k.\n" .
@@ -315,8 +315,8 @@ class AiCatalogController extends Controller
                     'badge' => 'Hero Product',
                     'desc' => 'Fokus utama, background bersih (putih/ivory), pencahayaan studio lembut, identitas logo & warna presisi.',
                     'prompt' => $prompts['hero'],
-                    'url' => "/api/v1/public/ai/image-proxy?prompt=" . rawurlencode($prompts['hero']) . "&seed=" . ($seedBase + 1) . "&width=1024&height=576",
-                    'directUrl' => "/api/v1/public/ai/image-proxy?prompt=" . rawurlencode($prompts['hero']) . "&seed=" . ($seedBase + 1) . "&width=1280&height=720",
+                    'url' => "/api/v1/public/ai/image-proxy?prompt=" . rawurlencode($prompts['hero']) . "&seed=" . ($seedBase + 1) . "&width=960&height=1280",
+                    'directUrl' => "/api/v1/public/ai/image-proxy?prompt=" . rawurlencode($prompts['hero']) . "&seed=" . ($seedBase + 1) . "&width=960&height=1280",
                 ],
                 [
                     'id' => 'detail',
@@ -325,8 +325,8 @@ class AiCatalogController extends Controller
                     'badge' => 'Detail & Quality',
                     'desc' => 'Macro shot tekstur, material, kerapian finishing & kemasan untuk meyakinkan calon pembeli/mitra.',
                     'prompt' => $prompts['detail'],
-                    'url' => "/api/v1/public/ai/image-proxy?prompt=" . rawurlencode($prompts['detail']) . "&seed=" . ($seedBase + 2) . "&width=1024&height=576",
-                    'directUrl' => "/api/v1/public/ai/image-proxy?prompt=" . rawurlencode($prompts['detail']) . "&seed=" . ($seedBase + 2) . "&width=1280&height=720",
+                    'url' => "/api/v1/public/ai/image-proxy?prompt=" . rawurlencode($prompts['detail']) . "&seed=" . ($seedBase + 2) . "&width=960&height=1280",
+                    'directUrl' => "/api/v1/public/ai/image-proxy?prompt=" . rawurlencode($prompts['detail']) . "&seed=" . ($seedBase + 2) . "&width=960&height=1280",
                 ],
                 [
                     'id' => 'benefit',
@@ -335,8 +335,8 @@ class AiCatalogController extends Controller
                     'badge' => 'Key Features',
                     'desc' => 'Tampilan infografis modern menyajikan poin keunggulan dan alasan mengapa produk ini layak dipilih.',
                     'prompt' => $prompts['benefit'],
-                    'url' => "/api/v1/public/ai/image-proxy?prompt=" . rawurlencode($prompts['benefit']) . "&seed=" . ($seedBase + 3) . "&width=1024&height=576",
-                    'directUrl' => "/api/v1/public/ai/image-proxy?prompt=" . rawurlencode($prompts['benefit']) . "&seed=" . ($seedBase + 3) . "&width=1280&height=720",
+                    'url' => "/api/v1/public/ai/image-proxy?prompt=" . rawurlencode($prompts['benefit']) . "&seed=" . ($seedBase + 3) . "&width=960&height=1280",
+                    'directUrl' => "/api/v1/public/ai/image-proxy?prompt=" . rawurlencode($prompts['benefit']) . "&seed=" . ($seedBase + 3) . "&width=960&height=1280",
                 ],
                 [
                     'id' => 'lifestyle',
@@ -345,8 +345,8 @@ class AiCatalogController extends Controller
                     'badge' => 'Real Context',
                     'desc' => 'Fotografi kontekstual penggunaan nyata produk sesuai kategori (meja kerja, lab, konsumsi, atau aktivitas sehari-hari).',
                     'prompt' => $prompts['lifestyle'],
-                    'url' => "/api/v1/public/ai/image-proxy?prompt=" . rawurlencode($prompts['lifestyle']) . "&seed=" . ($seedBase + 4) . "&width=1024&height=576",
-                    'directUrl' => "/api/v1/public/ai/image-proxy?prompt=" . rawurlencode($prompts['lifestyle']) . "&seed=" . ($seedBase + 4) . "&width=1280&height=720",
+                    'url' => "/api/v1/public/ai/image-proxy?prompt=" . rawurlencode($prompts['lifestyle']) . "&seed=" . ($seedBase + 4) . "&width=960&height=1280",
+                    'directUrl' => "/api/v1/public/ai/image-proxy?prompt=" . rawurlencode($prompts['lifestyle']) . "&seed=" . ($seedBase + 4) . "&width=960&height=1280",
                 ],
             ];
 
@@ -493,12 +493,12 @@ class AiCatalogController extends Controller
         }
 
         // SVG fallback placeholder
-        $svg = '<svg width="1280" height="720" viewBox="0 0 1280 720" xmlns="http://www.w3.org/2000/svg">
+        $svg = '<svg width="960" height="1280" viewBox="0 0 960 1280" xmlns="http://www.w3.org/2000/svg">
             <rect width="100%" height="100%" fill="#07192C"/>
-            <circle cx="640" cy="320" r="80" fill="#0F4C81"/>
-            <text x="640" y="335" font-family="system-ui, sans-serif" font-size="48" fill="#C5A059" text-anchor="middle">&#128248;</text>
-            <text x="640" y="440" font-family="system-ui, sans-serif" font-size="28" font-weight="bold" fill="#FFFFFF" text-anchor="middle">Katalog Foto Marketplace Vokasi UNS</text>
-            <text x="640" y="480" font-family="system-ui, sans-serif" font-size="18" fill="#94A3B8" text-anchor="middle">Resolusi HD 1280x720 &bull; Standar Komersial</text>
+            <circle cx="480" cy="560" r="80" fill="#0F4C81"/>
+            <text x="480" y="575" font-family="system-ui, sans-serif" font-size="28" font-weight="bold" fill="#C5A059" text-anchor="middle">UNS</text>
+            <text x="480" y="690" font-family="system-ui, sans-serif" font-size="28" font-weight="bold" fill="#FFFFFF" text-anchor="middle">Katalog Foto Marketplace Vokasi UNS</text>
+            <text x="480" y="730" font-family="system-ui, sans-serif" font-size="18" fill="#94A3B8" text-anchor="middle">Format Portrait 3:4 (960x1280) &bull; Standar Komersial</text>
         </svg>';
 
         return response($svg, 200)->header('Content-Type', 'image/svg+xml');

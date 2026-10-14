@@ -443,7 +443,7 @@ export const DEFAULT_SITE_SETTINGS: SiteSettings = {
   // Setting Prompt AI Studio & Gemini API
   gemini_api_key: process.env.NEXT_PUBLIC_GEMINI_API_KEY || "",
   ai_default_domain: "spsbu.unsmadiun.id",
-  ai_default_prompt: "Pencahayaan studio komersial lembut, resolusi HD 8k, aspect ratio landscape 16:9, clean minimalis, pertahankan keaslian warna, logo, dan identitas visual konsisten di seluruh 4 foto.",
+  ai_default_prompt: "Pencahayaan studio komersial lembut, resolusi HD 8k, format portrait 3:4 (960x1280), clean minimalis, pertahankan keaslian warna, logo, dan identitas visual konsisten di seluruh 4 foto.",
 
   // 4 Marketplace Photos Paten Prompts & Master Consistency
   ai_prompt_1_hero: `Gunakan foto produk yang diberikan sebagai referensi utama. Identifikasi otomatis jenis produk, bentuk, warna, material, label, kemasan, logo, tulisan, serta karakter visualnya. Buat foto produk marketplace premium dengan komposisi hero product photography.

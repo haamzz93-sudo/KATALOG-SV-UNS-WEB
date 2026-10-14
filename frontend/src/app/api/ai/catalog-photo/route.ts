@@ -53,7 +53,7 @@ ${templateBenefit || "Gunakan produk asli sebagai fokus utama. Buat foto ketiga 
 PROMPT 4 (Lifestyle / Real Use Context):
 ${templateLifestyle || "Gunakan produk asli sebagai referensi dan pertahankan desainnya secara akurat. Buat foto lifestyle profesional yang menunjukkan produk digunakan dalam konteks nyata sesuai kategorinya."}
 
-CRITICAL: Generate 4 specialized, detailed English photography prompts for an image generator (16:9 landscape aspect ratio, 8k resolution, photorealistic commercial photoshoot). Return strictly a JSON object with this exact schema:
+CRITICAL: Generate 4 specialized, detailed English photography prompts for an image generator (3:4 portrait aspect ratio, 960x1280 resolution, photorealistic commercial photoshoot). Return strictly a JSON object with this exact schema:
 {
   "hero_prompt": "...",
   "detail_prompt": "...",
@@ -107,7 +107,7 @@ CRITICAL: Generate 4 specialized, detailed English photography prompts for an im
       lifestyle: geminiEnhancedPrompt?.lifestyle_prompt || `Authentic lifestyle product photography of ${baseSubject}, in natural real-world use environment for ${kategori}, warm ambient morning light, commercial catalog aesthetic, high quality depth of field, 8k`,
     };
 
-    // 3. Generate 4 Foto Dinamis HD Landscape (1280x720) via Proxy (Bypasses 402 Referer Paywall)
+    // 3. Generate 4 Foto Dinamis HD Portrait 3:4 (960x1280) via Proxy (Bypasses 402 Referer Paywall)
     const seedBase = Date.now();
     const photos = [
       {
@@ -117,8 +117,8 @@ CRITICAL: Generate 4 specialized, detailed English photography prompts for an im
         badge: "Hero Product",
         desc: "Fokus utama, background bersih (putih/ivory), pencahayaan studio lembut, identitas logo & warna presisi.",
         prompt: prompts.hero,
-        url: `/api/v1/public/ai/image-proxy?prompt=${encodeURIComponent(prompts.hero)}&seed=${seedBase + 1}&width=1280&height=720`,
-        directUrl: `https://image.pollinations.ai/prompt/${encodeURIComponent(prompts.hero)}?width=1280&height=720&seed=${seedBase + 1}&model=turbo&nologo=true`,
+        url: `/api/v1/public/ai/image-proxy?prompt=${encodeURIComponent(prompts.hero)}&seed=${seedBase + 1}&width=960&height=1280`,
+        directUrl: `https://image.pollinations.ai/prompt/${encodeURIComponent(prompts.hero)}?width=960&height=1280&seed=${seedBase + 1}&model=turbo&nologo=true`,
       },
       {
         id: "detail",
@@ -127,8 +127,8 @@ CRITICAL: Generate 4 specialized, detailed English photography prompts for an im
         badge: "Detail & Quality",
         desc: "Macro shot tekstur, material, kerapian finishing & kemasan untuk meyakinkan calon pembeli/mitra.",
         prompt: prompts.detail,
-        url: `/api/v1/public/ai/image-proxy?prompt=${encodeURIComponent(prompts.detail)}&seed=${seedBase + 2}&width=1280&height=720`,
-        directUrl: `https://image.pollinations.ai/prompt/${encodeURIComponent(prompts.detail)}?width=1280&height=720&seed=${seedBase + 2}&model=turbo&nologo=true`,
+        url: `/api/v1/public/ai/image-proxy?prompt=${encodeURIComponent(prompts.detail)}&seed=${seedBase + 2}&width=960&height=1280`,
+        directUrl: `https://image.pollinations.ai/prompt/${encodeURIComponent(prompts.detail)}?width=960&height=1280&seed=${seedBase + 2}&model=turbo&nologo=true`,
       },
       {
         id: "benefit",
@@ -137,8 +137,8 @@ CRITICAL: Generate 4 specialized, detailed English photography prompts for an im
         badge: "Key Features",
         desc: "Tampilan infografis modern menyajikan poin keunggulan dan alasan mengapa produk ini layak dipilih.",
         prompt: prompts.benefit,
-        url: `/api/v1/public/ai/image-proxy?prompt=${encodeURIComponent(prompts.benefit)}&seed=${seedBase + 3}&width=1280&height=720`,
-        directUrl: `https://image.pollinations.ai/prompt/${encodeURIComponent(prompts.benefit)}?width=1280&height=720&seed=${seedBase + 3}&model=turbo&nologo=true`,
+        url: `/api/v1/public/ai/image-proxy?prompt=${encodeURIComponent(prompts.benefit)}&seed=${seedBase + 3}&width=960&height=1280`,
+        directUrl: `https://image.pollinations.ai/prompt/${encodeURIComponent(prompts.benefit)}?width=960&height=1280&seed=${seedBase + 3}&model=turbo&nologo=true`,
       },
       {
         id: "lifestyle",
@@ -147,8 +147,8 @@ CRITICAL: Generate 4 specialized, detailed English photography prompts for an im
         badge: "Real Context",
         desc: "Fotografi kontekstual penggunaan nyata produk sesuai kategori (meja kerja, lab, konsumsi, atau aktivitas sehari-hari).",
         prompt: prompts.lifestyle,
-        url: `/api/v1/public/ai/image-proxy?prompt=${encodeURIComponent(prompts.lifestyle)}&seed=${seedBase + 4}&width=1280&height=720`,
-        directUrl: `https://image.pollinations.ai/prompt/${encodeURIComponent(prompts.lifestyle)}?width=1280&height=720&seed=${seedBase + 4}&model=turbo&nologo=true`,
+        url: `/api/v1/public/ai/image-proxy?prompt=${encodeURIComponent(prompts.lifestyle)}&seed=${seedBase + 4}&width=960&height=1280`,
+        directUrl: `https://image.pollinations.ai/prompt/${encodeURIComponent(prompts.lifestyle)}?width=960&height=1280&seed=${seedBase + 4}&model=turbo&nologo=true`,
       },
     ];
 

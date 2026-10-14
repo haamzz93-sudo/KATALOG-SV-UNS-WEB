@@ -80,10 +80,13 @@ function AdminDashboardContent() {
   }, [settings, isCmsSaving]);
 
   // AI Prompt Studio Setting State
+  const DEFAULT_PORTRAIT_AI_PROMPT = "Pencahayaan studio komersial lembut, resolusi HD 8k, format portrait 3:4 (960x1280), clean minimalis, pertahankan keaslian warna, logo, dan identitas visual konsisten di seluruh 4 foto.";
+  const cleanPromptTemplate = (val?: string) => (!val || val.includes("1280x720") || val.includes("landscape") || val.includes("16:9")) ? DEFAULT_PORTRAIT_AI_PROMPT : val;
+
   const [aiApiKey, setAiApiKey] = useState(settings.gemini_api_key || process.env.NEXT_PUBLIC_GEMINI_API_KEY || "");
-  const [aiDomain, setAiDomain] = useState(settings.ai_default_domain || "katalog.unsmadiun.id");
+  const [aiDomain, setAiDomain] = useState(settings.ai_default_domain || "spsbu.unsmadiun.id");
   const [aiPromptTemplate, setAiPromptTemplate] = useState(
-    settings.ai_default_prompt || "Tolong buatkan gambar dinamis ukuran landscape (1280x720 pixel), produk untuk display katalog produk pada marketplace. Pastikan hasilnya menjadi produk bagus, dinamis, kualitas HD, layak jual. Desain clean, tidak terlalu banyak kalimat."
+    cleanPromptTemplate(settings.ai_default_prompt)
   );
 
   // 4 Marketplace Photos Paten Prompts & Master Consistency State (Full CRUD)
@@ -100,7 +103,7 @@ function AdminDashboardContent() {
   useEffect(() => {
     if (settings.gemini_api_key) setAiApiKey(settings.gemini_api_key);
     if (settings.ai_default_domain) setAiDomain(settings.ai_default_domain);
-    if (settings.ai_default_prompt) setAiPromptTemplate(settings.ai_default_prompt);
+    if (settings.ai_default_prompt) setAiPromptTemplate(cleanPromptTemplate(settings.ai_default_prompt));
     if (settings.ai_prompt_1_hero) setAiPromptHero(settings.ai_prompt_1_hero);
     if (settings.ai_prompt_2_detail) setAiPromptDetail(settings.ai_prompt_2_detail);
     if (settings.ai_prompt_3_benefit) setAiPromptBenefit(settings.ai_prompt_3_benefit);

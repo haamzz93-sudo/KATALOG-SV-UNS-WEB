@@ -64,6 +64,19 @@ export default function CreateProdiItem() {
     "WHY YOU'LL LOVE IT",
   ];
 
+  const DEFAULT_AI_PROMPT = "Pencahayaan studio komersial lembut, resolusi HD 8k, format portrait 3:4 (960x1280), clean minimalis, pertahankan keaslian warna, logo, dan identitas visual konsisten di seluruh 4 foto.";
+
+  const getCleanPrompt = (val?: string) => {
+    if (!val || val.includes("1280x720") || val.includes("landscape") || val.includes("16:9")) {
+      return DEFAULT_AI_PROMPT;
+    }
+    return val;
+  };
+
+  const draftKey = `katalog_create_draft_${currentUser?.id || "anon"}`;
+  const [draftSavedAt, setDraftSavedAt] = useState<string | null>(null);
+  const [isDraftLoaded, setIsDraftLoaded] = useState(false);
+
   const [isAiStudioOpen, setIsAiStudioOpen] = useState(false);
   const [aiKategori, setAiKategori] = useState<string>("PRODUK MAKANAN");
   const [aiDetailLabels, setAiDetailLabels] = useState<string[]>([
@@ -72,14 +85,18 @@ export default function CreateProdiItem() {
     "Desain Presisi",
   ]);
   const [aiBenefitHeadline, setAiBenefitHeadline] = useState<string>("KENAPA PRODUK INI LAYAK DIPILIH?");
-  const [aiPrompt, setAiPrompt] = useState(
-    settings.ai_default_prompt ||
-      "Pencahayaan studio komersial lembut, resolusi HD 8k, format portrait 3:4, clean minimalis, pertahankan keaslian warna, logo, dan identitas visual konsisten di seluruh 4 foto."
+  const [aiPrompt, setAiPrompt] = useState<string>(
+    getCleanPrompt(settings.ai_default_prompt)
   );
   const [aiRawPhoto, setAiRawPhoto] = useState<string>("");
   const [aiRawPhotoBase64, setAiRawPhotoBase64] = useState<string>("");
   const [aiLoading, setAiLoading] = useState(false);
   const [aiPhotos, setAiPhotos] = useState<any[]>([]);
+
+  // Clean dynamic specs (Bebas dari data dummy)
+  const [specs, setSpecs] = useState([
+    { group_name: "Spesifikasi Umum", spec_key: "", spec_value: "" }
+  ]);
 
   const handleToggleDetailTag = (tag: string) => {
     if (aiDetailLabels.includes(tag)) {
@@ -111,10 +128,169 @@ export default function CreateProdiItem() {
     fetchProdis();
   }, [currentUser]);
 
-  // Clean dynamic specs (Bebas dari data dummy)
-  const [specs, setSpecs] = useState([
-    { group_name: "Spesifikasi Umum", spec_key: "", spec_value: "" }
+  // 1. Restore draft per user account on initial load
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    try {
+      const saved = localStorage.getItem(draftKey);
+      if (saved) {
+        const d = JSON.parse(saved);
+        if (d.namaItem !== undefined) setNamaItem(d.namaItem);
+        if (d.tagline !== undefined) setTagline(d.tagline);
+        if (d.deskripsiSingkat !== undefined) setDeskripsiSingkat(d.deskripsiSingkat);
+        if (d.deskripsiLengkap !== undefined) setDeskripsiLengkap(d.deskripsiLengkap);
+        if (d.prodiId !== undefined) setProdiId(d.prodiId);
+        if (d.categoryId !== undefined) setCategoryId(d.categoryId);
+        if (d.liveDemoUrl !== undefined) setLiveDemoUrl(d.liveDemoUrl);
+        if (d.model3dUrl !== undefined) setModel3dUrl(d.model3dUrl);
+        if (d.thumbnailUrl !== undefined) setThumbnailUrl(d.thumbnailUrl);
+        if (d.statusPublikasi !== undefined) setStatusPublikasi(d.statusPublikasi);
+        if (d.hargaTipe !== undefined) setHargaTipe(d.hargaTipe);
+        if (d.hargaNominal !== undefined) setHargaNominal(d.hargaNominal);
+        if (d.picNama !== undefined) setPicNama(d.picNama);
+        if (d.picKontak !== undefined) setPicKontak(d.picKontak);
+        if (d.picLaboratorium !== undefined) setPicLaboratorium(d.picLaboratorium);
+        if (d.specs && Array.isArray(d.specs) && d.specs.length > 0) setSpecs(d.specs);
+        if (d.isAiStudioOpen !== undefined) setIsAiStudioOpen(d.isAiStudioOpen);
+        if (d.aiKategori !== undefined) setAiKategori(d.aiKategori);
+        if (d.aiDetailLabels && Array.isArray(d.aiDetailLabels) && d.aiDetailLabels.length > 0) setAiDetailLabels(d.aiDetailLabels);
+        if (d.aiBenefitHeadline !== undefined) setAiBenefitHeadline(d.aiBenefitHeadline);
+        if (d.aiPrompt) setAiPrompt(getCleanPrompt(d.aiPrompt));
+        if (d.aiRawPhoto !== undefined) setAiRawPhoto(d.aiRawPhoto);
+        if (d.aiRawPhotoBase64 !== undefined) setAiRawPhotoBase64(d.aiRawPhotoBase64);
+        if (d.aiPhotos && Array.isArray(d.aiPhotos) && d.aiPhotos.length > 0) setAiPhotos(d.aiPhotos);
+        if (d.savedAt) setDraftSavedAt(d.savedAt);
+        toast.info("Draft Dipulihkan", "Data formulir yang Anda input sebelumnya berhasil dimuat kembali.");
+      }
+    } catch (e) {
+      console.warn("Gagal memuat draft formulir:", e);
+    } finally {
+      setIsDraftLoaded(true);
+    }
+  }, [draftKey]);
+
+  // 2. Debounced auto-save draft to localStorage whenever form data changes
+  useEffect(() => {
+    if (!isDraftLoaded || typeof window === "undefined") return;
+
+    const hasData =
+      namaItem.trim() ||
+      tagline.trim() ||
+      deskripsiSingkat.trim() ||
+      deskripsiLengkap.trim() ||
+      thumbnailUrl ||
+      aiRawPhoto ||
+      (aiPhotos && aiPhotos.length > 0) ||
+      liveDemoUrl.trim() ||
+      picNama.trim();
+
+    if (!hasData) return;
+
+    const timer = setTimeout(() => {
+      try {
+        const now = new Date().toLocaleTimeString("id-ID", { hour: "2-digit", minute: "2-digit" });
+        const draftData = {
+          prodiId,
+          categoryId,
+          namaItem,
+          tagline,
+          deskripsiSingkat,
+          deskripsiLengkap,
+          liveDemoUrl,
+          model3dUrl,
+          thumbnailUrl,
+          statusPublikasi,
+          hargaTipe,
+          hargaNominal,
+          picNama,
+          picKontak,
+          picLaboratorium,
+          specs,
+          isAiStudioOpen,
+          aiKategori,
+          aiDetailLabels,
+          aiBenefitHeadline,
+          aiPrompt,
+          aiRawPhoto,
+          aiRawPhotoBase64,
+          aiPhotos,
+          savedAt: now,
+        };
+
+        try {
+          localStorage.setItem(draftKey, JSON.stringify(draftData));
+          setDraftSavedAt(now);
+        } catch (storageErr) {
+          const safeDraft = {
+            ...draftData,
+            aiPhotos: [],
+            aiRawPhotoBase64: "",
+          };
+          localStorage.setItem(draftKey, JSON.stringify(safeDraft));
+          setDraftSavedAt(now);
+        }
+      } catch (err) {
+        console.error("Gagal menyimpan auto-draft:", err);
+      }
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [
+    isDraftLoaded,
+    draftKey,
+    prodiId,
+    categoryId,
+    namaItem,
+    tagline,
+    deskripsiSingkat,
+    deskripsiLengkap,
+    liveDemoUrl,
+    model3dUrl,
+    thumbnailUrl,
+    statusPublikasi,
+    hargaTipe,
+    hargaNominal,
+    picNama,
+    picKontak,
+    picLaboratorium,
+    specs,
+    isAiStudioOpen,
+    aiKategori,
+    aiDetailLabels,
+    aiBenefitHeadline,
+    aiPrompt,
+    aiRawPhoto,
+    aiRawPhotoBase64,
+    aiPhotos,
   ]);
+
+  const handleClearDraft = () => {
+    if (confirm("Kosongkan isian formulir dan hapus draft akun ini?")) {
+      if (typeof window !== "undefined") {
+        localStorage.removeItem(draftKey);
+      }
+      setNamaItem("");
+      setTagline("");
+      setDeskripsiSingkat("");
+      setDeskripsiLengkap("");
+      setLiveDemoUrl("");
+      setModel3dUrl("");
+      setThumbnailUrl("");
+      setStatusPublikasi("published");
+      setHargaTipe("starting_at");
+      setHargaNominal(0);
+      setPicNama("");
+      setPicKontak("");
+      setPicLaboratorium("");
+      setSpecs([{ group_name: "Spesifikasi Umum", spec_key: "", spec_value: "" }]);
+      setAiRawPhoto("");
+      setAiRawPhotoBase64("");
+      setAiPhotos([]);
+      setAiPrompt(DEFAULT_AI_PROMPT);
+      setDraftSavedAt(null);
+      toast.info("Draft Dikosongkan", "Formulir telah direset kembali.");
+    }
+  };
 
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
@@ -253,6 +429,9 @@ export default function CreateProdiItem() {
 
       const res = await api.createItem(payload);
       if (res.success) {
+        if (typeof window !== "undefined") {
+          localStorage.removeItem(draftKey);
+        }
         setIsSuccess(true);
         toast.success("Inovasi Berhasil Didaftarkan!", `Produk "${namaItem}" telah berhasil disimpan ke katalog prodi.`);
         setTimeout(() => {
@@ -287,13 +466,36 @@ export default function CreateProdiItem() {
         </span>
       </div>
 
-      <div className="text-left">
-        <h1 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight">
-          Tambah Produk Inovasi Baru
-        </h1>
-        <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
-          Lengkapi data produk sesuai standar 5 Elemen (Mockup, Demo, Nama, Spesifikasi Teknis, Harga).
-        </p>
+      <div className="flex flex-wrap items-center justify-between gap-3 text-left">
+        <div>
+          <h1 className="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight">
+            Tambah Produk Inovasi Baru
+          </h1>
+          <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">
+            Lengkapi data produk sesuai standar 5 Elemen (Mockup, Demo, Nama, Spesifikasi Teknis, Harga).
+          </p>
+        </div>
+
+        {/* Auto-Save Draft Status Per Akun */}
+        <div className="flex items-center gap-2">
+          {draftSavedAt && (
+            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 text-[11px] font-semibold text-emerald-700 dark:text-emerald-300 shadow-xs">
+              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+              <span>Draft tersimpan ({draftSavedAt})</span>
+            </div>
+          )}
+          {draftSavedAt && (
+            <button
+              type="button"
+              onClick={handleClearDraft}
+              title="Kosongkan formulir dan hapus draft akun ini"
+              className="px-3 py-1.5 rounded-full bg-slate-100 hover:bg-rose-50 text-slate-600 hover:text-rose-600 dark:bg-slate-800 dark:hover:bg-rose-950/40 dark:text-slate-300 dark:hover:text-rose-400 border border-slate-200 dark:border-slate-700 text-xs font-semibold transition flex items-center gap-1.5 cursor-pointer"
+            >
+              <Trash2 className="w-3.5 h-3.5" />
+              <span>Reset Form</span>
+            </button>
+          )}
+        </div>
       </div>
 
       {errorMsg && (
@@ -785,7 +987,7 @@ export default function CreateProdiItem() {
                                   download
                                   style={{ borderRadius: "9999px" }}
                                   className="p-1.5 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:text-amber-500 hover:bg-amber-50 dark:hover:bg-amber-950/40 transition cursor-pointer"
-                                  title="Buka / Unduh HD 1280x720"
+                                  title="Buka / Unduh HD Portrait 3:4 (960x1280)"
                                 >
                                   <Download className="w-3.5 h-3.5" />
                                 </a>
