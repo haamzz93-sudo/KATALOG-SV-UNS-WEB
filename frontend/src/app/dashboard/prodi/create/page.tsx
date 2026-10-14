@@ -40,23 +40,14 @@ export default function CreateProdiItem() {
   const [picKontak, setPicKontak] = useState("");
   const [picLaboratorium, setPicLaboratorium] = useState("");
 
-  // AI Studio Edit Foto State (Gemini AI - 4 Marketplace Photos)
-  const AI_CATEGORY_GROUPS = [
-    {
-      type: "Produk",
-      label: "Produk",
-      subcategories: ["Makanan", "Minuman", "Obat", "Kosmetik", "Hasil Pertanian", "Animasi", "Produk Lainnya"],
-    },
-    {
-      type: "Teknologi",
-      label: "Teknologi",
-      subcategories: ["Mesin", "IoT", "Software As A Service", "Hardware & IT"],
-    },
-    {
-      type: "Layanan",
-      label: "Layanan",
-      subcategories: ["Jasa", "Konsultasi & Uji Lab", "Pelatihan"],
-    },
+  // AI Studio Edit Foto State (4 Marketplace Photos)
+  const AI_PRODUCT_CATEGORIES = [
+    "PRODUK MAKANAN",
+    "PRODUK MINUMAN",
+    "PRODUK OBAT HERBAL",
+    "PRODUK TEKNOLOGI",
+    "PRODUK KIMIA",
+    "PRODUK LAINNYA",
   ];
 
   const AI_DETAIL_TAGS = [
@@ -74,8 +65,7 @@ export default function CreateProdiItem() {
   ];
 
   const [isAiStudioOpen, setIsAiStudioOpen] = useState(false);
-  const [aiJenisGroup, setAiJenisGroup] = useState<string>("Produk");
-  const [aiKategori, setAiKategori] = useState<string>("Makanan");
+  const [aiKategori, setAiKategori] = useState<string>("PRODUK MAKANAN");
   const [aiDetailLabels, setAiDetailLabels] = useState<string[]>([
     "Detail Material",
     "Finishing Rapi",
@@ -562,62 +552,35 @@ export default function CreateProdiItem() {
                       />
                     </div>
 
-                    {/* 2. Pilihan Checkbox Kategori Sesuai Permintaan Dosen */}
-                    <div className="space-y-3">
-                      <div>
-                        <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block mb-1.5">
-                          2. Pilih Jenis Inovasi:
-                        </label>
-                        <div className="grid grid-cols-3 gap-2">
-                          {AI_CATEGORY_GROUPS.map((grp) => {
-                            const isGroupSelected = aiJenisGroup === grp.type;
-                            return (
-                              <button
-                                key={grp.type}
-                                type="button"
-                                onClick={() => {
-                                  setAiJenisGroup(grp.type);
-                                  setAiKategori(grp.subcategories[0]);
-                                }}
-                                style={{ borderRadius: "14px" }}
-                                className={`p-2.5 text-xs font-bold transition border flex items-center justify-center gap-1.5 cursor-pointer text-center ${
-                                  isGroupSelected
-                                    ? "bg-[#0F4C81] text-white border-[#0F4C81] shadow-xs ring-2 ring-[#0F4C81]/30"
-                                    : "bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700"
-                                }`}
-                              >
-                                <span>{grp.label}</span>
-                              </button>
-                            );
-                          })}
-                        </div>
-                      </div>
-
-                      <div>
-                        <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block mb-1.5">
-                          Pilih Sub-Kategori ({aiJenisGroup}):
-                        </label>
-                        <div className="flex flex-wrap gap-2">
-                          {(AI_CATEGORY_GROUPS.find((g) => g.type === aiJenisGroup)?.subcategories || []).map((sub) => {
-                            const isSelected = aiKategori === sub;
-                            return (
-                              <button
-                                key={sub}
-                                type="button"
-                                onClick={() => setAiKategori(sub)}
-                                style={{ borderRadius: "9999px" }}
-                                className={`px-3 py-1.5 text-xs font-bold transition border flex items-center gap-1.5 cursor-pointer ${
-                                  isSelected
-                                    ? "bg-[#C5A059] text-white border-[#C5A059] shadow-xs"
-                                    : "bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:border-amber-400"
-                                }`}
-                              >
-                                {isSelected && <Check className="w-3 h-3 text-white" />}
-                                <span>{sub}</span>
-                              </button>
-                            );
-                          })}
-                        </div>
+                    {/* 2. PROMT CEKBOK JENIS PRODUK */}
+                    <div>
+                      <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block mb-1.5">
+                        2. Pilih Jenis Produk:
+                      </label>
+                      <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                        {AI_PRODUCT_CATEGORIES.map((cat) => {
+                          const isSelected = aiKategori === cat;
+                          return (
+                            <button
+                              key={cat}
+                              type="button"
+                              onClick={() => setAiKategori(cat)}
+                              style={{ borderRadius: "14px" }}
+                              className={`p-2.5 text-xs font-bold transition border flex items-center justify-between px-3 cursor-pointer text-left ${
+                                isSelected
+                                  ? "bg-[#0F4C81] text-white border-[#0F4C81] shadow-xs ring-2 ring-[#0F4C81]/30"
+                                  : "bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700"
+                              }`}
+                            >
+                              <span className="truncate">{cat}</span>
+                              <div className={`w-3.5 h-3.5 rounded-full border flex items-center justify-center shrink-0 ${
+                                isSelected ? "border-white bg-[#C5A059]" : "border-slate-400"
+                              }`}>
+                                {isSelected && <Check className="w-2.5 h-2.5 text-white" />}
+                              </div>
+                            </button>
+                          );
+                        })}
                       </div>
                     </div>
 

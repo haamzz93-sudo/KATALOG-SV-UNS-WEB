@@ -198,7 +198,62 @@ export const isolateProductForeground = (
     console.warn("Isolasi background canvas gagal, fallback ke gambar asli:", err);
   }
 
-  return canvas;
+  return trimTransparentBorders(canvas);
+};
+
+/**
+ * Memotong margin kosong/transparan di sekitar produk sehingga
+ * produk terbingkai penuh (bounding-box cropping) dengan proporsi hero yang pas.
+ */
+export const trimTransparentBorders = (canvas: HTMLCanvasElement): HTMLCanvasElement => {
+  const ctx = canvas.getContext("2d");
+  if (!ctx) return canvas;
+
+  const w = canvas.width;
+  const h = canvas.height;
+  try {
+    const imgData = ctx.getImageData(0, 0, w, h);
+    const data = imgData.data;
+
+    let minX = w, minY = h, maxX = 0, maxY = 0;
+    let found = false;
+
+    for (let y = 0; y < h; y++) {
+      for (let x = 0; x < w; x++) {
+        const alpha = data[(y * w + x) * 4 + 3];
+        if (alpha > 12) {
+          if (x < minX) minX = x;
+          if (x > maxX) maxX = x;
+          if (y < minY) minY = y;
+          if (y > maxY) maxY = y;
+          found = true;
+        }
+      }
+    }
+
+    if (!found || minX >= maxX || minY >= maxY) return canvas;
+
+    // Beri sedikit padding 4px
+    const pad = 4;
+    minX = Math.max(0, minX - pad);
+    minY = Math.max(0, minY - pad);
+    maxX = Math.min(w - 1, maxX + pad);
+    maxY = Math.min(h - 1, maxY + pad);
+
+    const cropW = maxX - minX + 1;
+    const cropH = maxY - minY + 1;
+
+    const cropped = document.createElement("canvas");
+    cropped.width = cropW;
+    cropped.height = cropH;
+    const croppedCtx = cropped.getContext("2d");
+    if (!croppedCtx) return canvas;
+
+    croppedCtx.drawImage(canvas, minX, minY, cropW, cropH, 0, 0, cropW, cropH);
+    return cropped;
+  } catch {
+    return canvas;
+  }
 };
 
 /**
@@ -300,11 +355,11 @@ export const generateHeroPhoto = (
   ctx.stroke();
 
   // 3. Product Contact Shadow on Podium
-  const prodTargetH = 390;
+  const prodTargetH = 430;
   const prodRatio = img.width / img.height;
   const prodW = prodTargetH * prodRatio;
   const prodX = 640 - prodW / 2;
-  const prodY = podY - prodTargetH + 20;
+  const prodY = podY - prodTargetH + 12;
 
   drawContactShadow(ctx, 640, podY + 5, prodW * 0.45, 18, 0.35);
 
