@@ -156,7 +156,7 @@ export const generateHeroPhoto = (
 
   ctx.fillStyle = "#FFFFFF";
   ctx.font = "bold 13px system-ui, -apple-system, sans-serif";
-  ctx.fillText("✨ 1. FOTO UTAMA • HERO MARKETPLACE", 58, 57);
+  ctx.fillText("1. FOTO UTAMA • HERO MARKETPLACE", 58, 57);
 
   // Category Tag Top Right
   if (kategori) {
@@ -241,7 +241,7 @@ export const generateDetailPhoto = (
   ctx.fill();
   ctx.fillStyle = "#FFFFFF";
   ctx.font = "bold 13px system-ui, -apple-system, sans-serif";
-  ctx.fillText("🔍 2. DETAIL & KUALITAS • MACRO CRAFTSMANSHIP", 56, 58);
+  ctx.fillText("2. DETAIL & KUALITAS • MACRO CRAFTSMANSHIP", 56, 58);
 
   // 4. Feature Callout Badges (Glassmorphism Pills)
   const tags = detailTags && detailTags.length > 0
@@ -257,7 +257,7 @@ export const generateDetailPhoto = (
 
   tags.forEach((tag, idx) => {
     const pos = badgePositions[idx] || { x: 60, y: 200 + idx * 80 };
-    const text = `✦ ${tag}`;
+    const text = tag;
 
     // Glass pill background
     ctx.save();
@@ -344,19 +344,19 @@ export const generateBenefitPhoto = (
     {
       title: "Kualitas & Formula Terverifikasi Lab",
       desc: "Diriset & dikembangkan langsung oleh sivitas akademika Sekolah Vokasi UNS dengan uji mutu ketat.",
-      icon: "🔬",
+      badge: "01",
       color: "#0F4C81",
     },
     {
       title: "Kemasan Rapi, Higienis & Siap Pasar",
       desc: "Standar packaging komersial modern, melindungi kualitas produk, serta siap bersaing di marketplace.",
-      icon: "📦",
+      badge: "02",
       color: "#C5A059",
     },
     {
       title: "Solutif & Siap Kolaborasi Industri",
       desc: "Menjawab kebutuhan mitra DUDI dan konsumen dengan efisiensi biaya dan daya guna maksimal.",
-      icon: "🤝",
+      badge: "03",
       color: "#10B981",
     },
   ];
@@ -378,15 +378,16 @@ export const generateBenefitPhoto = (
     ctx.stroke();
     ctx.restore();
 
-    // Icon Circle
+    // Number Badge Circle
     ctx.fillStyle = feat.color + "18";
     ctx.beginPath();
     ctx.arc(95, cardY + 45, 24, 0, Math.PI * 2);
     ctx.fill();
 
-    ctx.font = "20px system-ui, sans-serif";
+    ctx.fillStyle = feat.color;
+    ctx.font = "bold 15px system-ui, -apple-system, sans-serif";
     ctx.textAlign = "center";
-    ctx.fillText(feat.icon, 95, cardY + 52);
+    ctx.fillText(feat.badge, 95, cardY + 50);
     ctx.textAlign = "left";
 
     // Card Title
@@ -532,7 +533,7 @@ export const generateLifestylePhoto = (
   ctx.fill();
   ctx.fillStyle = "#FFFFFF";
   ctx.font = "bold 13px system-ui, -apple-system, sans-serif";
-  ctx.fillText("☕ 4. KONTEKS LIFESTYLE • REAL USE DISPLAY", 56, 58);
+  ctx.fillText("4. KONTEKS LIFESTYLE • REAL USE DISPLAY", 56, 58);
 
   // Bottom Label
   ctx.fillStyle = "rgba(255, 255, 255, 0.85)";

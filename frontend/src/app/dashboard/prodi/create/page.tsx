@@ -525,7 +525,7 @@ export default function CreateProdiItem() {
 
                     {/* Aturan Identitas Visual Konsisten */}
                     <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-400/20 text-[11px] text-amber-800 dark:text-amber-300">
-                      <strong>✨ Standar 4 Foto Marketplace:</strong> Menghasilkan 1 set komplit (1. Foto Utama / Hero, 2. Detail & Kualitas Macro, 3. Infografis Fitur & Alasan Membeli, 4. Konteks Lifestyle) dengan visual identity, warna, logo, dan pencahayaan studio yang konsisten.
+                      <strong>Standar 4 Foto Marketplace:</strong> Menghasilkan 1 set komplit (1. Foto Utama / Hero, 2. Detail & Kualitas Macro, 3. Infografis Fitur & Alasan Membeli, 4. Konteks Lifestyle) dengan visual identity, warna, logo, dan pencahayaan studio yang konsisten.
                     </div>
 
                     {/* 1. Tambah Foto Mentah (Raw Photo) */}
@@ -714,7 +714,7 @@ export default function CreateProdiItem() {
                         className="flex-1 py-3 px-4 rounded-full bg-gradient-to-r from-amber-500 via-[#C5A059] to-[#0F4C81] hover:brightness-105 text-white font-black text-xs shadow-md transition flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
                       >
                         <RefreshCw className={`w-3.5 h-3.5 ${aiLoading ? "animate-spin" : ""}`} />
-                        <span>{aiLoading ? "Memproses 4 Foto Marketplace..." : "✨ Hasilkan 4 Foto Marketplace (100% Produk Asli Presisi)"}</span>
+                        <span>{aiLoading ? "Memproses 4 Foto Marketplace..." : "Hasilkan 4 Foto Marketplace (100% Produk Asli Presisi)"}</span>
                       </button>
 
                       <button
@@ -735,7 +735,7 @@ export default function CreateProdiItem() {
                       <div className="pt-2 space-y-3">
                         <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-1.5">
                           <span className="text-xs font-black text-slate-900 dark:text-white">
-                            📸 4 Foto Marketplace Siap Digunakan (Klik untuk Memilih Mockup Utama):
+                            4 Foto Marketplace Siap Digunakan (Klik untuk Memilih Mockup Utama):
                           </span>
                           <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-bold">
                             ✓ Resolusi HD 1280x720
