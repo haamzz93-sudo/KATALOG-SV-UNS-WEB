@@ -99,7 +99,7 @@ function AdminDashboardContent() {
     setIsAiTesting(true);
     setAiTestResult(null);
     try {
-      const API_BASE = process.env.NEXT_PUBLIC_API_URL || (typeof window !== "undefined" ? "/api/v1" : "http://127.0.0.1:8000/api/v1");
+      const API_BASE = typeof window !== "undefined" ? "/api/v1" : (process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000/api/v1");
       const payload = { apiKey: aiApiKey };
 
       let res = await fetch(`${API_BASE}/public/ai/test-key`, {

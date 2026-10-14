@@ -470,7 +470,7 @@ export const SiteSettingsProvider: React.FC<{ children: React.ReactNode }> = ({ 
 
     // 2. Authoritative fresh fetch from MySQL API
     try {
-      const API_BASE = process.env.NEXT_PUBLIC_API_URL || (typeof window !== "undefined" ? "/api/v1" : "http://127.0.0.1:8000/api/v1");
+      const API_BASE = typeof window !== "undefined" ? "/api/v1" : (process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000/api/v1");
       const res = await fetch(`${API_BASE}/public/settings?t=${Date.now()}`, {
         headers: { Accept: "application/json" },
         cache: "no-store",
@@ -519,7 +519,7 @@ export const SiteSettingsProvider: React.FC<{ children: React.ReactNode }> = ({ 
   const updateSettings = async (newSettings: Partial<SiteSettings>): Promise<boolean> => {
     // First, persist to backend MySQL API
     try {
-      const API_BASE = process.env.NEXT_PUBLIC_API_URL || (typeof window !== "undefined" ? "/api/v1" : "http://127.0.0.1:8000/api/v1");
+      const API_BASE = typeof window !== "undefined" ? "/api/v1" : (process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000/api/v1");
       const token = typeof window !== "undefined" ? localStorage.getItem("vokasi_auth_token") : null;
 
       const res = await fetch(`${API_BASE}/settings`, {
