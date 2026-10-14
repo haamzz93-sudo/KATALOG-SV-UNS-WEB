@@ -270,6 +270,13 @@ export interface SiteSettings {
   catalog_tab_jasa_id?: string;
   catalog_tab_jasa_en?: string;
 
+  // 4 Marketplace Photos Paten Prompts & Master Consistency (Full CRUD)
+  ai_prompt_1_hero?: string;
+  ai_prompt_2_detail?: string;
+  ai_prompt_3_benefit?: string;
+  ai_prompt_4_lifestyle?: string;
+  ai_prompt_consistency?: string;
+
   [key: string]: any;
 }
 
@@ -437,6 +444,46 @@ export const DEFAULT_SITE_SETTINGS: SiteSettings = {
   gemini_api_key: process.env.NEXT_PUBLIC_GEMINI_API_KEY || "",
   ai_default_domain: "spsbu.unsmadiun.id",
   ai_default_prompt: "Pencahayaan studio komersial lembut, resolusi HD 8k, aspect ratio landscape 16:9, clean minimalis, pertahankan keaslian warna, logo, dan identitas visual konsisten di seluruh 4 foto.",
+
+  // 4 Marketplace Photos Paten Prompts & Master Consistency
+  ai_prompt_1_hero: `Gunakan foto produk yang diberikan sebagai referensi utama. Identifikasi otomatis jenis produk, bentuk, warna, material, label, kemasan, logo, tulisan, serta karakter visualnya. Buat foto produk marketplace premium dengan komposisi hero product photography.
+Ketentuan Paten:
+- Pertahankan bentuk, warna, logo, label, tulisan, kemasan, dan proporsi produk secara akurat.
+- Jangan mengubah identitas produk dan jangan menambahkan fitur yang sebenarnya tidak ada.
+- Tampilkan produk dalam angle terbaik sesuai kategorinya.
+- Bila produk memiliki bagian depan dan belakang penting, tampilkan secara proporsional. Bila berupa paket/set, susun semua item dengan rapi.
+- Background: putih bersih, ivory, light grey, atau gradient lembut yang clean dan tidak ramai sesuai tone produk.
+- Lighting: soft studio lighting, natural highlight, realistic soft shadow, detail tajam.
+- Komposisi: produk menjadi focal point utama, center composition atau slightly off-center, whitespace cukup.
+- Mood: premium, trustworthy, professional, clean, modern, commercial, high-end marketplace photography HD.
+- Hindari: background berlebihan, logo/warna/tulisan berubah, bentuk terdistorsi, efek terlalu dramatis.`,
+
+  ai_prompt_2_detail: `Gunakan produk yang sama sebagai referensi utama. Buat foto kedua yang fokus pada detail kualitas dan craftsmanship produk.
+Ketentuan Paten:
+- Identifikasi otomatis elemen paling penting berdasarkan kategori produk (tekstur bahan, detail jahitan, finishing permukaan, material, kemasan, tutup/botol, layar/tombol, konektor, struktur, tekstur makanan, kandungan visual, detail printing, bagian fungsional penting).
+- Tampilkan 3–5 close-up detail dalam layout editorial modern.
+- Tambahkan label singkat yang hanya menyebut karakter yang benar-benar terlihat dari produk: "Detail Material", "Finishing Rapi", "Desain Presisi", "Tekstur Berkualitas", "Kemasan Premium", "Detail Fungsional". Jangan membuat klaim teknis fiktif.
+- Background: putih / light grey / warna netral premium dengan aksen warna menyesuaikan produk.
+- Gaya: premium detail photography, macro product shot, commercial catalog, clean infographic, sharp realistic texture.`,
+
+  ai_prompt_3_benefit: `Gunakan produk asli sebagai fokus utama. Buat foto ketiga dalam format modern benefit infographic yang menjelaskan alasan utama calon pembeli memilih produk.
+Ketentuan Paten:
+- Analisis kategori produk terlebih dahulu, lalu tampilkan maksimal 3–5 benefit atau fitur utama yang relevan dan aman berdasarkan informasi produk yang tersedia.
+- Adaptasi kategori: fashion (nyaman, ringan, fit), elektronik (fungsi utama, konektivitas), makanan (rasa, kemasan, penyajian), alat/mesin (fungsi, efisiensi), pertanian/kimia (cara dan target penggunaan).
+- Jangan mengarang spesifikasi, sertifikasi, klaim kesehatan atau performa yang tidak tersedia.
+- Komposisi: produk besar di tengah atau kanan, feature cards kecil di sekeliling, icon minimalis, teks sangat singkat, hierarchy kuat, mudah dibaca di smartphone.
+- Headline universal: "KENAPA PRODUK INI LAYAK DIPILIH?" atau "WHY YOU'LL LOVE IT".
+- Gaya: clean product infographic, premium marketplace advertising, modern, concise, trustworthy, visually persuasive.`,
+
+  ai_prompt_4_lifestyle: `Gunakan produk asli sebagai referensi dan pertahankan desainnya secara akurat. Buat foto lifestyle profesional yang menunjukkan produk digunakan dalam konteks nyata sesuai kategorinya.
+Ketentuan Paten:
+- Sistem menentukan konteks penggunaan paling natural: pakaian (dikenakan model), tumbler (meja kerja/gym), skincare (meja vanity), elektronik/teknologi (meja kerja/lab/kantor), makanan (disajikan secara appetizing), pertanian/alat (digunakan di kebun/ruang kerja).
+- Ketentuan: produk tetap identik dengan referensi, skala realistis, penggunaan masuk akal, tidak mengubah fungsi, manusia jika ada terlihat natural dan profesional, tidak terlalu banyak objek.
+- Lighting: natural premium lighting, cinematic ringan realistis, shallow depth of field bila sesuai.
+- Mood: aspirational, premium, authentic, modern lifestyle, professional commercial photography.
+- Tujuan: membuat calon pembeli langsung membayangkan produk digunakan dalam kehidupan nyata.`,
+
+  ai_prompt_consistency: `Gunakan satu visual identity yang konsisten untuk seluruh 4 foto. Pertahankan warna produk yang sama, tone lighting seragam, proporsi produk konsisten, dan kualitas fotografi setara katalog brand profesional. Jangan mengubah logo, label, teks, bentuk, warna, material, jumlah item, atau fitur produk dari referensi asli.`,
 };
 
 const sanitizeBlobSetting = (val: any, fallback: string): string => {

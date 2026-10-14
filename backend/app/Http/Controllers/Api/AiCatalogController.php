@@ -11,6 +11,16 @@ use Illuminate\Support\Facades\Log;
 
 class AiCatalogController extends Controller
 {
+    public const DEFAULT_PROMPT_HERO = "Gunakan foto produk yang diberikan sebagai referensi utama. Identifikasi otomatis jenis produk, bentuk, warna, material, label, kemasan, logo, tulisan, serta karakter visualnya. Buat foto produk marketplace premium dengan komposisi hero product photography.\n\nKetentuan Paten:\n- Pertahankan bentuk, warna, logo, label, tulisan, kemasan, dan proporsi produk secara akurat.\n- Jangan mengubah identitas produk dan jangan menambahkan fitur yang sebenarnya tidak ada.\n- Tampilkan produk dalam angle terbaik sesuai kategorinya.\n- Bila produk memiliki bagian depan dan belakang penting, tampilkan secara proporsional. Bila berupa paket/set, susun semua item dengan rapi.\n- Background: putih bersih, ivory, light grey, atau gradient lembut yang clean dan tidak ramai sesuai tone produk.\n- Lighting: soft studio lighting, natural highlight, realistic soft shadow, detail tajam.\n- Komposisi: produk menjadi focal point utama, center composition atau slightly off-center, whitespace cukup.\n- Mood: premium, trustworthy, professional, clean, modern, commercial, high-end marketplace photography HD.\n- Hindari: background berlebihan, logo/warna/tulisan berubah, bentuk terdistorsi, efek terlalu dramatis.";
+
+    public const DEFAULT_PROMPT_DETAIL = "Gunakan produk yang sama sebagai referensi utama. Buat foto kedua yang fokus pada detail kualitas dan craftsmanship produk.\n\nKetentuan Paten:\n- Identifikasi otomatis elemen paling penting berdasarkan kategori produk (tekstur bahan, detail jahitan, finishing permukaan, material, kemasan, tutup/botol, layar/tombol, konektor, struktur, tekstur makanan, kandungan visual, detail printing, bagian fungsional penting).\n- Tampilkan 3–5 close-up detail dalam layout editorial modern.\n- Tambahkan label singkat yang hanya menyebut karakter yang benar-benar terlihat dari produk: \"Detail Material\", \"Finishing Rapi\", \"Desain Presisi\", \"Tekstur Berkualitas\", \"Kemasan Premium\", \"Detail Fungsional\". Jangan membuat klaim teknis fiktif.\n- Background: putih / light grey / warna netral premium dengan aksen warna menyesuaikan produk.\n- Gaya: premium detail photography, macro product shot, commercial catalog, clean infographic, sharp realistic texture.";
+
+    public const DEFAULT_PROMPT_BENEFIT = "Gunakan produk asli sebagai fokus utama. Buat foto ketiga dalam format modern benefit infographic yang menjelaskan alasan utama calon pembeli memilih produk.\n\nKetentuan Paten:\n- Analisis kategori produk terlebih dahulu, lalu tampilkan maksimal 3–5 benefit atau fitur utama yang relevan dan aman berdasarkan informasi produk yang tersedia.\n- Adaptasi kategori: fashion (nyaman, ringan, fit), elektronik (fungsi utama, konektivitas), makanan (rasa, kemasan, penyajian), alat/mesin (fungsi, efisiensi), pertanian/kimia (cara dan target penggunaan).\n- Jangan mengarang spesifikasi, sertifikasi, klaim kesehatan atau performa yang tidak tersedia.\n- Komposisi: produk besar di tengah atau kanan, feature cards kecil di sekeliling, icon minimalis, teks sangat singkat, hierarchy kuat, mudah dibaca di smartphone.\n- Headline universal: \"KENAPA PRODUK INI LAYAK DIPILIH?\" atau \"WHY YOU'LL LOVE IT\".\n- Gaya: clean product infographic, premium marketplace advertising, modern, concise, trustworthy, visually persuasive.";
+
+    public const DEFAULT_PROMPT_LIFESTYLE = "Gunakan produk asli sebagai referensi dan pertahankan desainnya secara akurat. Buat foto lifestyle profesional yang menunjukkan produk digunakan dalam konteks nyata sesuai kategorinya.\n\nKetentuan Paten:\n- Sistem menentukan konteks penggunaan paling natural: pakaian (dikenakan model), tumbler (meja kerja/gym), skincare (meja vanity), elektronik/teknologi (meja kerja/lab/kantor), makanan (disajikan secara appetizing), pertanian/alat (digunakan di kebun/ruang kerja).\n- Ketentuan: produk tetap identik dengan referensi, skala realistis, penggunaan masuk akal, tidak mengubah fungsi, manusia jika ada terlihat natural dan profesional, tidak terlalu banyak objek.\n- Lighting: natural premium lighting, cinematic ringan realistis, shallow depth of field bila sesuai.\n- Mood: aspirational, premium, authentic, modern lifestyle, professional commercial photography.\n- Tujuan: membuat calon pembeli langsung membayangkan produk digunakan dalam kehidupan nyata.";
+
+    public const DEFAULT_PROMPT_CONSISTENCY = "Gunakan satu visual identity yang konsisten untuk seluruh 4 foto. Pertahankan warna produk yang sama, tone lighting seragam, proporsi produk konsisten, dan kualitas fotografi setara katalog brand profesional. Jangan mengubah logo, label, teks, bentuk, warna, material, jumlah item, atau fitur produk dari referensi asli.";
+
     /**
      * Generate 4 professional marketplace photos using Gemini 2.5 Flash + HD rendering
      * 1. Hero Product (Foto Utama Marketplace)
@@ -41,6 +51,16 @@ class AiCatalogController extends Controller
                 $kategori = strtoupper("PRODUK " . $subJenis);
             }
 
+            // Inputan Khusus Foto 2 & Foto 3
+            $detailLabels = $request->input('detailLabels', 'Detail Material, Finishing Rapi, Desain Presisi');
+            if (is_array($detailLabels)) {
+                $detailLabels = implode(', ', $detailLabels);
+            }
+            $benefitHeadline = trim($request->input('benefitHeadline', 'KENAPA PRODUK INI LAYAK DIPILIH?'));
+            if (empty($benefitHeadline)) {
+                $benefitHeadline = 'KENAPA PRODUK INI LAYAK DIPILIH?';
+            }
+
             $rawImageBase64 = $request->input('rawImageBase64', null);
             $customPrompt = $request->input('customPrompt', '');
 
@@ -49,7 +69,14 @@ class AiCatalogController extends Controller
                 $domain = SiteSetting::get('ai_default_domain') ?: 'spsbu.unsmadiun.id';
             }
 
-            // 1. Konsultasi / Pembuatan 4 Prompt Presisi via Gemini 2.5 Flash jika API Key tersedia
+            // 1. Ambil Template Prompt Paten dari Database (Full CRUD Sinkron)
+            $templateHero = SiteSetting::get('ai_prompt_1_hero') ?: self::DEFAULT_PROMPT_HERO;
+            $templateDetail = SiteSetting::get('ai_prompt_2_detail') ?: self::DEFAULT_PROMPT_DETAIL;
+            $templateBenefit = SiteSetting::get('ai_prompt_3_benefit') ?: self::DEFAULT_PROMPT_BENEFIT;
+            $templateLifestyle = SiteSetting::get('ai_prompt_4_lifestyle') ?: self::DEFAULT_PROMPT_LIFESTYLE;
+            $templateConsistency = SiteSetting::get('ai_prompt_consistency') ?: self::DEFAULT_PROMPT_CONSISTENCY;
+
+            // 2. Konsultasi / Pembuatan 4 Prompt Presisi via Gemini 2.5 Flash jika API Key tersedia
             $geminiEnhancedPrompt = null;
 
             if (!empty($apiKey)) {
@@ -57,23 +84,16 @@ class AiCatalogController extends Controller
                     $geminiUrl = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={$apiKey}";
 
                     $systemInstruction = "You are a World-Class Commercial Product Photographer and AI Creative Director specializing in high-converting marketplace visual assets (Domain: {$domain}).\n" .
-                        "You are analyzing a product named \"{$namaItem}\"" . (!empty($tagline) ? " with tagline \"{$tagline}\"" : "") . " categorized under \"{$kategori}\".\n\n" .
-                        "Generate 4 specialized commercial photography prompts in ENGLISH for a 4-photo marketplace product listing:\n\n" .
-                        "1. hero_prompt (Foto Utama Marketplace):\n" .
-                        "- Eye-level commercial hero photography on a minimalist clean ivory/white studio podium or surface.\n" .
-                        "- Soft balanced studio rim lighting, crisp focal point, elegant soft shadows.\n" .
-                        "- Strictly preserve original colors, logo, shape, proportions, and brand identity.\n\n" .
-                        "2. detail_prompt (Detail & Kualitas):\n" .
-                        "- Editorial macro close-up shot showcasing tactile texture, premium materials, craftsmanship, precise finishing, neat seams, and packaging details.\n" .
-                        "- Shallow depth of field, sharp macro lens focus.\n\n" .
-                        "3. benefit_prompt (Infografis Fitur & Alasan Membeli):\n" .
-                        "- Modern clean commercial product infographic layout with universal headline 'KENAPA PRODUK INI LAYAK DIPILIH?' or 'WHY YOU'LL LOVE IT'.\n" .
-                        "- Highlighting 3-5 core functional benefits with subtle minimalist aesthetic badges or graphic pointers around the product.\n\n" .
-                        "4. lifestyle_prompt (Konteks Penggunaan Nyata):\n" .
-                        "- Authentic contextual photography showing the product in genuine real-world usage suited to {$kategori} (e.g., appetizing food serving, wellness desk setup for herbal, modern office/tech workbench for engineering/IoT).\n" .
-                        "- Warm natural inviting light, aspirational commercial atmosphere.\n\n" .
-                        "CONSISTENT VISUAL IDENTITY: All 4 images must portray the exact same product model, identical colors, branding, scale, and lighting aesthetic.\n" .
-                        "Format your response as a strict JSON object with NO extra markdown or text:\n" .
+                        "You are analyzing a product named \"{$namaItem}\"" . (!empty($tagline) ? " with tagline \"{$tagline}\"" : "") . " categorized under \"{$kategori}\".\n" .
+                        (!empty($detailLabels) ? "Verified quality characters to feature on details: {$detailLabels}.\n" : "") .
+                        "Infographic headline to feature: \"{$benefitHeadline}\".\n\n" .
+                        "=== STRICT GUIDELINES FROM USER SPECIFICATION ===\n" .
+                        "MASTER CONSISTENCY RULE:\n{$templateConsistency}\n\n" .
+                        "PROMPT 1 (Hero Product / Foto Utama Marketplace):\n{$templateHero}\n\n" .
+                        "PROMPT 2 (Detail & Quality / Meyakinkan Kualitas):\n{$templateDetail}\n\n" .
+                        "PROMPT 3 (Benefit & Key Features / Alasan Membeli):\n{$templateBenefit}\n\n" .
+                        "PROMPT 4 (Lifestyle / Real Use Context):\n{$templateLifestyle}\n\n" .
+                        "CRITICAL: Generate 4 specialized, detailed English photography prompts for an image generator (16:9 landscape aspect ratio, 8k resolution, photorealistic commercial photoshoot). Return strictly a JSON object with this exact schema:\n" .
                         "{\n" .
                         "  \"hero_prompt\": \"...\",\n" .
                         "  \"detail_prompt\": \"...\",\n" .
@@ -120,14 +140,14 @@ class AiCatalogController extends Controller
                 }
             }
 
-            // 2. Susun 4 Prompt Fotografi Marketplace
+            // 3. Susun 4 Prompt Fotografi Marketplace
             $baseSubject = "{$kategori} named \"{$namaItem}\", high quality commercial product photography for {$domain}, clean studio lighting, 8k resolution, photorealistic, sharp focus, 16:9 landscape aspect ratio, premium marketplace catalog showcase";
 
             $prompts = [
-                'hero' => $geminiEnhancedPrompt['hero_prompt'] ?? "Eye-level commercial hero product photography of {$baseSubject}, centered on clean minimalist ivory podium, soft studio lighting, crisp focus, clean white background",
-                'detail' => $geminiEnhancedPrompt['detail_prompt'] ?? "Editorial macro close-up photography of {$baseSubject}, capturing fine material craftsmanship, tactile surface textures, precision finishing and premium packaging details, soft studio light, shallow depth of field",
-                'benefit' => $geminiEnhancedPrompt['benefit_prompt'] ?? "Modern aesthetic commercial infographic presentation of {$baseSubject}, showcasing key product benefits and reasons to buy with clean minimalist layout, soft lighting, premium marketplace catalog display",
-                'lifestyle' => $geminiEnhancedPrompt['lifestyle_prompt'] ?? "Authentic lifestyle product photography of {$baseSubject}, in natural real-world use environment, warm ambient morning light, commercial catalog aesthetic, high quality depth of field",
+                'hero' => $geminiEnhancedPrompt['hero_prompt'] ?? "Eye-level commercial hero product photography of {$baseSubject}, centered on clean minimalist ivory podium, soft studio lighting, crisp focus, clean white and light grey background, photorealistic 8k",
+                'detail' => $geminiEnhancedPrompt['detail_prompt'] ?? "Editorial macro close-up photography of {$baseSubject}, capturing fine material craftsmanship, tactile surface textures, {$detailLabels}, precision finishing and premium packaging details, soft studio light, shallow depth of field, 8k",
+                'benefit' => $geminiEnhancedPrompt['benefit_prompt'] ?? "Modern aesthetic commercial infographic presentation of {$baseSubject}, featuring headline '{$benefitHeadline}', showcasing key product benefits and reasons to buy with clean minimalist layout, soft lighting, premium marketplace catalog display, 8k",
+                'lifestyle' => $geminiEnhancedPrompt['lifestyle_prompt'] ?? "Authentic lifestyle product photography of {$baseSubject}, in natural real-world use environment for {$kategori}, warm ambient morning light, commercial catalog aesthetic, high quality depth of field, 8k",
             ];
 
             // 3. Generate 4 Foto Dinamis HD Landscape (1280x720) via Turbo Model (No Paywall)
@@ -178,6 +198,8 @@ class AiCatalogController extends Controller
                     'nama_item' => $namaItem,
                     'tagline' => $tagline,
                     'kategori' => $kategori,
+                    'detail_labels' => $detailLabels,
+                    'benefit_headline' => $benefitHeadline,
                     'photos' => $photos,
                     'used_gemini' => !empty($geminiEnhancedPrompt),
                 ],

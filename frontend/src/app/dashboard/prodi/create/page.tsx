@@ -48,8 +48,29 @@ export default function CreateProdiItem() {
     "PRODUK KIMIA",
     "PRODUK LAINYA",
   ];
+
+  const AI_DETAIL_TAGS = [
+    "Detail Material",
+    "Finishing Rapi",
+    "Desain Presisi",
+    "Tekstur Berkualitas",
+    "Kemasan Premium",
+    "Detail Fungsional",
+  ];
+
+  const AI_BENEFIT_HEADLINES = [
+    "KENAPA PRODUK INI LAYAK DIPILIH?",
+    "WHY YOU'LL LOVE IT",
+  ];
+
   const [isAiStudioOpen, setIsAiStudioOpen] = useState(false);
   const [aiKategori, setAiKategori] = useState<string>("PRODUK MAKANAN");
+  const [aiDetailLabels, setAiDetailLabels] = useState<string[]>([
+    "Detail Material",
+    "Finishing Rapi",
+    "Desain Presisi",
+  ]);
+  const [aiBenefitHeadline, setAiBenefitHeadline] = useState<string>("KENAPA PRODUK INI LAYAK DIPILIH?");
   const [aiPrompt, setAiPrompt] = useState(
     settings.ai_default_prompt ||
       "Pencahayaan studio komersial lembut, resolusi HD 8k, aspect ratio landscape 16:9, clean minimalis, pertahankan keaslian warna, logo, dan identitas visual konsisten di seluruh 4 foto."
@@ -57,6 +78,22 @@ export default function CreateProdiItem() {
   const [aiRawPhoto, setAiRawPhoto] = useState<string>("");
   const [aiLoading, setAiLoading] = useState(false);
   const [aiPhotos, setAiPhotos] = useState<any[]>([]);
+
+  const handleToggleDetailTag = (tag: string) => {
+    if (aiDetailLabels.includes(tag)) {
+      if (aiDetailLabels.length > 1) {
+        setAiDetailLabels(aiDetailLabels.filter((t) => t !== tag));
+      } else {
+        toast.error("Minimal 1 Tag", "Pilih minimal satu karakter detail produk.");
+      }
+    } else {
+      if (aiDetailLabels.length < 5) {
+        setAiDetailLabels([...aiDetailLabels, tag]);
+      } else {
+        toast.info("Maksimal 5 Tag", "Maksimal 5 tag detail agar infografis tetap fokus.");
+      }
+    }
+  };
 
   useEffect(() => {
     async function fetchProdis() {
@@ -104,8 +141,15 @@ export default function CreateProdiItem() {
         namaItem: namaItem.trim() || "Produk Inovasi Vokasi UNS",
         tagline: tagline.trim() || undefined,
         kategori: aiKategori,
+        detailLabels: aiDetailLabels,
+        benefitHeadline: aiBenefitHeadline,
         rawImageBase64: aiRawPhoto || (thumbnailUrl && !thumbnailUrl.startsWith("blob:") ? thumbnailUrl : undefined),
         customPrompt: aiPrompt,
+        templateHero: settings.ai_prompt_1_hero,
+        templateDetail: settings.ai_prompt_2_detail,
+        templateBenefit: settings.ai_prompt_3_benefit,
+        templateLifestyle: settings.ai_prompt_4_lifestyle,
+        templateConsistency: settings.ai_prompt_consistency,
         domain: settings.ai_default_domain || "spsbu.unsmadiun.id",
       };
 
@@ -459,10 +503,79 @@ export default function CreateProdiItem() {
                       </div>
                     </div>
 
-                    {/* 3. Detail Identitas Produk */}
+                    {/* 3. Pilihan Tag Karakter Detail (Foto 2 - Detail & Craftsmanship) */}
+                    <div>
+                      <div className="flex items-center justify-between mb-1.5">
+                        <label className="text-xs font-bold text-slate-700 dark:text-slate-300">
+                          3. Tag Karakter Detail & Kualitas (Foto 2 Macro Shot):
+                        </label>
+                        <span className="text-[10px] text-slate-400">
+                          Pilih 1–5 karakter terlihat
+                        </span>
+                      </div>
+                      <div className="flex flex-wrap gap-2">
+                        {AI_DETAIL_TAGS.map((tag) => {
+                          const isChecked = aiDetailLabels.includes(tag);
+                          return (
+                            <button
+                              key={tag}
+                              type="button"
+                              onClick={() => handleToggleDetailTag(tag)}
+                              style={{ borderRadius: "9999px" }}
+                              className={`px-3 py-1.5 text-xs font-bold transition border flex items-center gap-1.5 cursor-pointer ${
+                                isChecked
+                                  ? "bg-emerald-600 text-white border-emerald-600 shadow-xs ring-2 ring-emerald-600/30"
+                                  : "bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700"
+                              }`}
+                            >
+                              <div className={`w-3 h-3 rounded-full flex items-center justify-center shrink-0 ${
+                                isChecked ? "bg-white text-emerald-600" : "border border-slate-400"
+                              }`}>
+                                {isChecked && <Check className="w-2.5 h-2.5 stroke-[3]" />}
+                              </div>
+                              <span>{tag}</span>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+
+                    {/* 4. Headline Infografis Keunggulan (Foto 3 - Benefit Infographic) */}
+                    <div>
+                      <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block mb-1.5">
+                        4. Headline Infografis Keunggulan (Foto 3 Infografis):
+                      </label>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        {AI_BENEFIT_HEADLINES.map((hl) => {
+                          const isSelected = aiBenefitHeadline === hl;
+                          return (
+                            <button
+                              key={hl}
+                              type="button"
+                              onClick={() => setAiBenefitHeadline(hl)}
+                              style={{ borderRadius: "14px" }}
+                              className={`p-2.5 text-xs font-bold transition border flex items-center gap-2 cursor-pointer text-left ${
+                                isSelected
+                                  ? "bg-[#0F4C81] text-white border-[#0F4C81] shadow-xs ring-2 ring-[#0F4C81]/30"
+                                  : "bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700"
+                              }`}
+                            >
+                              <div className={`w-3.5 h-3.5 rounded-full border flex items-center justify-center shrink-0 ${
+                                isSelected ? "border-white bg-[#C5A059]" : "border-slate-400"
+                              }`}>
+                                {isSelected && <Check className="w-2.5 h-2.5 text-white" />}
+                              </div>
+                              <span className="truncate">{hl}</span>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+
+                    {/* 5. Detail Identitas Produk */}
                     <div className="p-3 rounded-xl bg-slate-100/70 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/60 space-y-2">
                       <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block">
-                        3. Identitas Produk Terkoneksi:
+                        5. Identitas Produk Terkoneksi:
                       </span>
                       <div className="text-xs text-slate-800 dark:text-slate-200 space-y-1">
                         <div>
@@ -478,10 +591,10 @@ export default function CreateProdiItem() {
                       </div>
                     </div>
 
-                    {/* 4. Prompt Dinamis (Editable) */}
+                    {/* 6. Prompt Dinamis (Editable) */}
                     <div>
                       <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block mb-1">
-                        4. Catatan Prompt Dinamis & Permintaan Khusus:
+                        6. Catatan Prompt Dinamis & Permintaan Khusus:
                       </label>
                       <textarea
                         rows={2}

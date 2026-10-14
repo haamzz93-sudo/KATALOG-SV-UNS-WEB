@@ -10,12 +10,21 @@ export async function POST(req: NextRequest) {
       namaItem = "Produk Inovasi Vokasi UNS",
       tagline = "",
       kategori = "PRODUK MAKANAN",
+      detailLabels = "Detail Material, Finishing Rapi, Desain Presisi",
+      benefitHeadline = "KENAPA PRODUK INI LAYAK DIPILIH?",
       rawImageBase64,
       customPrompt,
+      templateHero,
+      templateDetail,
+      templateBenefit,
+      templateLifestyle,
+      templateConsistency,
       domain = "spsbu.unsmadiun.id"
     } = body;
 
     const activeKey = (apiKey && apiKey.trim()) || DEFAULT_GEMINI_API_KEY;
+
+    const labelsString = Array.isArray(detailLabels) ? detailLabels.join(", ") : detailLabels;
 
     // 1. Konsultasi / Pembuatan 4 Prompt Presisi via Gemini 2.5 Flash
     let geminiEnhancedPrompt: any = null;
@@ -25,28 +34,26 @@ export async function POST(req: NextRequest) {
         
         const systemInstruction = `You are a World-Class Commercial Product Photographer and AI Creative Director specializing in high-converting marketplace visual assets (Domain: ${domain}).
 You are analyzing a product named "${namaItem}"${tagline ? ` with tagline "${tagline}"` : ""} categorized under "${kategori}".
+Verified quality characters to feature on details: ${labelsString}.
+Infographic headline to feature: "${benefitHeadline}".
 
-Generate 4 specialized commercial photography prompts in ENGLISH for a 4-photo marketplace product listing:
+=== STRICT GUIDELINES FROM USER SPECIFICATION ===
+MASTER CONSISTENCY RULE:
+${templateConsistency || "Gunakan satu visual identity yang konsisten untuk seluruh 4 foto. Pertahankan warna produk yang sama, tone lighting seragam, proporsi produk konsisten, dan kualitas fotografi setara katalog brand profesional. Jangan mengubah logo, label, teks, bentuk, warna, material, jumlah item, atau fitur produk dari referensi asli."}
 
-1. hero_prompt (Foto Utama Marketplace):
-- Eye-level commercial hero photography on a minimalist clean ivory/white studio podium or surface.
-- Soft balanced studio rim lighting, crisp focal point, elegant soft shadows.
-- Strictly preserve original colors, logo, shape, proportions, and brand identity.
+PROMPT 1 (Hero Product / Foto Utama Marketplace):
+${templateHero || "Gunakan foto produk yang diberikan sebagai referensi utama. Identifikasi otomatis jenis produk, bentuk, warna, material, label, kemasan, logo, tulisan, serta karakter visualnya. Buat foto produk marketplace premium dengan komposisi hero product photography."}
 
-2. detail_prompt (Detail & Kualitas):
-- Editorial macro close-up shot showcasing tactile texture, premium materials, craftsmanship, precise finishing, neat seams, and packaging details.
-- Shallow depth of field, sharp macro lens focus.
+PROMPT 2 (Detail & Quality / Meyakinkan Kualitas):
+${templateDetail || "Gunakan produk yang sama sebagai referensi utama. Buat foto kedua yang fokus pada detail kualitas dan craftsmanship produk. Tampilkan 3–5 close-up detail dalam layout editorial modern."}
 
-3. benefit_prompt (Infografis Fitur & Alasan Membeli):
-- Modern clean commercial product infographic layout with universal headline 'KENAPA PRODUK INI LAYAK DIPILIH?' or 'WHY YOU'LL LOVE IT'.
-- Highlighting 3-5 core functional benefits with subtle minimalist aesthetic badges or graphic pointers around the product.
+PROMPT 3 (Benefit & Key Features / Alasan Membeli):
+${templateBenefit || "Gunakan produk asli sebagai fokus utama. Buat foto ketiga dalam format modern benefit infographic yang menjelaskan alasan utama calon pembeli memilih produk. Tampilkan headline: " + benefitHeadline}
 
-4. lifestyle_prompt (Konteks Penggunaan Nyata):
-- Authentic contextual photography showing the product in genuine real-world usage suited to ${kategori} (e.g., appetizing food serving, wellness desk setup for herbal, modern office/tech workbench for engineering/IoT).
-- Warm natural inviting light, aspirational commercial atmosphere.
+PROMPT 4 (Lifestyle / Real Use Context):
+${templateLifestyle || "Gunakan produk asli sebagai referensi dan pertahankan desainnya secara akurat. Buat foto lifestyle profesional yang menunjukkan produk digunakan dalam konteks nyata sesuai kategorinya."}
 
-CONSISTENT VISUAL IDENTITY: All 4 images must portray the exact same product model, identical colors, branding, scale, and lighting aesthetic.
-Format your response as a strict JSON object with NO extra markdown or text:
+CRITICAL: Generate 4 specialized, detailed English photography prompts for an image generator (16:9 landscape aspect ratio, 8k resolution, photorealistic commercial photoshoot). Return strictly a JSON object with this exact schema:
 {
   "hero_prompt": "...",
   "detail_prompt": "...",
@@ -94,10 +101,10 @@ Format your response as a strict JSON object with NO extra markdown or text:
     const baseSubject = `${kategori} named "${namaItem}", high quality commercial product photography for ${domain}, clean studio lighting, 8k resolution, photorealistic, sharp focus, 16:9 landscape aspect ratio, premium marketplace catalog showcase`;
 
     const prompts = {
-      hero: geminiEnhancedPrompt?.hero_prompt || `Eye-level commercial hero product photography of ${baseSubject}, centered on clean minimalist ivory podium, soft studio lighting, crisp focus, clean white background`,
-      detail: geminiEnhancedPrompt?.detail_prompt || `Editorial macro close-up photography of ${baseSubject}, capturing fine material craftsmanship, tactile surface textures, precision finishing and premium packaging details, soft studio light, shallow depth of field`,
-      benefit: geminiEnhancedPrompt?.benefit_prompt || `Modern aesthetic commercial infographic presentation of ${baseSubject}, showcasing key product benefits and reasons to buy with clean minimalist layout, soft lighting, premium marketplace catalog display`,
-      lifestyle: geminiEnhancedPrompt?.lifestyle_prompt || `Authentic lifestyle product photography of ${baseSubject}, in natural real-world use environment, warm ambient morning light, commercial catalog aesthetic, high quality depth of field`,
+      hero: geminiEnhancedPrompt?.hero_prompt || `Eye-level commercial hero product photography of ${baseSubject}, centered on clean minimalist ivory podium, soft studio lighting, crisp focus, clean white and light grey background, photorealistic 8k`,
+      detail: geminiEnhancedPrompt?.detail_prompt || `Editorial macro close-up photography of ${baseSubject}, capturing fine material craftsmanship, tactile surface textures, ${labelsString}, precision finishing and premium packaging details, soft studio light, shallow depth of field, 8k`,
+      benefit: geminiEnhancedPrompt?.benefit_prompt || `Modern aesthetic commercial infographic presentation of ${baseSubject}, featuring headline '${benefitHeadline}', showcasing key product benefits and reasons to buy with clean minimalist layout, soft lighting, premium marketplace catalog display, 8k`,
+      lifestyle: geminiEnhancedPrompt?.lifestyle_prompt || `Authentic lifestyle product photography of ${baseSubject}, in natural real-world use environment for ${kategori}, warm ambient morning light, commercial catalog aesthetic, high quality depth of field, 8k`,
     };
 
     // 3. Generate 4 Foto Dinamis HD Landscape (1280x720) via Turbo Model (No Paywall)

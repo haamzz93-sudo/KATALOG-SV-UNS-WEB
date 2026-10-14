@@ -85,6 +85,14 @@ function AdminDashboardContent() {
   const [aiPromptTemplate, setAiPromptTemplate] = useState(
     settings.ai_default_prompt || "Tolong buatkan gambar dinamis ukuran landscape (1280x720 pixel), produk untuk display katalog produk pada marketplace. Pastikan hasilnya menjadi produk bagus, dinamis, kualitas HD, layak jual. Desain clean, tidak terlalu banyak kalimat."
   );
+
+  // 4 Marketplace Photos Paten Prompts & Master Consistency State (Full CRUD)
+  const [aiPromptHero, setAiPromptHero] = useState(settings.ai_prompt_1_hero || DEFAULT_SITE_SETTINGS.ai_prompt_1_hero || "");
+  const [aiPromptDetail, setAiPromptDetail] = useState(settings.ai_prompt_2_detail || DEFAULT_SITE_SETTINGS.ai_prompt_2_detail || "");
+  const [aiPromptBenefit, setAiPromptBenefit] = useState(settings.ai_prompt_3_benefit || DEFAULT_SITE_SETTINGS.ai_prompt_3_benefit || "");
+  const [aiPromptLifestyle, setAiPromptLifestyle] = useState(settings.ai_prompt_4_lifestyle || DEFAULT_SITE_SETTINGS.ai_prompt_4_lifestyle || "");
+  const [aiPromptConsistency, setAiPromptConsistency] = useState(settings.ai_prompt_consistency || DEFAULT_SITE_SETTINGS.ai_prompt_consistency || "");
+
   const [isAiTesting, setIsAiTesting] = useState(false);
   const [aiTestResult, setAiTestResult] = useState<{ success: boolean; message: string } | null>(null);
   const [isAiSaving, setIsAiSaving] = useState(false);
@@ -93,7 +101,21 @@ function AdminDashboardContent() {
     if (settings.gemini_api_key) setAiApiKey(settings.gemini_api_key);
     if (settings.ai_default_domain) setAiDomain(settings.ai_default_domain);
     if (settings.ai_default_prompt) setAiPromptTemplate(settings.ai_default_prompt);
+    if (settings.ai_prompt_1_hero) setAiPromptHero(settings.ai_prompt_1_hero);
+    if (settings.ai_prompt_2_detail) setAiPromptDetail(settings.ai_prompt_2_detail);
+    if (settings.ai_prompt_3_benefit) setAiPromptBenefit(settings.ai_prompt_3_benefit);
+    if (settings.ai_prompt_4_lifestyle) setAiPromptLifestyle(settings.ai_prompt_4_lifestyle);
+    if (settings.ai_prompt_consistency) setAiPromptConsistency(settings.ai_prompt_consistency);
   }, [settings]);
+
+  const handleResetAiPrompts = () => {
+    setAiPromptHero(DEFAULT_SITE_SETTINGS.ai_prompt_1_hero || "");
+    setAiPromptDetail(DEFAULT_SITE_SETTINGS.ai_prompt_2_detail || "");
+    setAiPromptBenefit(DEFAULT_SITE_SETTINGS.ai_prompt_3_benefit || "");
+    setAiPromptLifestyle(DEFAULT_SITE_SETTINGS.ai_prompt_4_lifestyle || "");
+    setAiPromptConsistency(DEFAULT_SITE_SETTINGS.ai_prompt_consistency || "");
+    toast.info("Prompt Direset ke Standar Paten", "Template prompt dikembalikan ke standar paten resmi Sekolah Vokasi UNS. Klik 'Simpan Pengaturan AI' untuk menyimpan permanen ke sistem.");
+  };
 
   const handleTestGeminiKey = async () => {
     setIsAiTesting(true);
@@ -146,8 +168,13 @@ function AdminDashboardContent() {
         gemini_api_key: aiApiKey.trim(),
         ai_default_domain: aiDomain.trim(),
         ai_default_prompt: aiPromptTemplate.trim(),
+        ai_prompt_1_hero: aiPromptHero.trim(),
+        ai_prompt_2_detail: aiPromptDetail.trim(),
+        ai_prompt_3_benefit: aiPromptBenefit.trim(),
+        ai_prompt_4_lifestyle: aiPromptLifestyle.trim(),
+        ai_prompt_consistency: aiPromptConsistency.trim(),
       });
-      toast.success("Pengaturan AI Disimpan", "Kunci API & template prompt berhasil disimpan ke sistem!");
+      toast.success("Pengaturan AI Disimpan", "Kunci API & 5 template prompt studio berhasil disimpan secara permanen ke sistem!");
     } catch (e: any) {
       toast.error("Gagal Menyimpan", e.message);
     } finally {
@@ -5798,20 +5825,33 @@ function AdminDashboardContent() {
                 Setting Prompt & Visual Studio Foto Katalog
               </h3>
               <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1">
-                Kelola API Key Google Gemini, domain display marketplace hilirisasi, serta konfigurasi prompt dinamis untuk generator 3 foto katalog (Tampak Depan, Tampak Samping, & Display Komersial).
+                Kelola API Key Google Gemini, domain display marketplace hilirisasi, serta konfigurasi paten 4 foto katalog marketplace (Hero Product, Detail & Craftsmanship, Infografis Keunggulan, dan Konteks Lifestyle).
               </p>
             </div>
 
-            <button
-              type="button"
-              onClick={handleSaveAiSettings}
-              disabled={isAiSaving}
-              style={{ borderRadius: "9999px" }}
-              className="px-6 py-2.5 rounded-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-extrabold text-xs sm:text-sm shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 shrink-0"
-            >
-              <Save className="w-4 h-4" />
-              <span>{isAiSaving ? "Menyimpan..." : "Simpan Pengaturan AI"}</span>
-            </button>
+            <div className="flex flex-wrap items-center gap-2.5 shrink-0">
+              <button
+                type="button"
+                onClick={handleResetAiPrompts}
+                style={{ borderRadius: "9999px" }}
+                className="px-4 py-2.5 rounded-full bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold text-xs shadow-xs transition flex items-center justify-center gap-1.5 cursor-pointer"
+                title="Reset seluruh prompt ke standar paten resmi Sekolah Vokasi UNS"
+              >
+                <RotateCcw className="w-3.5 h-3.5" />
+                <span>Reset ke Standar Paten</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={handleSaveAiSettings}
+                disabled={isAiSaving}
+                style={{ borderRadius: "9999px" }}
+                className="px-6 py-2.5 rounded-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-extrabold text-xs sm:text-sm shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 shrink-0"
+              >
+                <Save className="w-4 h-4" />
+                <span>{isAiSaving ? "Menyimpan..." : "Simpan Pengaturan AI"}</span>
+              </button>
+            </div>
           </div>
 
           {/* Setting Form Grid */}
@@ -5870,12 +5910,12 @@ function AdminDashboardContent() {
                 )}
               </div>
 
-              {/* Prompt Template & Target Domain */}
+              {/* Target Domain & Global Prompt */}
               <div className="p-6 rounded-3xl bg-white dark:bg-[#07192C] border border-slate-200 dark:border-slate-800 shadow-sm space-y-4">
                 <div className="border-b border-slate-100 dark:border-slate-800 pb-3">
                   <h4 className="font-bold text-sm sm:text-base text-slate-900 dark:text-white flex items-center gap-2">
-                    <SlidersHorizontal className="w-4 h-4 text-[#C5A059]" />
-                    <span>2. Konfigurasi Prompt Dinamis & Target Domain</span>
+                    <Globe className="w-4 h-4 text-[#C5A059]" />
+                    <span>2. Domain Marketplace & Catatan Tambahan</span>
                   </h4>
                 </div>
 
@@ -5897,19 +5937,163 @@ function AdminDashboardContent() {
 
                 <div>
                   <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block mb-1.5">
-                    Template Prompt Dinamis (Instruksi Standar 4 Foto Marketplace)
+                    Instruksi Global Tambahan (Fallback Prompt)
                   </label>
                   <textarea
-                    rows={4}
+                    rows={2}
                     value={aiPromptTemplate}
                     onChange={(e) => setAiPromptTemplate(e.target.value)}
                     style={{ borderRadius: "18px" }}
-                    className="w-full p-4 text-xs sm:text-sm rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-white focus:outline-none focus:border-[#C5A059] leading-relaxed font-sans"
+                    className="w-full p-3.5 text-xs sm:text-sm rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-white focus:outline-none focus:border-[#C5A059] leading-relaxed font-sans"
                   />
-                  <p className="text-[11px] text-slate-400 mt-1">
-                    Prompt default ini akan otomatis memandu Gemini 2.5 Flash menghasilkan 4 variasi foto: Hero Product, Detail & Kualitas, Infografis Fitur, dan Konteks Lifestyle dengan visual identity yang konsisten.
-                  </p>
                 </div>
+              </div>
+
+              {/* Master Consistency Rule */}
+              <div className="p-6 rounded-3xl bg-amber-500/5 border border-amber-500/30 shadow-sm space-y-3">
+                <div className="flex items-center justify-between border-b border-amber-500/20 pb-2.5">
+                  <h4 className="font-bold text-sm sm:text-base text-amber-800 dark:text-amber-300 flex items-center gap-2">
+                    <Shield className="w-4 h-4 text-amber-500" />
+                    <span>3. Master Consistency Rule (Wajib untuk Seluruh 4 Foto)</span>
+                  </h4>
+                  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-100 dark:bg-amber-950 text-amber-800 dark:text-amber-300">
+                    Paten Otomatis
+                  </span>
+                </div>
+                <p className="text-xs text-slate-500 dark:text-slate-400">
+                  Aturan ini disisipkan ke seluruh 4 foto agar warna, logo, identitas brand, dan kualitas pencahayaan tetap seragam tanpa halusinasi.
+                </p>
+                <textarea
+                  rows={3}
+                  value={aiPromptConsistency}
+                  onChange={(e) => setAiPromptConsistency(e.target.value)}
+                  style={{ borderRadius: "18px" }}
+                  className="w-full p-3.5 text-xs rounded-2xl border border-amber-300 dark:border-amber-700/60 bg-white dark:bg-slate-900 text-slate-900 dark:text-white focus:outline-none focus:border-amber-500 leading-relaxed font-sans"
+                />
+              </div>
+
+              {/* 4 Dedicated Marketplace Prompts Cards */}
+              <div className="space-y-5">
+                <h4 className="font-extrabold text-base text-slate-900 dark:text-white flex items-center gap-2">
+                  <SlidersHorizontal className="w-5 h-5 text-[#0F4C81] dark:text-sky-400" />
+                  <span>4 Template Paten Prompt Foto Marketplace (Full CRUD)</span>
+                </h4>
+
+                {/* Prompt 1: Hero Product */}
+                <div className="p-5 rounded-3xl bg-white dark:bg-[#07192C] border border-slate-200 dark:border-slate-800 shadow-sm space-y-3">
+                  <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-2.5">
+                    <div className="flex items-center gap-2">
+                      <span className="w-6 h-6 rounded-full bg-[#0F4C81] text-white text-xs font-bold flex items-center justify-center">1</span>
+                      <strong className="text-sm font-bold text-slate-900 dark:text-white">Foto Utama / Hero Product Photography</strong>
+                    </div>
+                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-100 dark:bg-blue-950 text-[#0F4C81] dark:text-sky-300">
+                      Center Focal Point & Clean Podium
+                    </span>
+                  </div>
+                  <p className="text-xs text-slate-500 dark:text-slate-400">
+                    Menampilkan produk dalam angle terbaik di atas podium ivory/white/light grey, soft studio rim lighting, serta menjaga keaslian logo, bentuk, dan warna kemasan.
+                  </p>
+                  <textarea
+                    rows={5}
+                    value={aiPromptHero}
+                    onChange={(e) => setAiPromptHero(e.target.value)}
+                    style={{ borderRadius: "16px" }}
+                    className="w-full p-3.5 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-white focus:outline-none focus:border-[#C5A059] leading-relaxed font-sans"
+                  />
+                </div>
+
+                {/* Prompt 2: Detail & Quality */}
+                <div className="p-5 rounded-3xl bg-white dark:bg-[#07192C] border border-slate-200 dark:border-slate-800 shadow-sm space-y-3">
+                  <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-2.5">
+                    <div className="flex items-center gap-2">
+                      <span className="w-6 h-6 rounded-full bg-[#0F4C81] text-white text-xs font-bold flex items-center justify-center">2</span>
+                      <strong className="text-sm font-bold text-slate-900 dark:text-white">Detail & Craftsmanship (Meyakinkan Kualitas)</strong>
+                    </div>
+                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950 text-emerald-700 dark:text-emerald-300">
+                      Macro Shot 3-5 Close-up
+                    </span>
+                  </div>
+                  <p className="text-xs text-slate-500 dark:text-slate-400">
+                    Fokus pada detail material, kerapian finishing, tekstur permukaan, dan bagian fungsional produk.
+                  </p>
+                  <textarea
+                    rows={5}
+                    value={aiPromptDetail}
+                    onChange={(e) => setAiPromptDetail(e.target.value)}
+                    style={{ borderRadius: "16px" }}
+                    className="w-full p-3.5 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-white focus:outline-none focus:border-[#C5A059] leading-relaxed font-sans"
+                  />
+                </div>
+
+                {/* Prompt 3: Benefit & Key Features */}
+                <div className="p-5 rounded-3xl bg-white dark:bg-[#07192C] border border-slate-200 dark:border-slate-800 shadow-sm space-y-3">
+                  <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-2.5">
+                    <div className="flex items-center gap-2">
+                      <span className="w-6 h-6 rounded-full bg-[#0F4C81] text-white text-xs font-bold flex items-center justify-center">3</span>
+                      <strong className="text-sm font-bold text-slate-900 dark:text-white">Keunggulan & Fitur Utama (Alasan Membeli)</strong>
+                    </div>
+                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-purple-100 dark:bg-purple-950 text-purple-700 dark:text-purple-300">
+                      Modern Benefit Infographic
+                    </span>
+                  </div>
+                  <p className="text-xs text-slate-500 dark:text-slate-400">
+                    Infografis komersial modern dengan headline 'KENAPA PRODUK INI LAYAK DIPILIH?' atau 'WHY YOU'LL LOVE IT' menyajikan 3–5 keunggulan produk yang faktual.
+                  </p>
+                  <textarea
+                    rows={5}
+                    value={aiPromptBenefit}
+                    onChange={(e) => setAiPromptBenefit(e.target.value)}
+                    style={{ borderRadius: "16px" }}
+                    className="w-full p-3.5 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-white focus:outline-none focus:border-[#C5A059] leading-relaxed font-sans"
+                  />
+                </div>
+
+                {/* Prompt 4: Lifestyle & Real Use */}
+                <div className="p-5 rounded-3xl bg-white dark:bg-[#07192C] border border-slate-200 dark:border-slate-800 shadow-sm space-y-3">
+                  <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-2.5">
+                    <div className="flex items-center gap-2">
+                      <span className="w-6 h-6 rounded-full bg-[#0F4C81] text-white text-xs font-bold flex items-center justify-center">4</span>
+                      <strong className="text-sm font-bold text-slate-900 dark:text-white">Konteks Penggunaan Nyata (Lifestyle)</strong>
+                    </div>
+                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-100 dark:bg-amber-950 text-amber-700 dark:text-amber-300">
+                      Contextual Usage by Category
+                    </span>
+                  </div>
+                  <p className="text-xs text-slate-500 dark:text-slate-400">
+                    Fotografi kontekstual autentik saat produk digunakan (makanan tersaji lezat, elektronik di workstation, tumbler di meja kerja, produk riset di lab).
+                  </p>
+                  <textarea
+                    rows={5}
+                    value={aiPromptLifestyle}
+                    onChange={(e) => setAiPromptLifestyle(e.target.value)}
+                    style={{ borderRadius: "16px" }}
+                    className="w-full p-3.5 text-xs rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-white focus:outline-none focus:border-[#C5A059] leading-relaxed font-sans"
+                  />
+                </div>
+              </div>
+
+              {/* Bottom Action Bar */}
+              <div className="p-4 rounded-2xl bg-white dark:bg-[#07192C] border border-slate-200 dark:border-slate-800 flex items-center justify-between gap-4">
+                <button
+                  type="button"
+                  onClick={handleResetAiPrompts}
+                  style={{ borderRadius: "9999px" }}
+                  className="px-4 py-2 rounded-full bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 text-xs font-bold flex items-center gap-1.5 cursor-pointer"
+                >
+                  <RotateCcw className="w-3.5 h-3.5" />
+                  <span>Reset ke Standar Paten</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={handleSaveAiSettings}
+                  disabled={isAiSaving}
+                  style={{ borderRadius: "9999px" }}
+                  className="px-6 py-2.5 rounded-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white font-extrabold text-xs shadow-md transition flex items-center gap-2 cursor-pointer disabled:opacity-50"
+                >
+                  <Save className="w-4 h-4" />
+                  <span>{isAiSaving ? "Menyimpan..." : "Simpan Semua Pengaturan Prompt"}</span>
+                </button>
               </div>
             </div>
 
