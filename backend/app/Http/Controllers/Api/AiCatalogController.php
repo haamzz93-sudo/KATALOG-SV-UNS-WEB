@@ -285,6 +285,16 @@ class AiCatalogController extends Controller
         $encoded = rawurlencode($prompt);
         $fetchUrl = "https://image.pollinations.ai/prompt/{$encoded}?width={$width}&height={$height}&seed={$seed}&model=turbo&nologo=true";
 
+        $cacheName = 'ai_' . md5($prompt . $seed . $width . $height) . '.jpg';
+        $targetPath = public_path('uploads/' . $cacheName);
+        if (file_exists($targetPath) && filesize($targetPath) > 1000) {
+            return response()->file($targetPath, [
+                'Content-Type' => 'image/jpeg',
+                'Cache-Control' => 'public, max-age=86400',
+                'Access-Control-Allow-Origin' => '*',
+            ]);
+        }
+
         try {
             $response = Http::withHeaders([
                     'User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
@@ -294,6 +304,10 @@ class AiCatalogController extends Controller
                 ->get($fetchUrl);
 
             if ($response->successful() && strlen($response->body()) > 500) {
+                try {
+                    @file_put_contents($targetPath, $response->body());
+                } catch (\Throwable $cEx) {}
+
                 return response($response->body(), 200)
                     ->header('Content-Type', $response->header('Content-Type') ?: 'image/jpeg')
                     ->header('Cache-Control', 'public, max-age=86400, stale-while-revalidate=43200')
