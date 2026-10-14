@@ -83,17 +83,74 @@ class AiCatalogController extends Controller
                 try {
                     $geminiUrl = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={$apiKey}";
 
-                    $systemInstruction = "You are a World-Class Commercial Product Photographer and AI Creative Director specializing in high-converting marketplace visual assets (Domain: {$domain}).\n" .
-                        "You are analyzing a product named \"{$namaItem}\"" . (!empty($tagline) ? " with tagline \"{$tagline}\"" : "") . " categorized under \"{$kategori}\".\n" .
-                        (!empty($detailLabels) ? "Verified quality characters to feature on details: {$detailLabels}.\n" : "") .
-                        "Infographic headline to feature: \"{$benefitHeadline}\".\n\n" .
-                        "=== STRICT GUIDELINES FROM USER SPECIFICATION ===\n" .
-                        "MASTER CONSISTENCY RULE:\n{$templateConsistency}\n\n" .
-                        "PROMPT 1 (Hero Product / Foto Utama Marketplace):\n{$templateHero}\n\n" .
-                        "PROMPT 2 (Detail & Quality / Meyakinkan Kualitas):\n{$templateDetail}\n\n" .
-                        "PROMPT 3 (Benefit & Key Features / Alasan Membeli):\n{$templateBenefit}\n\n" .
-                        "PROMPT 4 (Lifestyle / Real Use Context):\n{$templateLifestyle}\n\n" .
-                        "CRITICAL: Generate 4 specialized, detailed English photography prompts for an image generator (16:9 landscape aspect ratio, 8k resolution, photorealistic commercial photoshoot). Return strictly a JSON object with this exact schema:\n" .
+                    // Handle both Data URL and local server file path (/uploads/...)
+                    $inlineImageAdded = false;
+                    $imageParts = [];
+
+                    if (!empty($rawImageBase64)) {
+                        if (str_starts_with($rawImageBase64, 'data:')) {
+                            $segments = explode(';base64,', $rawImageBase64);
+                            if (count($segments) === 2) {
+                                $mimeType = str_replace('data:', '', $segments[0]);
+                                $imageParts[] = [
+                                    'inlineData' => [
+                                        'mimeType' => $mimeType,
+                                        'data' => $segments[1],
+                                    ]
+                                ];
+                                $inlineImageAdded = true;
+                            }
+                        } else {
+                            $possiblePaths = [
+                                public_path(ltrim($rawImageBase64, '/')),
+                                base_path('../frontend/public/' . ltrim($rawImageBase64, '/')),
+                                base_path('../public/' . ltrim($rawImageBase64, '/')),
+                                storage_path('app/public/' . ltrim(str_replace('/storage/', '', $rawImageBase64), '/')),
+                                storage_path('app/' . ltrim($rawImageBase64, '/')),
+                                public_path('uploads/' . basename($rawImageBase64)),
+                                base_path('../frontend/public/uploads/' . basename($rawImageBase64)),
+                            ];
+                            foreach ($possiblePaths as $tryPath) {
+                                if (file_exists($tryPath) && is_file($tryPath)) {
+                                    $bytes = @file_get_contents($tryPath);
+                                    if ($bytes) {
+                                        $ext = strtolower(pathinfo($tryPath, PATHINFO_EXTENSION));
+                                        $mimeType = ($ext === 'png') ? 'image/png' : (($ext === 'webp') ? 'image/webp' : 'image/jpeg');
+                                        $imageParts[] = [
+                                            'inlineData' => [
+                                                'mimeType' => $mimeType,
+                                                'data' => base64_encode($bytes),
+                                            ]
+                                        ];
+                                        $inlineImageAdded = true;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    $displayName = (!empty($namaItem) && !str_contains($namaItem, 'Belum diisi')) ? "\"{$namaItem}\"" : "the exact product shown in reference image";
+                    $systemInstruction = "You are a World-Class Commercial Product Photographer and AI Creative Director specializing in high-converting marketplace visual assets (Domain: {$domain}).\n\n" .
+                        ($inlineImageAdded
+                            ? "CRITICAL MANDATE - REAL PRODUCT PACKAGING REPLICATION:\n" .
+                              "1. A real product reference image is attached to this request. Inspect it thoroughly.\n" .
+                              "2. Identify the exact physical object, form factor, and packaging: e.g. stand-up matte foil zipper pouch packaging, glass dropper bottle, cardboard box, electronic device, machine casing, etc.\n" .
+                              "3. Identify the EXACT dominant colors (e.g. blue and pink), geometric or curved graphic patterns, and printed labels/text (e.g. bold \"MOCKUP\").\n" .
+                              "4. IN ALL 4 PROMPTS, THE MAIN CENTRAL SUBJECT MUST BE THIS EXACT PHYSICAL OBJECT WITH ITS EXACT PACKAGING FORMAT, EXACT COLORS, AND LABELS.\n" .
+                              "5. STRICT NEGATIVE CONSTRAINT: DO NOT describe the food/ingredients inside (e.g. DO NOT mention fruit, oranges, citrus, bowls, plates, snacks, powder, food contents). The photo must strictly focus on the PACKAGING/CONTAINER itself as a commercial marketplace product.\n"
+                            : "Subject: High quality commercial product for category '{$kategori}'" . (!empty($namaItem) && !str_contains($namaItem, 'Belum diisi') ? " named \"{$namaItem}\"" : "") . ".\n") .
+                        "\nCategory: \"{$kategori}\"" . (!empty($tagline) ? ", Tagline: \"{$tagline}\"" : "") . "\n" .
+                        (!empty($detailLabels) ? "Features/Tags to highlight on macro shot: {$detailLabels}.\n" : "") .
+                        "Infographic headline: \"{$benefitHeadline}\".\n\n" .
+                        "=== USER EXTRA INSTRUCTION ===\n" . ($customPrompt ?: 'Jaga agar produk tampak tajam, profesional, layak jual, konsisten di seluruh 4 foto.') . "\n\n" .
+                        "Generate 4 specialized English photography prompts for a commercial image generator (16:9 landscape aspect ratio, photorealistic 8k commercial photoshoot):\n" .
+                        "- 'hero_prompt': High-end commercial hero product photography of [EXACT PHYSICAL ITEM WITH ITS EXACT COLORS AND LABELS], centered on a clean minimalist white studio pedestal, soft studio rim lighting, crisp focus, clean white/light grey studio background, photorealistic 8k, product packaging only.\n" .
+                        "- 'detail_prompt': Editorial macro close-up photography of [EXACT PHYSICAL ITEM WITH ITS EXACT COLORS], capturing extreme close-up of [{$detailLabels}], material craftsmanship, surface texture, precision print and seams, soft studio lighting, shallow depth of field, 8k.\n" .
+                        "- 'benefit_prompt': Clean aesthetic commercial infographic presentation of [EXACT PHYSICAL ITEM WITH ITS EXACT COLORS], modern minimalist feature highlight layout with headline '{$benefitHeadline}', studio lighting, crisp typography, 8k.\n" .
+                        "- 'lifestyle_prompt': Commercial lifestyle product photography of [EXACT PHYSICAL ITEM WITH ITS EXACT COLORS AND LABELS] placed naturally on a modern minimalist wooden table or desk, natural morning window lighting, commercial catalog aesthetic, shallow depth of field, 8k.\n\n" .
+                        "IMPORTANT: Keep each prompt concise (under 45 words), starting directly with the subject, using dense visual keywords. Avoid storytelling paragraphs or background filler words.\n" .
+                        "Return strictly a JSON object with this exact schema:\n" .
                         "{\n" .
                         "  \"hero_prompt\": \"...\",\n" .
                         "  \"detail_prompt\": \"...\",\n" .
@@ -101,22 +158,11 @@ class AiCatalogController extends Controller
                         "  \"lifestyle_prompt\": \"...\"\n" .
                         "}";
 
-                    $parts = [
-                        ['text' => $systemInstruction . "\n\nInstruksi Pengguna Tambahan: " . ($customPrompt ?: 'Jaga agar produk tampak tajam, profesional, layak jual, konsisten di seluruh 4 foto')]
-                    ];
-
-                    if (!empty($rawImageBase64) && str_starts_with($rawImageBase64, 'data:')) {
-                        $segments = explode(';base64,', $rawImageBase64);
-                        if (count($segments) === 2) {
-                            $mimeType = str_replace('data:', '', $segments[0]);
-                            $parts[] = [
-                                'inlineData' => [
-                                    'mimeType' => $mimeType,
-                                    'data' => $segments[1],
-                                ]
-                            ];
-                        }
+                    $parts = [];
+                    foreach ($imageParts as $imgPart) {
+                        $parts[] = $imgPart;
                     }
+                    $parts[] = ['text' => $systemInstruction];
 
                     $response = Http::timeout(25)
                         ->withHeaders(['Content-Type' => 'application/json'])
@@ -141,7 +187,10 @@ class AiCatalogController extends Controller
             }
 
             // 3. Susun 4 Prompt Fotografi Marketplace
-            $baseSubject = "{$kategori} named \"{$namaItem}\", high quality commercial product photography for {$domain}, clean studio lighting, 8k resolution, photorealistic, sharp focus, 16:9 landscape aspect ratio, premium marketplace catalog showcase";
+            $displayItem = (!empty($namaItem) && !str_contains($namaItem, 'Belum diisi')) ? "\"{$namaItem}\"" : "innovation product";
+            $baseSubject = !empty($rawImageBase64)
+                ? "commercial product packaging for {$displayItem} ({$kategori}), clean studio lighting, 8k resolution, photorealistic, sharp focus, 16:9 landscape aspect ratio, premium marketplace catalog showcase"
+                : "commercial {$kategori} product {$displayItem}, high quality commercial product photography for {$domain}, clean studio lighting, 8k resolution, photorealistic, sharp focus, 16:9 landscape aspect ratio, premium marketplace catalog showcase";
 
             $prompts = [
                 'hero' => $geminiEnhancedPrompt['hero_prompt'] ?? "Eye-level commercial hero product photography of {$baseSubject}, centered on clean minimalist ivory podium, soft studio lighting, crisp focus, clean white and light grey background, photorealistic 8k",
@@ -300,7 +349,7 @@ class AiCatalogController extends Controller
                     'User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
                     'Accept' => 'image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8',
                 ])
-                ->timeout(30)
+                ->timeout(45)
                 ->get($fetchUrl);
 
             if ($response->successful() && strlen($response->body()) > 500) {
@@ -320,7 +369,7 @@ class AiCatalogController extends Controller
                     'User-Agent' => 'Mozilla/5.0',
                     'Accept' => 'image/*',
                 ])
-                ->timeout(25)
+                ->timeout(35)
                 ->get($fallbackUrl);
 
             if ($fallbackRes->successful() && strlen($fallbackRes->body()) > 500) {

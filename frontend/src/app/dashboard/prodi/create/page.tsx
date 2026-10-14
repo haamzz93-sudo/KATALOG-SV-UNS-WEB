@@ -86,6 +86,7 @@ export default function CreateProdiItem() {
       "Pencahayaan studio komersial lembut, resolusi HD 8k, aspect ratio landscape 16:9, clean minimalis, pertahankan keaslian warna, logo, dan identitas visual konsisten di seluruh 4 foto."
   );
   const [aiRawPhoto, setAiRawPhoto] = useState<string>("");
+  const [aiRawPhotoBase64, setAiRawPhotoBase64] = useState<string>("");
   const [aiLoading, setAiLoading] = useState(false);
   const [aiPhotos, setAiPhotos] = useState<any[]>([]);
 
@@ -153,7 +154,7 @@ export default function CreateProdiItem() {
         kategori: aiKategori,
         detailLabels: aiDetailLabels,
         benefitHeadline: aiBenefitHeadline,
-        rawImageBase64: aiRawPhoto || (thumbnailUrl && !thumbnailUrl.startsWith("blob:") ? thumbnailUrl : undefined),
+        rawImageBase64: aiRawPhotoBase64 || aiRawPhoto || (thumbnailUrl && !thumbnailUrl.startsWith("blob:") ? thumbnailUrl : undefined),
         customPrompt: aiPrompt,
         templateHero: settings.ai_prompt_1_hero,
         templateDetail: settings.ai_prompt_2_detail,
@@ -508,8 +509,9 @@ export default function CreateProdiItem() {
                         acceptedType="image"
                         maxSizeMb={5}
                         currentUrl={aiRawPhoto}
-                        onUploadSuccess={(url) => {
+                        onUploadSuccess={(url, info) => {
                           if (url) setAiRawPhoto(url);
+                          if (info?.dataUrl) setAiRawPhotoBase64(info.dataUrl);
                         }}
                       />
                     </div>
@@ -719,10 +721,9 @@ export default function CreateProdiItem() {
                                     loading="lazy"
                                     className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
                                     onError={(e) => {
-                                      // Fallback jika upstream memblokir: load via direct proxy
                                       const target = e.currentTarget;
-                                      if (!target.src.includes("/api/v1/public/ai/image-proxy") && photo.prompt) {
-                                        target.src = `/api/v1/public/ai/image-proxy?prompt=${encodeURIComponent(photo.prompt)}&width=1280&height=720`;
+                                      if (photo.directUrl && target.src !== photo.directUrl) {
+                                        target.src = photo.directUrl;
                                       }
                                     }}
                                   />

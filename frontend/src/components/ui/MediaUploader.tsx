@@ -7,7 +7,7 @@ interface MediaUploaderProps {
   label?: string;
   description?: string;
   currentUrl?: string;
-  onUploadSuccess: (url: string, fileInfo?: { type: "image" | "video"; duration?: number; sizeMb: number }) => void;
+  onUploadSuccess: (url: string, fileInfo?: { type: "image" | "video"; duration?: number; sizeMb: number; dataUrl?: string }) => void;
   acceptedType?: "image" | "video" | "both";
   maxSizeMb?: number;
   maxDurationSeconds?: number;
@@ -95,6 +95,54 @@ export const MediaUploader: React.FC<MediaUploaderProps> = ({
       }
     }
 
+    // Helper to compress image in browser using canvas
+    const compressImage = async (f: File, maxDim = 1440, quality = 0.85): Promise<File> => {
+      if (!f.type.startsWith("image/") || f.type === "image/svg+xml" || f.type === "image/gif") {
+        return f;
+      }
+      return new Promise((resolve) => {
+        const img = new Image();
+        const reader = new FileReader();
+        reader.onload = (e) => {
+          img.onload = () => {
+            let width = img.width;
+            let height = img.height;
+            if (width > maxDim || height > maxDim) {
+              if (width > height) {
+                height = Math.round((height * maxDim) / width);
+                width = maxDim;
+              } else {
+                width = Math.round((width * maxDim) / height);
+                height = maxDim;
+              }
+            }
+            const canvas = document.createElement("canvas");
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext("2d");
+            if (!ctx) return resolve(f);
+            ctx.drawImage(img, 0, 0, width, height);
+            canvas.toBlob(
+              (blob) => {
+                if (!blob) return resolve(f);
+                const compressed = new File([blob], f.name.replace(/\.[^/.]+$/, ".jpg"), {
+                  type: "image/jpeg",
+                  lastModified: Date.now(),
+                });
+                resolve(compressed);
+              },
+              "image/jpeg",
+              quality
+            );
+          };
+          img.onerror = () => resolve(f);
+          img.src = e.target?.result as string;
+        };
+        reader.onerror = () => resolve(f);
+        reader.readAsDataURL(f);
+      });
+    };
+
     // Proceed to upload
     setIsUploading(true);
     const localUrl = URL.createObjectURL(file);
@@ -111,8 +159,12 @@ export const MediaUploader: React.FC<MediaUploaderProps> = ({
       });
 
     try {
+      // Compress image client-side if it is a photo
+      const uploadFile = isImg ? await compressImage(file) : file;
+      const safeDataUrl = isImg ? await readAsDataUrl(uploadFile) : localUrl;
+
       const formData = new FormData();
-      formData.append("file", file);
+      formData.append("file", uploadFile);
 
       const API_BASE = typeof window !== "undefined" ? "/api/v1" : (process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000/api/v1");
       
@@ -126,21 +178,22 @@ export const MediaUploader: React.FC<MediaUploaderProps> = ({
 
       if (res.ok) {
         const json = await res.json();
-        const serverUrl = json.url || localUrl;
+        const serverUrl = json.url || safeDataUrl;
         setPreviewUrl(serverUrl);
         onUploadSuccess(serverUrl, {
           type: isVid ? "video" : "image",
           duration: videoDuration || undefined,
-          sizeMb: Number(sizeMb.toFixed(2)),
+          sizeMb: Number((uploadFile.size / (1024 * 1024)).toFixed(2)),
+          dataUrl: safeDataUrl,
         });
       } else {
         // Fallback to data URL so the media persists across reloads and database saves
-        const safeDataUrl = !isVid ? await readAsDataUrl(file) : localUrl;
         setPreviewUrl(safeDataUrl);
         onUploadSuccess(safeDataUrl, {
           type: isVid ? "video" : "image",
           duration: videoDuration || undefined,
           sizeMb: Number(sizeMb.toFixed(2)),
+          dataUrl: safeDataUrl,
         });
       }
     } catch {
@@ -151,6 +204,7 @@ export const MediaUploader: React.FC<MediaUploaderProps> = ({
         type: isVid ? "video" : "image",
         duration: videoDuration || undefined,
         sizeMb: Number(sizeMb.toFixed(2)),
+        dataUrl: safeDataUrl,
       });
     } finally {
       setIsUploading(false);

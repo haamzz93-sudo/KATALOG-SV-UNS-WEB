@@ -81,10 +81,22 @@ class SettingController extends Controller
     public function upload(Request $request): JsonResponse
     {
         try {
+            $base64Data = $request->input('file_base64') ?: $request->input('data');
+            if (!empty($base64Data) && str_starts_with($base64Data, 'data:')) {
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Berkas berhasil diproses.',
+                    'url' => $base64Data,
+                    'type' => 'image',
+                    'file_name' => 'img_' . time() . '.jpg',
+                    'size_bytes' => strlen($base64Data),
+                ]);
+            }
+
             if (!$request->hasFile('file')) {
                 return response()->json([
                     'success' => false,
-                    'message' => 'Tidak ada berkas yang diunggah.',
+                    'message' => 'Tidak ada berkas yang diunggah. Pastikan ukuran file tidak melebihi batas server.',
                 ], 422);
             }
 
