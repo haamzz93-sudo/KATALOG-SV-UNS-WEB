@@ -20,6 +20,7 @@ $registerRoutes = function () {
         Route::post('/inquiries', [PublicCatalogController::class, 'submitInquiry']);
         Route::get('/settings', [SettingController::class, 'index']);
         Route::post('/upload', [SettingController::class, 'upload']);
+        Route::get('/file/{filename}', [SettingController::class, 'serveFile']);
         Route::get('/stats', [PimpinanController::class, 'dashboardStats']);
         Route::post('/ai/catalog-photo', [AiCatalogController::class, 'generatePhotos']);
         Route::post('/ai/test-key', [AiCatalogController::class, 'testKey']);

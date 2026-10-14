@@ -25,16 +25,180 @@ interface GeneratorOptions {
 }
 
 /**
- * Memuat gambar ke elemen Image HTML
+ * Polyfill aman untuk rounded rectangle di semua browser
  */
-const loadImage = (src: string): Promise<HTMLImageElement> => {
+export const drawRoundRect = (
+  ctx: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  w: number,
+  h: number,
+  r: number | number[]
+) => {
+  if (typeof ctx.roundRect === "function") {
+    ctx.roundRect(x, y, w, h, r);
+  } else {
+    const radius = typeof r === "number" ? r : (r[0] || 0);
+    ctx.moveTo(x + radius, y);
+    ctx.lineTo(x + w - radius, y);
+    ctx.quadraticCurveTo(x + w, y, x + w, y + radius);
+    ctx.lineTo(x + w, y + h - radius);
+    ctx.quadraticCurveTo(x + w, y + h, x + w - radius, y + h);
+    ctx.lineTo(x + radius, y + h);
+    ctx.quadraticCurveTo(x, y + h, x, y + h - radius);
+    ctx.lineTo(x, y + radius);
+    ctx.quadraticCurveTo(x, y, x + radius, y);
+    ctx.closePath();
+  }
+};
+
+/**
+ * Memuat gambar ke elemen Image HTML dengan konversi aman ke Blob/DataURL
+ * agar tidak pernah terkena CORS error dan kanvas tidak pernah 'tainted'.
+ */
+export const loadImage = async (src: string): Promise<HTMLImageElement> => {
+  let finalSrc = src;
+
+  // Jika src adalah URL remote/relative, konversi ke base64 data URL via fetch & FileReader
+  if (!src.startsWith("data:") && !src.startsWith("blob:")) {
+    try {
+      const res = await fetch(src);
+      if (res.ok) {
+        const blob = await res.blob();
+        finalSrc = await new Promise<string>((resolve) => {
+          const reader = new FileReader();
+          reader.onloadend = () => resolve(reader.result as string);
+          reader.readAsDataURL(blob);
+        });
+      }
+    } catch (e) {
+      console.warn("fetch blob fallback:", e);
+    }
+  }
+
   return new Promise((resolve, reject) => {
     const img = new Image();
-    img.crossOrigin = "anonymous";
+    // Jangan pernah pasang crossOrigin untuk data: atau blob: URL
+    if (!finalSrc.startsWith("data:") && !finalSrc.startsWith("blob:")) {
+      img.crossOrigin = "anonymous";
+    }
     img.onload = () => resolve(img);
     img.onerror = (e) => reject(new Error("Gagal memuat gambar produk mentah: " + e));
-    img.src = src;
+    img.src = finalSrc;
   });
+};
+
+/**
+ * Isolasi Foreground Produk (Smart Background Removal / Studio Isolation)
+ * Menggunakan algoritma BFS Flood-Fill dari tepi border gambar untuk memotong
+ * background studio/meja berwarna terang secara presisi tanpa merusak detail
+ * logo, warna, atau teks di dalam produk fisik.
+ */
+export const isolateProductForeground = (
+  sourceImg: HTMLImageElement | HTMLCanvasElement,
+  tolerance = 34
+): HTMLCanvasElement => {
+  const canvas = document.createElement("canvas");
+  const w = sourceImg.width;
+  const h = sourceImg.height;
+  canvas.width = w;
+  canvas.height = h;
+
+  const ctx = canvas.getContext("2d");
+  if (!ctx) return canvas;
+
+  ctx.drawImage(sourceImg, 0, 0);
+
+  // Jika resolusi sangat besar, batasi untuk performa real-time
+  try {
+    const imgData = ctx.getImageData(0, 0, w, h);
+    const data = imgData.data;
+
+    // 1. Sampling warna background dari 4 sudut & tepi atas
+    const sampleCorner = (px: number, py: number) => {
+      const idx = (py * w + px) * 4;
+      return [data[idx], data[idx + 1], data[idx + 2]];
+    };
+
+    const corners = [
+      sampleCorner(2, 2),
+      sampleCorner(w - 3, 2),
+      sampleCorner(2, h - 3),
+      sampleCorner(w - 3, h - 3),
+      sampleCorner(Math.floor(w / 2), 2),
+    ];
+
+    const avgBgR = corners.reduce((acc, c) => acc + c[0], 0) / corners.length;
+    const avgBgG = corners.reduce((acc, c) => acc + c[1], 0) / corners.length;
+    const avgBgB = corners.reduce((acc, c) => acc + c[2], 0) / corners.length;
+
+    // Hanya potong jika background bertipe studio/terang (brightness > 120)
+    const brightness = (avgBgR + avgBgG + avgBgB) / 3;
+    if (brightness < 110) {
+      return canvas; // Kembalikan apa adanya jika foto background gelap pekat
+    }
+
+    // 2. BFS Flood-fill dari seluruh tepi luar (Border Pixels)
+    const totalPixels = w * h;
+    const visited = new Uint8Array(totalPixels);
+    const queue = new Int32Array(totalPixels);
+    let head = 0;
+    let tail = 0;
+
+    const isBackground = (r: number, g: number, b: number) => {
+      const dr = r - avgBgR;
+      const dg = g - avgBgG;
+      const db = b - avgBgB;
+      return Math.sqrt(dr * dr + dg * dg + db * db) <= tolerance;
+    };
+
+    const enqueue = (px: number, py: number) => {
+      const pIdx = py * w + px;
+      if (visited[pIdx]) return;
+      const dIdx = pIdx * 4;
+      if (isBackground(data[dIdx], data[dIdx + 1], data[dIdx + 2])) {
+        visited[pIdx] = 1;
+        queue[tail++] = pIdx;
+      }
+    };
+
+    // Border atas & bawah
+    for (let x = 0; x < w; x++) {
+      enqueue(x, 0);
+      enqueue(x, h - 1);
+    }
+    // Border kiri & kanan
+    for (let y = 0; y < h; y++) {
+      enqueue(0, y);
+      enqueue(w - 1, y);
+    }
+
+    // Eksekusi BFS
+    while (head < tail) {
+      const curr = queue[head++];
+      const cx = curr % w;
+      const cy = Math.floor(curr / w);
+
+      // Tetangga 4 arah
+      if (cx > 0) enqueue(cx - 1, cy);
+      if (cx < w - 1) enqueue(cx + 1, cy);
+      if (cy > 0) enqueue(cx, cy - 1);
+      if (cy < h - 1) enqueue(cx, cy + 1);
+    }
+
+    // 3. Ubah seluruh pixel background terhubung menjadi transparan (Alpha = 0)
+    for (let i = 0; i < totalPixels; i++) {
+      if (visited[i]) {
+        data[i * 4 + 3] = 0;
+      }
+    }
+
+    ctx.putImageData(imgData, 0, 0);
+  } catch (err) {
+    console.warn("Isolasi background canvas gagal, fallback ke gambar asli:", err);
+  }
+
+  return canvas;
 };
 
 /**
@@ -46,7 +210,7 @@ const drawContactShadow = (
   cy: number,
   rx: number,
   ry: number,
-  opacity = 0.28
+  opacity = 0.32
 ) => {
   ctx.save();
   const grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, rx);
@@ -65,7 +229,7 @@ const drawContactShadow = (
  * Center focal point, podium ivory minimalis, studio lighting
  */
 export const generateHeroPhoto = (
-  img: HTMLImageElement,
+  img: HTMLImageElement | HTMLCanvasElement,
   namaItem: string,
   kategori: string
 ): string => {
@@ -103,7 +267,6 @@ export const generateHeroPhoto = (
   ctx.beginPath();
   ctx.ellipse(podX, podY + podH + 10, podRx + 25, podRy + 15, 0, 0, Math.PI * 2);
   ctx.fillStyle = "rgba(15, 23, 42, 0.08)";
-  ctx.filter = "blur(18px)";
   ctx.fill();
   ctx.restore();
 
@@ -149,9 +312,9 @@ export const generateHeroPhoto = (
   ctx.drawImage(img, prodX, prodY, prodW, prodTargetH);
 
   // 5. Header Branding Badge
-  ctx.fillStyle = "rgba(15, 76, 129, 0.9)";
+  ctx.fillStyle = "rgba(15, 76, 129, 0.92)";
   ctx.beginPath();
-  ctx.roundRect(40, 35, 340, 34, 17);
+  drawRoundRect(ctx, 40, 35, 340, 34, 17);
   ctx.fill();
 
   ctx.fillStyle = "#FFFFFF";
@@ -160,11 +323,11 @@ export const generateHeroPhoto = (
 
   // Category Tag Top Right
   if (kategori) {
-    ctx.fillStyle = "rgba(255, 255, 255, 0.88)";
+    ctx.fillStyle = "rgba(255, 255, 255, 0.9)";
     ctx.strokeStyle = "rgba(197, 160, 89, 0.6)";
     ctx.lineWidth = 1.5;
     ctx.beginPath();
-    ctx.roundRect(1020, 35, 220, 34, 17);
+    drawRoundRect(ctx, 1020, 35, 220, 34, 17);
     ctx.fill();
     ctx.stroke();
 
@@ -185,10 +348,10 @@ export const generateHeroPhoto = (
 
 /**
  * 2. DETAIL & QUALITY (MACRO SHOT) (1280x720)
- * Macro zoom 1.7x pada produk asli, overlay tag karakter kualitas
+ * Macro zoom 1.75x pada produk asli, overlay tag karakter kualitas
  */
 export const generateDetailPhoto = (
-  img: HTMLImageElement,
+  img: HTMLImageElement | HTMLCanvasElement,
   detailTags: string[]
 ): string => {
   const canvas = document.createElement("canvas");
@@ -224,20 +387,14 @@ export const generateDetailPhoto = (
   const macroY = 100;
 
   // Shadow belakang produk
-  ctx.save();
-  ctx.beginPath();
-  ctx.ellipse(640, 640, macroW * 0.48, 25, 0, 0, Math.PI * 2);
-  ctx.fillStyle = "rgba(15, 23, 42, 0.16)";
-  ctx.filter = "blur(14px)";
-  ctx.fill();
-  ctx.restore();
+  drawContactShadow(ctx, 640, 640, macroW * 0.48, 25, 0.25);
 
   ctx.drawImage(img, macroX, macroY, macroW, macroH);
 
   // 3. Header Badge
   ctx.fillStyle = "rgba(15, 76, 129, 0.92)";
   ctx.beginPath();
-  ctx.roundRect(40, 35, 360, 36, 18);
+  drawRoundRect(ctx, 40, 35, 360, 36, 18);
   ctx.fill();
   ctx.fillStyle = "#FFFFFF";
   ctx.font = "bold 13px system-ui, -apple-system, sans-serif";
@@ -257,19 +414,14 @@ export const generateDetailPhoto = (
 
   tags.forEach((tag, idx) => {
     const pos = badgePositions[idx] || { x: 60, y: 200 + idx * 80 };
-    const text = tag;
 
     // Glass pill background
     ctx.save();
     ctx.fillStyle = "rgba(255, 255, 255, 0.92)";
     ctx.strokeStyle = "rgba(197, 160, 89, 0.75)";
     ctx.lineWidth = 1.8;
-    ctx.shadowColor = "rgba(15, 23, 42, 0.12)";
-    ctx.shadowBlur = 10;
-    ctx.shadowOffsetY = 4;
-
     ctx.beginPath();
-    ctx.roundRect(pos.x, pos.y, 280, 48, 24);
+    drawRoundRect(ctx, pos.x, pos.y, 280, 48, 24);
     ctx.fill();
     ctx.stroke();
     ctx.restore();
@@ -302,7 +454,7 @@ export const generateDetailPhoto = (
  * Headline komersial, kartu keunggulan di sisi kiri, produk asli di sisi kanan
  */
 export const generateBenefitPhoto = (
-  img: HTMLImageElement,
+  img: HTMLImageElement | HTMLCanvasElement,
   headline: string,
   namaItem: string,
   kategori: string
@@ -369,11 +521,8 @@ export const generateBenefitPhoto = (
     ctx.fillStyle = "#FFFFFF";
     ctx.strokeStyle = "rgba(226, 232, 240, 0.9)";
     ctx.lineWidth = 1.5;
-    ctx.shadowColor = "rgba(15, 23, 42, 0.05)";
-    ctx.shadowBlur = 8;
-    ctx.shadowOffsetY = 3;
     ctx.beginPath();
-    ctx.roundRect(55, cardY, 520, 125, 16);
+    drawRoundRect(ctx, 55, cardY, 520, 125, 16);
     ctx.fill();
     ctx.stroke();
     ctx.restore();
@@ -448,7 +597,7 @@ export const generateBenefitPhoto = (
  * Permukaan kayu hangat, pencahayaan alami jendela, produk asli berdiri natural
  */
 export const generateLifestylePhoto = (
-  img: HTMLImageElement,
+  img: HTMLImageElement | HTMLCanvasElement,
   kategori: string
 ): string => {
   const canvas = document.createElement("canvas");
@@ -507,7 +656,8 @@ export const generateLifestylePhoto = (
 
   // 3. Product Placement on Table (x = 640, y = 480)
   const prodH = 410;
-  const prodW = (prodH * img.width) / img.height;
+  const prodRatio = img.width / img.height;
+  const prodW = prodH * prodRatio;
   const prodX = 640 - prodW / 2;
   const prodY = 470 - prodH + 20;
 
@@ -529,7 +679,7 @@ export const generateLifestylePhoto = (
   // 4. Header Badge
   ctx.fillStyle = "rgba(15, 76, 129, 0.9)";
   ctx.beginPath();
-  ctx.roundRect(40, 35, 380, 36, 18);
+  drawRoundRect(ctx, 40, 35, 380, 36, 18);
   ctx.fill();
   ctx.fillStyle = "#FFFFFF";
   ctx.font = "bold 13px system-ui, -apple-system, sans-serif";
@@ -555,12 +705,17 @@ export async function generateStudioMarketplacePhotos(
     throw new Error("Foto produk mentahan belum diunggah.");
   }
 
+  // 1. Muat gambar produk secara aman
   const img = await loadImage(imageSrc);
 
-  const heroUrl = generateHeroPhoto(img, namaItem, kategori);
-  const detailUrl = generateDetailPhoto(img, detailTags);
-  const benefitUrl = generateBenefitPhoto(img, benefitHeadline, namaItem, kategori);
-  const lifestyleUrl = generateLifestylePhoto(img, kategori);
+  // 2. Isolasi foreground produk (potong background studio secara otomatis jika latar terang)
+  const isolatedImg = isolateProductForeground(img);
+
+  // 3. Render 4 standar marketplace
+  const heroUrl = generateHeroPhoto(isolatedImg, namaItem, kategori);
+  const detailUrl = generateDetailPhoto(isolatedImg, detailTags);
+  const benefitUrl = generateBenefitPhoto(isolatedImg, benefitHeadline, namaItem, kategori);
+  const lifestyleUrl = generateLifestylePhoto(isolatedImg, kategori);
 
   return [
     {

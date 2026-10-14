@@ -151,7 +151,7 @@ class SettingController extends Controller
             @chmod($targetDir, 0777);
 
             $saved = false;
-            $fileUrl = '/uploads/' . $fileName;
+            $fileUrl = '/api/v1/public/file/' . $fileName;
 
             // Strategy 1: Direct move to public/uploads
             if (is_dir($targetDir)) {
@@ -171,7 +171,7 @@ class SettingController extends Controller
                     if (is_dir($targetDir)) {
                         @file_put_contents($targetDir . DIRECTORY_SEPARATOR . $fileName, $fileBytes);
                         if (file_exists($targetDir . DIRECTORY_SEPARATOR . $fileName)) {
-                            $fileUrl = '/uploads/' . $fileName;
+                            $fileUrl = '/api/v1/public/file/' . $fileName;
                             $saved = true;
                         }
                     }
@@ -190,7 +190,7 @@ class SettingController extends Controller
                     if ($fileBytes !== null && is_dir($frontendDir)) {
                         @file_put_contents($frontendDir . DIRECTORY_SEPARATOR . $fileName, $fileBytes);
                         if (file_exists($frontendDir . DIRECTORY_SEPARATOR . $fileName)) {
-                            $fileUrl = '/uploads/' . $fileName;
+                            $fileUrl = '/api/v1/public/file/' . $fileName;
                             $saved = true;
                         }
                     }
@@ -262,5 +262,33 @@ class SettingController extends Controller
                 'message' => 'Terjadi kesalahan saat unggah: ' . $e->getMessage(),
             ], 422);
         }
+    }
+
+    /**
+     * Serve uploaded file directly via API route to guarantee CORS and bypass Next.js 404
+     */
+    public function serveFile(string $filename)
+    {
+        $filename = basename($filename);
+        $candidates = [
+            public_path('uploads/' . $filename),
+            storage_path('app/public/uploads/' . $filename),
+            base_path('../frontend/public/uploads/' . $filename),
+            base_path('public/uploads/' . $filename),
+        ];
+
+        foreach ($candidates as $filePath) {
+            if (file_exists($filePath)) {
+                $mime = mime_content_type($filePath) ?: 'application/octet-stream';
+                return response()->file($filePath, [
+                    'Content-Type' => $mime,
+                    'Access-Control-Allow-Origin' => '*',
+                    'Access-Control-Allow-Methods' => 'GET, HEAD, OPTIONS',
+                    'Cache-Control' => 'public, max-age=86400',
+                ]);
+            }
+        }
+
+        return response()->json(['error' => 'File tidak ditemukan'], 404);
     }
 }

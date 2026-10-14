@@ -148,6 +148,15 @@ export default function CreateProdiItem() {
     setAiLoading(true);
     const rawImg = aiRawPhotoBase64 || aiRawPhoto || (thumbnailUrl && !thumbnailUrl.startsWith("blob:") ? thumbnailUrl : undefined);
 
+    if (!rawImg && !forceAi) {
+      toast.info(
+        "Unggah Foto Produk Terlebih Dahulu",
+        "Silakan unggah foto produk mentah pada bagian 1 di atas agar 4 foto marketplace presisi dapat dihasilkan."
+      );
+      setAiLoading(false);
+      return;
+    }
+
     // 1. Prioritaskan Studio Komposisi Produk Asli (100% Presisi tanpa Distorsi AI)
     if (rawImg && !forceAi) {
       try {
@@ -167,7 +176,13 @@ export default function CreateProdiItem() {
         setAiLoading(false);
         return;
       } catch (err: any) {
-        console.warn("Studio generator fallback to backend:", err);
+        console.error("Studio generator error:", err);
+        toast.error(
+          "Gagal Komposisi Studio Foto",
+          err?.message || "Terjadi kendala saat memproses gambar produk mentah."
+        );
+        setAiLoading(false);
+        return;
       }
     }
 
@@ -459,8 +474,12 @@ export default function CreateProdiItem() {
                 acceptedType="image"
                 maxSizeMb={5}
                 currentUrl={thumbnailUrl}
-                onUploadSuccess={(url) => {
+                onUploadSuccess={(url, info) => {
                   if (url) setThumbnailUrl(url);
+                  if (info?.dataUrl) {
+                    setAiRawPhotoBase64(info.dataUrl);
+                    if (!aiRawPhoto) setAiRawPhoto(url);
+                  }
                 }}
               />
             </div>
