@@ -5,6 +5,16 @@ const API_BASE_URL = typeof window !== "undefined" ? "/api/v1" : (process.env.NE
 
 import { setSecureCookie, getSecureCookie, deleteSecureCookie, clearPersistentAuth } from "./security";
 
+// Helper to sanitize broken/blob image URLs
+export const getValidImageUrl = (url: string | null | undefined): string => {
+  if (!url || typeof url !== "string") return "/images/brand/slogan-poster-vokasi.jpg";
+  const trimmed = url.trim();
+  if (!trimmed || trimmed.startsWith("blob:") || trimmed === "undefined" || trimmed === "null") {
+    return "/images/brand/slogan-poster-vokasi.jpg";
+  }
+  return trimmed;
+};
+
 // Helper for token (localStorage + session cookie)
 export const getToken = (): string | null => {
   if (typeof window === "undefined") return null;
@@ -68,7 +78,12 @@ export const getCustomItems = (): CatalogItem[] => {
   if (typeof window === "undefined") return [];
   try {
     const raw = localStorage.getItem("vokasi_custom_items");
-    return raw ? JSON.parse(raw) : [];
+    if (!raw) return [];
+    const parsed: CatalogItem[] = JSON.parse(raw);
+    return parsed.map((item) => ({
+      ...item,
+      thumbnail_url: getValidImageUrl(item.thumbnail_url),
+    }));
   } catch {
     return [];
   }
@@ -431,7 +446,10 @@ export const api = {
       });
       if (!res.ok) throw new Error("Failed to fetch catalog");
       const json = await res.json();
-      allItems = json.data && Array.isArray(json.data) ? json.data : [];
+      allItems = (json.data && Array.isArray(json.data) ? json.data : []).map((it: CatalogItem) => ({
+        ...it,
+        thumbnail_url: getValidImageUrl(it.thumbnail_url),
+      }));
     } catch {
       const custom = getCustomItems();
       allItems = custom.length > 0 ? custom : FALLBACK_ITEMS;
@@ -472,14 +490,20 @@ export const api = {
       });
       if (res.ok) {
         const json = await res.json();
-        if (json.data) return json.data;
+        if (json.data) {
+          return {
+            ...json.data,
+            thumbnail_url: getValidImageUrl(json.data.thumbnail_url),
+          };
+        }
       }
     } catch {
       // ignore
     }
 
     const custom = getCustomItems();
-    return custom.find((i) => i.slug === slug) || FALLBACK_ITEMS.find((i) => i.slug === slug) || null;
+    const found = custom.find((i) => i.slug === slug) || FALLBACK_ITEMS.find((i) => i.slug === slug) || null;
+    return found ? { ...found, thumbnail_url: getValidImageUrl(found.thumbnail_url) } : null;
   },
 
   async logDemoClick(id: number): Promise<void> {
@@ -590,7 +614,7 @@ export const api = {
       deskripsi_lengkap: itemData.deskripsi_lengkap || "",
       live_demo_url: itemData.live_demo_url || null,
       model_3d_url: itemData.model_3d_url || null,
-      thumbnail_url: itemData.thumbnail_url || "/images/brand/slogan-poster-vokasi.jpg",
+      thumbnail_url: getValidImageUrl(itemData.thumbnail_url),
       status_publikasi: itemData.status_publikasi || "published",
       harga_tipe: itemData.harga_tipe || "starting_at",
       harga_nominal: itemData.harga_nominal || 0,
@@ -619,6 +643,10 @@ export const api = {
     saveCustomItem(newItem);
 
     try {
+      const sanitizedPayload = {
+        ...itemData,
+        thumbnail_url: getValidImageUrl(itemData.thumbnail_url),
+      };
       const res = await fetch(`${API_BASE_URL}/prodi/items`, {
         method: "POST",
         headers: {
@@ -626,12 +654,15 @@ export const api = {
           "Accept": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify(itemData),
+        body: JSON.stringify(sanitizedPayload),
       });
       const json = await res.json();
       if (res.ok) {
         if (json.data) {
-          saveCustomItem(json.data);
+          saveCustomItem({
+            ...json.data,
+            thumbnail_url: getValidImageUrl(json.data.thumbnail_url),
+          });
         }
         return { success: true, data: json.data || newItem, message: json.message || "Produk berhasil ditambahkan ke database MySQL." };
       }
@@ -646,6 +677,10 @@ export const api = {
   async updateItem(id: number, itemData: any): Promise<{ success: boolean; data?: CatalogItem; message?: string }> {
     const token = getToken();
     try {
+      const sanitizedPayload = {
+        ...itemData,
+        ...(itemData.thumbnail_url ? { thumbnail_url: getValidImageUrl(itemData.thumbnail_url) } : {}),
+      };
       const res = await fetch(`${API_BASE_URL}/prodi/items/${id}`, {
         method: "PUT",
         headers: {
@@ -653,7 +688,7 @@ export const api = {
           "Accept": "application/json",
           Authorization: `Bearer ${token}`,
         },
-        body: JSON.stringify(itemData),
+        body: JSON.stringify(sanitizedPayload),
       });
       const json = await res.json();
       if (res.ok) {

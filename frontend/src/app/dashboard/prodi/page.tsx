@@ -122,9 +122,12 @@ export default function ProdiDashboard() {
                       <td className="py-4">
                         <div className="flex items-center gap-3">
                           <img
-                            src={item.thumbnail_url || "/images/brand/slogan-poster-vokasi.jpg"}
+                            src={item.thumbnail_url && !item.thumbnail_url.startsWith("blob:") ? item.thumbnail_url : "/images/brand/slogan-poster-vokasi.jpg"}
                             alt={item.nama_item}
                             className="w-14 h-11 rounded-xl object-cover bg-slate-100 dark:bg-slate-800 shrink-0 border border-slate-200 dark:border-slate-700"
+                            onError={(e) => {
+                              (e.currentTarget as HTMLImageElement).src = "/images/brand/slogan-poster-vokasi.jpg";
+                            }}
                           />
                           <div>
                             <h4 className="font-bold text-sm text-slate-900 dark:text-white line-clamp-1">
@@ -205,9 +208,12 @@ export default function ProdiDashboard() {
                 <div key={item.id} className="py-3.5 space-y-2.5">
                   <div className="flex items-start gap-3">
                     <img
-                      src={item.thumbnail_url || "/images/brand/slogan-poster-vokasi.jpg"}
+                      src={item.thumbnail_url && !item.thumbnail_url.startsWith("blob:") ? item.thumbnail_url : "/images/brand/slogan-poster-vokasi.jpg"}
                       alt={item.nama_item}
                       className="w-16 h-14 rounded-xl object-cover bg-slate-100 dark:bg-slate-800 shrink-0 border border-slate-200 dark:border-slate-700"
+                      onError={(e) => {
+                        (e.currentTarget as HTMLImageElement).src = "/images/brand/slogan-poster-vokasi.jpg";
+                      }}
                     />
                     <div className="min-w-0 flex-1">
                       <div className="flex items-start justify-between gap-1.5">

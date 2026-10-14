@@ -39,13 +39,20 @@ export default function CreateProdiItem() {
   const [picKontak, setPicKontak] = useState("");
   const [picLaboratorium, setPicLaboratorium] = useState("");
 
-  // AI Studio Edit Foto State (Gemini AI)
+  // AI Studio Edit Foto State (Gemini AI - 4 Marketplace Photos)
+  const AI_CATEGORIES = [
+    "PRODUK MAKANAN",
+    "PRODUK MINUMAN",
+    "PRODUK OBAT HERBAL",
+    "PRODUK TEKNOLOGI",
+    "PRODUK KIMIA",
+    "PRODUK LAINYA",
+  ];
   const [isAiStudioOpen, setIsAiStudioOpen] = useState(false);
-  const [aiJenis, setAiJenis] = useState<"produk" | "teknologi" | "layanan">("produk");
-  const [aiSubJenis, setAiSubJenis] = useState("Makanan");
+  const [aiKategori, setAiKategori] = useState<string>("PRODUK MAKANAN");
   const [aiPrompt, setAiPrompt] = useState(
     settings.ai_default_prompt ||
-      "Tolong buatkan gambar dinamis ukuran landscape (1280x720 pixel), produk untuk display katalog produk pada marketplace. Pastikan hasilnya menjadi produk bagus, dinamis, kualitas HD, layak jual. Desain clean, tidak terlalu banyak kalimat."
+      "Pencahayaan studio komersial lembut, resolusi HD 8k, aspect ratio landscape 16:9, clean minimalis, pertahankan keaslian warna, logo, dan identitas visual konsisten di seluruh 4 foto."
   );
   const [aiRawPhoto, setAiRawPhoto] = useState<string>("");
   const [aiLoading, setAiLoading] = useState(false);
@@ -94,12 +101,12 @@ export default function CreateProdiItem() {
       const API_BASE = typeof window !== "undefined" ? "/api/v1" : (process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000/api/v1");
       const payload = {
         apiKey: settings.gemini_api_key,
-        jenis: aiJenis,
-        subJenis: aiSubJenis,
-        rawImageBase64: aiRawPhoto || thumbnailUrl || undefined,
-        customPrompt: aiPrompt,
         namaItem: namaItem.trim() || "Produk Inovasi Vokasi UNS",
-        domain: settings.ai_default_domain || "katalog.unsmadiun.id",
+        tagline: tagline.trim() || undefined,
+        kategori: aiKategori,
+        rawImageBase64: aiRawPhoto || (thumbnailUrl && !thumbnailUrl.startsWith("blob:") ? thumbnailUrl : undefined),
+        customPrompt: aiPrompt,
+        domain: settings.ai_default_domain || "spsbu.unsmadiun.id",
       };
 
       let res = await fetch(`${API_BASE}/public/ai/catalog-photo`, {
@@ -127,7 +134,7 @@ export default function CreateProdiItem() {
       if (res.ok && data.success && (data.data?.photos || data.photos)) {
         const resultPhotos = data.data?.photos || data.photos;
         setAiPhotos(resultPhotos);
-        toast.success("Foto Studio Siap", "3 sudut foto produk katalog kualitas HD berhasil dihasilkan!");
+        toast.success("Foto Marketplace Siap", "4 foto katalog standar marketplace profesional berhasil dihasilkan!");
       } else {
         toast.error("Gagal Studio Foto", data.message || "Gagal memproses gambar");
       }
@@ -153,7 +160,7 @@ export default function CreateProdiItem() {
         deskripsi_lengkap: deskripsiLengkap,
         live_demo_url: liveDemoUrl || null,
         model_3d_url: model3dUrl || null,
-        thumbnail_url: thumbnailUrl,
+        thumbnail_url: thumbnailUrl && !thumbnailUrl.startsWith("blob:") ? thumbnailUrl : "/images/brand/slogan-poster-vokasi.jpg",
         status_publikasi: statusPublikasi,
         harga_tipe: hargaTipe,
         harga_nominal: hargaNominal,
@@ -394,18 +401,23 @@ export default function CreateProdiItem() {
                     <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-2">
                       <span className="text-xs font-bold text-amber-600 dark:text-amber-400 flex items-center gap-1.5">
                         <SlidersHorizontal className="w-4 h-4" />
-                        <span>Generator 3 Foto Multi-Sudut (HD Landscape)</span>
+                        <span>Generator 4 Foto Marketplace Komersial (HD 1280x720)</span>
                       </span>
                       <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-amber-100 dark:bg-amber-950/80 text-amber-800 dark:text-amber-300 font-bold">
-                        Domain: {settings.ai_default_domain || "katalog.unsmadiun.id"}
+                        Target: {settings.ai_default_domain || "spsbu.unsmadiun.id"}
                       </span>
+                    </div>
+
+                    {/* Aturan Identitas Visual Konsisten */}
+                    <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-400/20 text-[11px] text-amber-800 dark:text-amber-300">
+                      <strong>✨ Standar 4 Foto Marketplace:</strong> Menghasilkan 1 set komplit (1. Foto Utama / Hero, 2. Detail & Kualitas Macro, 3. Infografis Fitur & Alasan Membeli, 4. Konteks Lifestyle) dengan visual identity, warna, logo, dan pencahayaan studio yang konsisten.
                     </div>
 
                     {/* 1. Tambah Foto Mentah (Raw Photo) */}
                     <div>
                       <MediaUploader
-                        label="1. Tambah Foto Mentah Produk (Opsional untuk AI Visual Enhancer)"
-                        description="Upload foto produk asli/mentah dari lab atau handphone"
+                        label="1. Unggah Foto Mentah Produk (Opsional / Rekomendasi)"
+                        description="Upload foto produk asli/mentah dari lab atau handphone untuk dianalisis oleh AI Studio"
                         acceptedType="image"
                         maxSizeMb={5}
                         currentUrl={aiRawPhoto}
@@ -415,93 +427,53 @@ export default function CreateProdiItem() {
                       />
                     </div>
 
-                    {/* 2. Pilihan Jenis */}
+                    {/* 2. Pilihan Checkbox Kategori (6 Kategori Resmi) */}
                     <div>
                       <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block mb-1.5">
-                        2. Pilih Jenis Inovasi:
+                        2. Pilih Kategori Produk:
                       </label>
-                      <div className="grid grid-cols-3 gap-2">
-                        {(["produk", "teknologi", "layanan"] as const).map((j) => (
-                          <button
-                            key={j}
-                            type="button"
-                            onClick={() => {
-                              setAiJenis(j);
-                              if (j === "produk") setAiSubJenis("Makanan");
-                              else if (j === "teknologi") setAiSubJenis("Mesin");
-                              else setAiSubJenis("Konsultasi");
-                            }}
-                            style={{ borderRadius: "9999px" }}
-                            className={`py-1.5 px-3 rounded-full text-xs font-bold capitalize transition border cursor-pointer ${
-                              aiJenis === j
-                                ? "bg-[#0F4C81] text-white border-[#0F4C81] shadow-xs"
-                                : "bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:bg-slate-100"
-                            }`}
-                          >
-                            {j}
-                          </button>
-                        ))}
+                      <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                        {AI_CATEGORIES.map((cat) => {
+                          const isSelected = aiKategori === cat;
+                          return (
+                            <button
+                              key={cat}
+                              type="button"
+                              onClick={() => setAiKategori(cat)}
+                              style={{ borderRadius: "14px" }}
+                              className={`p-2.5 text-xs font-bold transition border flex items-center gap-2 cursor-pointer text-left ${
+                                isSelected
+                                  ? "bg-[#0F4C81] text-white border-[#0F4C81] shadow-xs ring-2 ring-[#0F4C81]/30"
+                                  : "bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700"
+                              }`}
+                            >
+                              <div className={`w-3.5 h-3.5 rounded-full border flex items-center justify-center shrink-0 ${
+                                isSelected ? "border-white bg-[#C5A059]" : "border-slate-400"
+                              }`}>
+                                {isSelected && <Check className="w-2.5 h-2.5 text-white" />}
+                              </div>
+                              <span className="truncate">{cat}</span>
+                            </button>
+                          );
+                        })}
                       </div>
                     </div>
 
-                    {/* 3. Pilihan Sub-Jenis Sesuai Instruksi Dosen */}
-                    <div>
-                      <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block mb-1.5">
-                        3. Kategori Spesifik ({aiJenis}):
-                      </label>
-                      <div className="flex flex-wrap gap-1.5">
-                        {aiJenis === "produk" && (
-                          ["Makanan", "Minuman", "Obat", "Kosmetik", "Hasil Pertanian", "Animasi"].map((sub) => (
-                            <button
-                              key={sub}
-                              type="button"
-                              onClick={() => setAiSubJenis(sub)}
-                              style={{ borderRadius: "9999px" }}
-                              className={`py-1 px-3 rounded-full text-[11px] font-bold transition border cursor-pointer ${
-                                aiSubJenis === sub
-                                  ? "bg-amber-500 text-white border-amber-500 shadow-xs"
-                                  : "bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:bg-slate-100"
-                              }`}
-                            >
-                              {sub}
-                            </button>
-                          ))
-                        )}
-
-                        {aiJenis === "teknologi" && (
-                          ["Mesin", "IoT", "Software As A Service"].map((sub) => (
-                            <button
-                              key={sub}
-                              type="button"
-                              onClick={() => setAiSubJenis(sub)}
-                              style={{ borderRadius: "9999px" }}
-                              className={`py-1 px-3 rounded-full text-[11px] font-bold transition border cursor-pointer ${
-                                aiSubJenis === sub
-                                  ? "bg-blue-600 text-white border-blue-600 shadow-xs"
-                                  : "bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:bg-slate-100"
-                              }`}
-                            >
-                              {sub}
-                            </button>
-                          ))
-                        )}
-
-                        {aiJenis === "layanan" && (
-                          ["Konsultasi", "Pelatihan", "Uji Lab", "Preservasi"].map((sub) => (
-                            <button
-                              key={sub}
-                              type="button"
-                              onClick={() => setAiSubJenis(sub)}
-                              style={{ borderRadius: "9999px" }}
-                              className={`py-1 px-3 rounded-full text-[11px] font-bold transition border cursor-pointer ${
-                                aiSubJenis === sub
-                                  ? "bg-emerald-600 text-white border-emerald-600 shadow-xs"
-                                  : "bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:bg-slate-100"
-                              }`}
-                            >
-                              {sub}
-                            </button>
-                          ))
+                    {/* 3. Detail Identitas Produk */}
+                    <div className="p-3 rounded-xl bg-slate-100/70 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/60 space-y-2">
+                      <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block">
+                        3. Identitas Produk Terkoneksi:
+                      </span>
+                      <div className="text-xs text-slate-800 dark:text-slate-200 space-y-1">
+                        <div>
+                          <strong className="text-slate-600 dark:text-slate-400">Nama Produk:</strong>{" "}
+                          <span>{namaItem.trim() || "(Belum diisi - akan gunakan nama default)"}</span>
+                        </div>
+                        {tagline && (
+                          <div>
+                            <strong className="text-slate-600 dark:text-slate-400">Tagline:</strong>{" "}
+                            <span>{tagline.trim()}</span>
+                          </div>
                         )}
                       </div>
                     </div>
@@ -509,10 +481,10 @@ export default function CreateProdiItem() {
                     {/* 4. Prompt Dinamis (Editable) */}
                     <div>
                       <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block mb-1">
-                        4. Prompt Dinamis (Dapat Diedit):
+                        4. Catatan Prompt Dinamis & Permintaan Khusus:
                       </label>
                       <textarea
-                        rows={3}
+                        rows={2}
                         value={aiPrompt}
                         onChange={(e) => setAiPrompt(e.target.value)}
                         style={{ borderRadius: "14px" }}
@@ -526,42 +498,55 @@ export default function CreateProdiItem() {
                       onClick={handleGenerateAiPhotos}
                       disabled={aiLoading}
                       style={{ borderRadius: "9999px" }}
-                      className="w-full py-2.5 rounded-full bg-gradient-to-r from-amber-500 to-[#0F4C81] hover:from-amber-600 hover:to-[#135996] text-white font-black text-xs shadow-md transition flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+                      className="w-full py-2.5 rounded-full bg-gradient-to-r from-amber-500 via-[#C5A059] to-[#0F4C81] hover:brightness-105 text-white font-black text-xs shadow-md transition flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
                     >
                       <RefreshCw className={`w-3.5 h-3.5 ${aiLoading ? "animate-spin" : ""}`} />
-                      <span>{aiLoading ? "Memproses 3 Foto Studio..." : "Hasilkan 3 Foto HD (Tampak Depan, Samping & Display)"}</span>
+                      <span>{aiLoading ? "Memproses 4 Foto Marketplace..." : "Hasilkan 4 Foto Marketplace (Hero, Detail, Fitur & Lifestyle)"}</span>
                     </button>
 
-                    {/* 6. Hasil 3 Foto Produk */}
+                    {/* 6. Hasil 4 Foto Produk */}
                     {aiPhotos.length > 0 && (
                       <div className="pt-2 space-y-3">
-                        <span className="text-xs font-black text-slate-900 dark:text-white block border-b border-slate-200 dark:border-slate-800 pb-1">
-                          📸 Hasil Foto Studio (Klik untuk Memilih Mockup Utama):
-                        </span>
-                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                        <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-1.5">
+                          <span className="text-xs font-black text-slate-900 dark:text-white">
+                            📸 4 Foto Marketplace Siap Digunakan (Klik untuk Memilih Mockup Utama):
+                          </span>
+                          <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-bold">
+                            ✓ Resolusi HD 1280x720
+                          </span>
+                        </div>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
                           {aiPhotos.map((photo) => (
                             <div
                               key={photo.id}
-                              className={`rounded-2xl p-2 border transition ${
+                              className={`rounded-2xl p-2.5 border transition flex flex-col justify-between ${
                                 thumbnailUrl === photo.url
                                   ? "border-emerald-500 bg-emerald-50/50 dark:bg-emerald-950/40 ring-2 ring-emerald-500/30"
                                   : "border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:border-amber-400"
                               }`}
                             >
-                              <div className="relative aspect-video rounded-xl overflow-hidden bg-slate-100 dark:bg-slate-900 mb-2">
-                                <img
-                                  src={photo.url}
-                                  alt={photo.title}
-                                  className="w-full h-full object-cover"
-                                />
-                                <span className="absolute top-1.5 left-1.5 px-2 py-0.5 rounded-full bg-slate-950/80 text-[10px] font-bold text-white">
-                                  {photo.angle}
-                                </span>
+                              <div>
+                                <div className="relative aspect-video rounded-xl overflow-hidden bg-slate-100 dark:bg-slate-900 mb-2">
+                                  <img
+                                    src={photo.url}
+                                    alt={photo.title}
+                                    className="w-full h-full object-cover"
+                                  />
+                                  <span className="absolute top-1.5 left-1.5 px-2 py-0.5 rounded-full bg-slate-950/80 text-[9.5px] font-bold text-white shadow-xs">
+                                    {photo.angle || photo.badge}
+                                  </span>
+                                </div>
+                                <h5 className="font-bold text-[11px] text-slate-900 dark:text-white truncate mb-1">
+                                  {photo.title}
+                                </h5>
+                                {photo.desc && (
+                                  <p className="text-[10px] text-slate-500 dark:text-slate-400 leading-snug line-clamp-2 mb-2">
+                                    {photo.desc}
+                                  </p>
+                                )}
                               </div>
-                              <h5 className="font-bold text-[11px] text-slate-900 dark:text-white truncate mb-2">
-                                {photo.title}
-                              </h5>
-                              <div className="flex items-center gap-1.5">
+                              <div className="flex items-center gap-1.5 pt-1 border-t border-slate-100 dark:border-slate-700/60">
                                 <button
                                   type="button"
                                   onClick={() => {

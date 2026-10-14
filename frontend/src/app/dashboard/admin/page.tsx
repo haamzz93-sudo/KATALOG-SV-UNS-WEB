@@ -2277,9 +2277,12 @@ function AdminDashboardContent() {
                           <td className="py-4">
                             <div className="flex items-center gap-3">
                               <img
-                                src={item.thumbnail_url || "/images/brand/slogan-poster-vokasi.jpg"}
+                                src={item.thumbnail_url && !item.thumbnail_url.startsWith("blob:") ? item.thumbnail_url : "/images/brand/slogan-poster-vokasi.jpg"}
                                 alt={item.nama_item}
                                 className="w-12 h-10 rounded-xl object-cover bg-slate-100 dark:bg-slate-800 shrink-0 border border-slate-200 dark:border-slate-700 shadow-xs"
+                                onError={(e) => {
+                                  (e.currentTarget as HTMLImageElement).src = "/images/brand/slogan-poster-vokasi.jpg";
+                                }}
                               />
                               <div className="max-w-xs">
                                 <h4 className="font-bold text-sm text-slate-900 dark:text-white line-clamp-1">
@@ -2397,9 +2400,12 @@ function AdminDashboardContent() {
                     <div key={item.id} className="py-4 space-y-3">
                       <div className="flex items-start gap-3">
                         <img
-                          src={item.thumbnail_url || "/images/brand/slogan-poster-vokasi.jpg"}
+                          src={item.thumbnail_url && !item.thumbnail_url.startsWith("blob:") ? item.thumbnail_url : "/images/brand/slogan-poster-vokasi.jpg"}
                           alt={item.nama_item}
                           className="w-16 h-14 rounded-xl object-cover bg-slate-100 dark:bg-slate-800 shrink-0 border border-slate-200 dark:border-slate-700"
+                          onError={(e) => {
+                            (e.currentTarget as HTMLImageElement).src = "/images/brand/slogan-poster-vokasi.jpg";
+                          }}
                         />
                         <div className="min-w-0 flex-1">
                           <div className="flex items-start justify-between gap-1.5">
@@ -5881,17 +5887,17 @@ function AdminDashboardContent() {
                     type="text"
                     value={aiDomain}
                     onChange={(e) => setAiDomain(e.target.value)}
-                    placeholder="katalog.unsmadiun.id"
+                    placeholder="spsbu.unsmadiun.id"
                     className="w-full px-4 py-2.5 text-xs sm:text-sm font-medium rounded-full border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-white focus:outline-none focus:border-[#C5A059]"
                   />
                   <p className="text-[11px] text-slate-400 mt-1">
-                    Domain resmi hilirisasi bisnis (misal: <code>katalog.unsmadiun.id</code>).
+                    Domain resmi hilirisasi bisnis (misal: <code>spsbu.unsmadiun.id</code>).
                   </p>
                 </div>
 
                 <div>
                   <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block mb-1.5">
-                    Template Prompt Dinamis (Instruksi Standar Dosen)
+                    Template Prompt Dinamis (Instruksi Standar 4 Foto Marketplace)
                   </label>
                   <textarea
                     rows={4}
@@ -5901,31 +5907,35 @@ function AdminDashboardContent() {
                     className="w-full p-4 text-xs sm:text-sm rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-white focus:outline-none focus:border-[#C5A059] leading-relaxed font-sans"
                   />
                   <p className="text-[11px] text-slate-400 mt-1">
-                    Prompt default ini akan otomatis dimuat di formulir input setiap admin prodi saat mengunggah foto produk mentah.
+                    Prompt default ini akan otomatis memandu Gemini 2.5 Flash menghasilkan 4 variasi foto: Hero Product, Detail & Kualitas, Infografis Fitur, dan Konteks Lifestyle dengan visual identity yang konsisten.
                   </p>
                 </div>
               </div>
             </div>
 
-            {/* Sidebar Guide & Multi-Angle Output Preview */}
+            {/* Sidebar Guide & 4 Marketplace Photos Output Preview */}
             <div className="space-y-6">
               <div className="p-6 rounded-3xl bg-gradient-to-br from-amber-500/10 via-amber-500/5 to-transparent border border-amber-500/20 shadow-sm space-y-4">
                 <h4 className="font-extrabold text-sm sm:text-base text-amber-700 dark:text-amber-300 flex items-center gap-2">
                   <Camera className="w-5 h-5 text-amber-500" />
-                  <span>Spesifikasi Output Visual Studio</span>
+                  <span>Spesifikasi 4 Foto Marketplace Komersial</span>
                 </h4>
-                <div className="space-y-3 text-xs text-slate-600 dark:text-slate-300">
+                <div className="space-y-2.5 text-xs text-slate-600 dark:text-slate-300">
                   <div className="p-3 rounded-2xl bg-white/70 dark:bg-slate-900/70 border border-amber-500/20">
-                    <strong className="block font-bold text-slate-900 dark:text-white mb-0.5">📸 1. Tampak Depan (Front View)</strong>
-                    <span>Foto sudut depan lurus simetris dengan pencahayaan studio lembut.</span>
+                    <strong className="block font-bold text-slate-900 dark:text-white mb-0.5">📸 1. Foto Utama (Hero Product)</strong>
+                    <span>Fokus utama, background putih/ivory/grey, studio lighting lembut, logo & warna presisi.</span>
                   </div>
                   <div className="p-3 rounded-2xl bg-white/70 dark:bg-slate-900/70 border border-amber-500/20">
-                    <strong className="block font-bold text-slate-900 dark:text-white mb-0.5">📸 2. Tampak Samping (Isometric 45°)</strong>
-                    <span>Menampilkan kedalaman dimensi produk, sudut samping, dan tekstur material.</span>
+                    <strong className="block font-bold text-slate-900 dark:text-white mb-0.5">📸 2. Detail & Kualitas (Macro Shot)</strong>
+                    <span>Menampilkan tekstur material, jahitan/finishing rapi, dan detail kemasan untuk meyakinkan calon mitra.</span>
                   </div>
                   <div className="p-3 rounded-2xl bg-white/70 dark:bg-slate-900/70 border border-amber-500/20">
-                    <strong className="block font-bold text-slate-900 dark:text-white mb-0.5">📸 3. Display Marketplace HD</strong>
-                    <span>Mockup landscape komersial 1280x720 pixel siap pajang di marketplace.</span>
+                    <strong className="block font-bold text-slate-900 dark:text-white mb-0.5">📸 3. Keunggulan & Fitur (Infografis)</strong>
+                    <span>Infografis modern 'KENAPA PRODUK INI LAYAK DIPILIH?' menyajikan poin keunggulan faktual.</span>
+                  </div>
+                  <div className="p-3 rounded-2xl bg-white/70 dark:bg-slate-900/70 border border-amber-500/20">
+                    <strong className="block font-bold text-slate-900 dark:text-white mb-0.5">📸 4. Konteks Penggunaan (Lifestyle)</strong>
+                    <span>Fotografi kontekstual penggunaan nyata produk sesuai kategori (meja kerja, lab, konsumsi).</span>
                   </div>
                 </div>
 
@@ -7145,9 +7155,12 @@ function AdminDashboardContent() {
                 <div className="space-y-2">
                   <div className="flex items-center gap-3">
                     <img
-                      src={itemForm.thumbnail_url || "/images/brand/slogan-poster-vokasi.jpg"}
+                      src={itemForm.thumbnail_url && !itemForm.thumbnail_url.startsWith("blob:") ? itemForm.thumbnail_url : "/images/brand/slogan-poster-vokasi.jpg"}
                       alt="Preview"
                       className="w-16 h-12 rounded-xl object-cover border border-slate-200 dark:border-slate-700 shrink-0 bg-slate-100"
+                      onError={(e) => {
+                        (e.currentTarget as HTMLImageElement).src = "/images/brand/slogan-poster-vokasi.jpg";
+                      }}
                     />
                     <input
                       type="text"

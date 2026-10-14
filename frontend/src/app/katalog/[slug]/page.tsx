@@ -76,9 +76,16 @@ export default function DetailProdukPage() {
     }).format(val);
   };
 
+  const safeThumbnail = item.thumbnail_url && !item.thumbnail_url.startsWith("blob:") 
+    ? item.thumbnail_url 
+    : "/images/brand/slogan-poster-vokasi.jpg";
+
   const mediaList = item.media && item.media.length > 0
-    ? item.media
-    : [{ id: 1, file_url: item.thumbnail_url, is_primary: true, media_type: "image" as const, caption: item.nama_item }];
+    ? item.media.map(m => ({
+        ...m,
+        file_url: m.file_url && !m.file_url.startsWith("blob:") ? m.file_url : safeThumbnail
+      }))
+    : [{ id: 1, file_url: safeThumbnail, is_primary: true, media_type: "image" as const, caption: item.nama_item }];
 
   return (
     <div className="min-h-screen flex flex-col bg-[#F8FAFC] dark:bg-[#07192C] text-slate-900 dark:text-white transition-colors">
@@ -109,9 +116,12 @@ export default function DetailProdukPage() {
             {/* Primary Media Display */}
             <div className="relative aspect-[16/10] w-full rounded-2xl sm:rounded-[32px] overflow-hidden bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xl">
               <img
-                src={mediaList[activeMediaIndex]?.file_url || item.thumbnail_url}
+                src={mediaList[activeMediaIndex]?.file_url || safeThumbnail}
                 alt={item.nama_item}
                 className="w-full h-full object-cover object-center"
+                onError={(e) => {
+                  (e.currentTarget as HTMLImageElement).src = "/images/brand/slogan-poster-vokasi.jpg";
+                }}
               />
 
               {/* Badges on top */}

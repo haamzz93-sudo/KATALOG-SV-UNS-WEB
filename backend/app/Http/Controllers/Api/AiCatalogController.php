@@ -12,7 +12,11 @@ use Illuminate\Support\Facades\Log;
 class AiCatalogController extends Controller
 {
     /**
-     * Generate 3 multi-angle product photos using Gemini 2.5 Flash + HD rendering
+     * Generate 4 professional marketplace photos using Gemini 2.5 Flash + HD rendering
+     * 1. Hero Product (Foto Utama Marketplace)
+     * 2. Detail & Quality (Meyakinkan Kualitas)
+     * 3. Benefit & Key Features (Alasan Membeli / Infografis)
+     * 4. Lifestyle / Real Use Context (Konteks Penggunaan Nyata)
      */
     public function generatePhotos(Request $request): JsonResponse
     {
@@ -22,33 +26,63 @@ class AiCatalogController extends Controller
                 $apiKey = SiteSetting::get('gemini_api_key') ?: env('GEMINI_API_KEY', '');
             }
 
-            $jenis = $request->input('jenis', 'produk');
-            $subJenis = $request->input('subJenis', 'Makanan');
-            $rawImageBase64 = $request->input('rawImageBase64', null);
-            $customPrompt = $request->input('customPrompt', '');
             $namaItem = trim($request->input('namaItem', 'Produk Inovasi Vokasi UNS'));
             if (empty($namaItem)) {
                 $namaItem = 'Produk Inovasi Vokasi UNS';
             }
 
-            $domain = $request->input('domain', '');
-            if (empty($domain)) {
-                $domain = SiteSetting::get('ai_default_domain') ?: 'katalog.unsmadiun.id';
+            $tagline = trim($request->input('tagline', ''));
+
+            // Kategori: salah satu dari 6 pilihan resmi
+            // (MAKANAN, MINUMAN, OBAT HERBAL, TEKNOLOGI, KIMIA, LAINYA)
+            $kategori = trim($request->input('kategori', ''));
+            if (empty($kategori)) {
+                $subJenis = $request->input('subJenis', 'Makanan');
+                $kategori = strtoupper("PRODUK " . $subJenis);
             }
 
-            // 1. Konsultasi / Pembuatan Prompt Presisi via Gemini 2.5 Flash jika API Key tersedia
+            $rawImageBase64 = $request->input('rawImageBase64', null);
+            $customPrompt = $request->input('customPrompt', '');
+
+            $domain = $request->input('domain', '');
+            if (empty($domain)) {
+                $domain = SiteSetting::get('ai_default_domain') ?: 'spsbu.unsmadiun.id';
+            }
+
+            // 1. Konsultasi / Pembuatan 4 Prompt Presisi via Gemini 2.5 Flash jika API Key tersedia
             $geminiEnhancedPrompt = null;
 
             if (!empty($apiKey)) {
                 try {
                     $geminiUrl = "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={$apiKey}";
 
-                    $systemInstruction = "Kamu adalah AI Creative Director spesialis fotografi komersial marketplace profesional untuk Sekolah Vokasi UNS (Domain: {$domain}). " .
-                        "Tugasmu adalah menganalisis nama produk \"{$namaItem}\", jenis \"{$jenis}\", dan sub-jenis \"{$subJenis}\", lalu buatkan 3 deskripsi visual fotografi produk dalam Bahasa Inggris yang sangat fotorealistis, studio lighting, clean background, 8k resolution, landscape aspect ratio 16:9, layak jual di marketplace premium. " .
-                        "Format respon HANYA berupa JSON valid dengan struktur: {\"front_prompt\": \"...\", \"side_prompt\": \"...\", \"display_prompt\": \"...\"}";
+                    $systemInstruction = "You are a World-Class Commercial Product Photographer and AI Creative Director specializing in high-converting marketplace visual assets (Domain: {$domain}).\n" .
+                        "You are analyzing a product named \"{$namaItem}\"" . (!empty($tagline) ? " with tagline \"{$tagline}\"" : "") . " categorized under \"{$kategori}\".\n\n" .
+                        "Generate 4 specialized commercial photography prompts in ENGLISH for a 4-photo marketplace product listing:\n\n" .
+                        "1. hero_prompt (Foto Utama Marketplace):\n" .
+                        "- Eye-level commercial hero photography on a minimalist clean ivory/white studio podium or surface.\n" .
+                        "- Soft balanced studio rim lighting, crisp focal point, elegant soft shadows.\n" .
+                        "- Strictly preserve original colors, logo, shape, proportions, and brand identity.\n\n" .
+                        "2. detail_prompt (Detail & Kualitas):\n" .
+                        "- Editorial macro close-up shot showcasing tactile texture, premium materials, craftsmanship, precise finishing, neat seams, and packaging details.\n" .
+                        "- Shallow depth of field, sharp macro lens focus.\n\n" .
+                        "3. benefit_prompt (Infografis Fitur & Alasan Membeli):\n" .
+                        "- Modern clean commercial product infographic layout with universal headline 'KENAPA PRODUK INI LAYAK DIPILIH?' or 'WHY YOU'LL LOVE IT'.\n" .
+                        "- Highlighting 3-5 core functional benefits with subtle minimalist aesthetic badges or graphic pointers around the product.\n\n" .
+                        "4. lifestyle_prompt (Konteks Penggunaan Nyata):\n" .
+                        "- Authentic contextual photography showing the product in genuine real-world usage suited to {$kategori} (e.g., appetizing food serving, wellness desk setup for herbal, modern office/tech workbench for engineering/IoT).\n" .
+                        "- Warm natural inviting light, aspirational commercial atmosphere.\n\n" .
+                        "CONSISTENT VISUAL IDENTITY: All 4 images must portray the exact same product model, identical colors, branding, scale, and lighting aesthetic.\n" .
+                        "Format your response as a strict JSON object with NO extra markdown or text:\n" .
+                        "{\n" .
+                        "  \"hero_prompt\": \"...\",\n" .
+                        "  \"detail_prompt\": \"...\",\n" .
+                        "  \"benefit_prompt\": \"...\",\n" .
+                        "  \"lifestyle_prompt\": \"...\"\n" .
+                        "}";
 
                     $parts = [
-                        ['text' => $systemInstruction . "\n\nInstruksi Pengguna: " . ($customPrompt ?: 'Buat foto produk studio clean tanpa teks berlebihan')]
+                        ['text' => $systemInstruction . "\n\nInstruksi Pengguna Tambahan: " . ($customPrompt ?: 'Jaga agar produk tampak tajam, profesional, layak jual, konsisten di seluruh 4 foto')]
                     ];
 
                     if (!empty($rawImageBase64) && str_starts_with($rawImageBase64, 'data:')) {
@@ -86,48 +120,64 @@ class AiCatalogController extends Controller
                 }
             }
 
-            // 2. Susun 3 Prompt Fotografi Multi-Sudut (Tampak Depan, Tampak Samping, Display Marketplace)
-            $baseSubject = "{$subJenis} {$jenis} named \"{$namaItem}\", high quality product photography, commercial marketplace display for {$domain}, clean studio lighting, 8k resolution, photorealistic, sharp focus, 16:9 landscape aspect ratio, no heavy typography, aesthetic modern catalog showcase";
+            // 2. Susun 4 Prompt Fotografi Marketplace
+            $baseSubject = "{$kategori} named \"{$namaItem}\", high quality commercial product photography for {$domain}, clean studio lighting, 8k resolution, photorealistic, sharp focus, 16:9 landscape aspect ratio, premium marketplace catalog showcase";
 
             $prompts = [
-                'tampak_depan' => $geminiEnhancedPrompt['front_prompt'] ?? "Straight-on eye-level front view of {$baseSubject}, white and soft grey minimal studio podium background",
-                'tampak_samping' => $geminiEnhancedPrompt['side_prompt'] ?? "45-degree isometric side view of {$baseSubject}, showing depth and fine details, soft studio shadow, professional commercial product angle",
-                'tampak_display' => $geminiEnhancedPrompt['display_prompt'] ?? "Dynamic aesthetic marketplace lifestyle hero display of {$baseSubject}, modern presentation setup, premium commercial showcase",
+                'hero' => $geminiEnhancedPrompt['hero_prompt'] ?? "Eye-level commercial hero product photography of {$baseSubject}, centered on clean minimalist ivory podium, soft studio lighting, crisp focus, clean white background",
+                'detail' => $geminiEnhancedPrompt['detail_prompt'] ?? "Editorial macro close-up photography of {$baseSubject}, capturing fine material craftsmanship, tactile surface textures, precision finishing and premium packaging details, soft studio light, shallow depth of field",
+                'benefit' => $geminiEnhancedPrompt['benefit_prompt'] ?? "Modern aesthetic commercial infographic presentation of {$baseSubject}, showcasing key product benefits and reasons to buy with clean minimalist layout, soft lighting, premium marketplace catalog display",
+                'lifestyle' => $geminiEnhancedPrompt['lifestyle_prompt'] ?? "Authentic lifestyle product photography of {$baseSubject}, in natural real-world use environment, warm ambient morning light, commercial catalog aesthetic, high quality depth of field",
             ];
 
-            // 3. Generate 3 Foto Dinamis HD Landscape (1280x720) via Turbo Model (No Paywall)
+            // 3. Generate 4 Foto Dinamis HD Landscape (1280x720) via Turbo Model (No Paywall)
             $seedBase = time();
             $photos = [
                 [
-                    'id' => 'front',
-                    'title' => 'Tampak Depan (Front View)',
-                    'angle' => 'Sudut Depan Presisi',
-                    'prompt' => $prompts['tampak_depan'],
-                    'url' => "https://image.pollinations.ai/prompt/" . rawurlencode($prompts['tampak_depan']) . "?width=1280&height=720&seed=" . ($seedBase + 1) . "&model=turbo&nologo=true",
+                    'id' => 'hero',
+                    'title' => '1. Foto Utama (Hero Marketplace)',
+                    'angle' => 'Foto Utama',
+                    'badge' => 'Hero Product',
+                    'desc' => 'Fokus utama, background bersih (putih/ivory), pencahayaan studio lembut, identitas logo & warna presisi.',
+                    'prompt' => $prompts['hero'],
+                    'url' => "https://image.pollinations.ai/prompt/" . rawurlencode($prompts['hero']) . "?width=1280&height=720&seed=" . ($seedBase + 1) . "&model=turbo&nologo=true",
                 ],
                 [
-                    'id' => 'side',
-                    'title' => 'Tampak Samping (Isometric / Side Angle)',
-                    'angle' => 'Sudut Samping 45°',
-                    'prompt' => $prompts['tampak_samping'],
-                    'url' => "https://image.pollinations.ai/prompt/" . rawurlencode($prompts['tampak_samping']) . "?width=1280&height=720&seed=" . ($seedBase + 2) . "&model=turbo&nologo=true",
+                    'id' => 'detail',
+                    'title' => '2. Detail & Kualitas (Macro Shot)',
+                    'angle' => 'Meyakinkan Kualitas',
+                    'badge' => 'Detail & Quality',
+                    'desc' => 'Macro shot tekstur, material, kerapian finishing & kemasan untuk meyakinkan calon pembeli/mitra.',
+                    'prompt' => $prompts['detail'],
+                    'url' => "https://image.pollinations.ai/prompt/" . rawurlencode($prompts['detail']) . "?width=1280&height=720&seed=" . ($seedBase + 2) . "&model=turbo&nologo=true",
                 ],
                 [
-                    'id' => 'display',
-                    'title' => 'Display Marketplace (Hero Showcase)',
-                    'angle' => 'Display Komersial HD',
-                    'prompt' => $prompts['tampak_display'],
-                    'url' => "https://image.pollinations.ai/prompt/" . rawurlencode($prompts['tampak_display']) . "?width=1280&height=720&seed=" . ($seedBase + 3) . "&model=turbo&nologo=true",
+                    'id' => 'benefit',
+                    'title' => '3. Keunggulan & Fitur (Infografis)',
+                    'angle' => 'Alasan Membeli',
+                    'badge' => 'Key Features',
+                    'desc' => 'Tampilan infografis modern menyajikan poin keunggulan dan alasan mengapa produk ini layak dipilih.',
+                    'prompt' => $prompts['benefit'],
+                    'url' => "https://image.pollinations.ai/prompt/" . rawurlencode($prompts['benefit']) . "?width=1280&height=720&seed=" . ($seedBase + 3) . "&model=turbo&nologo=true",
+                ],
+                [
+                    'id' => 'lifestyle',
+                    'title' => '4. Konteks Penggunaan (Lifestyle)',
+                    'angle' => 'Konteks Real Use',
+                    'badge' => 'Real Context',
+                    'desc' => 'Fotografi kontekstual penggunaan nyata produk sesuai kategori (meja kerja, lab, konsumsi, atau aktivitas sehari-hari).',
+                    'prompt' => $prompts['lifestyle'],
+                    'url' => "https://image.pollinations.ai/prompt/" . rawurlencode($prompts['lifestyle']) . "?width=1280&height=720&seed=" . ($seedBase + 4) . "&model=turbo&nologo=true",
                 ],
             ];
 
             return response()->json([
                 'success' => true,
-                'message' => 'Foto katalog multi-angle berhasil diproses.',
+                'message' => '4 foto marketplace profesional berhasil diproses.',
                 'data' => [
                     'nama_item' => $namaItem,
-                    'jenis' => $jenis,
-                    'sub_jenis' => $subJenis,
+                    'tagline' => $tagline,
+                    'kategori' => $kategori,
                     'photos' => $photos,
                     'used_gemini' => !empty($geminiEnhancedPrompt),
                 ],
