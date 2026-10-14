@@ -435,8 +435,29 @@ export const DEFAULT_SITE_SETTINGS: SiteSettings = {
 
   // Setting Prompt AI Studio & Gemini API
   gemini_api_key: process.env.NEXT_PUBLIC_GEMINI_API_KEY || "",
-  ai_default_domain: "katalog.unsmadiun.id",
-  ai_default_prompt: "Tolong buatkan gambar dinamis ukuran landscape (1280x720 pixel), produk untuk display katalog produk pada marketplace. Pastikan hasilnya menjadi produk bagus, dinamis, kualitas HD, layak jual. Desain clean, tidak terlalu banyak kalimat.",
+  ai_default_domain: "spsbu.unsmadiun.id",
+  ai_default_prompt: "Pencahayaan studio komersial lembut, resolusi HD 8k, aspect ratio landscape 16:9, clean minimalis, pertahankan keaslian warna, logo, dan identitas visual konsisten di seluruh 4 foto.",
+};
+
+const sanitizeBlobSetting = (val: any, fallback: string): string => {
+  if (!val || typeof val !== "string") return fallback;
+  if (val.startsWith("blob:") || val === "undefined" || val === "null") return fallback;
+  return val;
+};
+
+const sanitizeSettingsObject = (obj: any): any => {
+  if (!obj || typeof obj !== "object") return obj;
+  const sanitized = { ...obj };
+  if (sanitized.brand_logo_color_url) {
+    sanitized.brand_logo_color_url = sanitizeBlobSetting(sanitized.brand_logo_color_url, "/images/brand/logo-sv-uns-official-color.png");
+  }
+  if (sanitized.brand_logo_url) {
+    sanitized.brand_logo_url = sanitizeBlobSetting(sanitized.brand_logo_url, "/images/brand/logo-sv-putih-official.png");
+  }
+  if (sanitized.login_logo_url) {
+    sanitized.login_logo_url = sanitizeBlobSetting(sanitized.login_logo_url, "/images/brand/logo-sv-uns-official-color.png");
+  }
+  return sanitized;
 };
 
 interface SiteSettingsContextType {
@@ -460,7 +481,8 @@ export const SiteSettingsProvider: React.FC<{ children: React.ReactNode }> = ({ 
         if (cached) {
           const parsed = JSON.parse(cached);
           if (parsed && typeof parsed === "object") {
-            setSettings((prev) => ({ ...DEFAULT_SITE_SETTINGS, ...prev, ...parsed }));
+            const cleanCached = sanitizeSettingsObject(parsed);
+            setSettings((prev) => ({ ...DEFAULT_SITE_SETTINGS, ...prev, ...cleanCached }));
           }
         }
       } catch (e) {
@@ -484,8 +506,9 @@ export const SiteSettingsProvider: React.FC<{ children: React.ReactNode }> = ({ 
           : rawData;
 
         if (Object.keys(unwrapped).length > 0) {
+          const cleanUnwrapped = sanitizeSettingsObject(unwrapped);
           setSettings((prev) => {
-            const merged = { ...DEFAULT_SITE_SETTINGS, ...prev, ...unwrapped };
+            const merged = { ...DEFAULT_SITE_SETTINGS, ...prev, ...cleanUnwrapped };
             if (typeof window !== "undefined") {
               localStorage.setItem("VOKASI_SITE_SETTINGS", JSON.stringify(merged));
             }
