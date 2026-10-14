@@ -23,6 +23,7 @@ $registerRoutes = function () {
         Route::get('/stats', [PimpinanController::class, 'dashboardStats']);
         Route::post('/ai/catalog-photo', [AiCatalogController::class, 'generatePhotos']);
         Route::post('/ai/test-key', [AiCatalogController::class, 'testKey']);
+        Route::get('/ai/image-proxy', [AiCatalogController::class, 'proxyImage']);
     });
 
     // 2. Auth Endpoints
@@ -74,6 +75,8 @@ $registerRoutes = function () {
     Route::delete('/admin/prodis/{id}', [AdminController::class, 'deleteProdi']);
     Route::post('/ai/catalog-photo', [AiCatalogController::class, 'generatePhotos']);
     Route::post('/ai/test-key', [AiCatalogController::class, 'testKey']);
+    Route::get('/ai/image-proxy', [AiCatalogController::class, 'proxyImage']);
+    Route::get('/image-proxy', [AiCatalogController::class, 'proxyImage']);
 };
 
 Route::prefix('v1')->group($registerRoutes);

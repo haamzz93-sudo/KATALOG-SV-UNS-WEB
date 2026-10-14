@@ -117,7 +117,7 @@ CRITICAL: Generate 4 specialized, detailed English photography prompts for an im
         badge: "Hero Product",
         desc: "Fokus utama, background bersih (putih/ivory), pencahayaan studio lembut, identitas logo & warna presisi.",
         prompt: prompts.hero,
-        url: `/api/ai/image-proxy?prompt=${encodeURIComponent(prompts.hero)}&seed=${seedBase + 1}&width=1280&height=720`,
+        url: `/api/v1/public/ai/image-proxy?prompt=${encodeURIComponent(prompts.hero)}&seed=${seedBase + 1}&width=1280&height=720`,
         directUrl: `https://image.pollinations.ai/prompt/${encodeURIComponent(prompts.hero)}?width=1280&height=720&seed=${seedBase + 1}&model=turbo&nologo=true`,
       },
       {
@@ -127,7 +127,7 @@ CRITICAL: Generate 4 specialized, detailed English photography prompts for an im
         badge: "Detail & Quality",
         desc: "Macro shot tekstur, material, kerapian finishing & kemasan untuk meyakinkan calon pembeli/mitra.",
         prompt: prompts.detail,
-        url: `/api/ai/image-proxy?prompt=${encodeURIComponent(prompts.detail)}&seed=${seedBase + 2}&width=1280&height=720`,
+        url: `/api/v1/public/ai/image-proxy?prompt=${encodeURIComponent(prompts.detail)}&seed=${seedBase + 2}&width=1280&height=720`,
         directUrl: `https://image.pollinations.ai/prompt/${encodeURIComponent(prompts.detail)}?width=1280&height=720&seed=${seedBase + 2}&model=turbo&nologo=true`,
       },
       {
@@ -137,7 +137,7 @@ CRITICAL: Generate 4 specialized, detailed English photography prompts for an im
         badge: "Key Features",
         desc: "Tampilan infografis modern menyajikan poin keunggulan dan alasan mengapa produk ini layak dipilih.",
         prompt: prompts.benefit,
-        url: `/api/ai/image-proxy?prompt=${encodeURIComponent(prompts.benefit)}&seed=${seedBase + 3}&width=1280&height=720`,
+        url: `/api/v1/public/ai/image-proxy?prompt=${encodeURIComponent(prompts.benefit)}&seed=${seedBase + 3}&width=1280&height=720`,
         directUrl: `https://image.pollinations.ai/prompt/${encodeURIComponent(prompts.benefit)}?width=1280&height=720&seed=${seedBase + 3}&model=turbo&nologo=true`,
       },
       {
@@ -147,7 +147,7 @@ CRITICAL: Generate 4 specialized, detailed English photography prompts for an im
         badge: "Real Context",
         desc: "Fotografi kontekstual penggunaan nyata produk sesuai kategori (meja kerja, lab, konsumsi, atau aktivitas sehari-hari).",
         prompt: prompts.lifestyle,
-        url: `/api/ai/image-proxy?prompt=${encodeURIComponent(prompts.lifestyle)}&seed=${seedBase + 4}&width=1280&height=720`,
+        url: `/api/v1/public/ai/image-proxy?prompt=${encodeURIComponent(prompts.lifestyle)}&seed=${seedBase + 4}&width=1280&height=720`,
         directUrl: `https://image.pollinations.ai/prompt/${encodeURIComponent(prompts.lifestyle)}?width=1280&height=720&seed=${seedBase + 4}&model=turbo&nologo=true`,
       },
     ];

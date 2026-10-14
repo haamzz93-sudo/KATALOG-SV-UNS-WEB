@@ -160,7 +160,7 @@ class AiCatalogController extends Controller
                     'badge' => 'Hero Product',
                     'desc' => 'Fokus utama, background bersih (putih/ivory), pencahayaan studio lembut, identitas logo & warna presisi.',
                     'prompt' => $prompts['hero'],
-                    'url' => "/api/ai/image-proxy?prompt=" . rawurlencode($prompts['hero']) . "&seed=" . ($seedBase + 1) . "&width=1280&height=720",
+                    'url' => "/api/v1/public/ai/image-proxy?prompt=" . rawurlencode($prompts['hero']) . "&seed=" . ($seedBase + 1) . "&width=1280&height=720",
                     'directUrl' => "https://image.pollinations.ai/prompt/" . rawurlencode($prompts['hero']) . "?width=1280&height=720&seed=" . ($seedBase + 1) . "&model=turbo&nologo=true",
                 ],
                 [
@@ -170,7 +170,7 @@ class AiCatalogController extends Controller
                     'badge' => 'Detail & Quality',
                     'desc' => 'Macro shot tekstur, material, kerapian finishing & kemasan untuk meyakinkan calon pembeli/mitra.',
                     'prompt' => $prompts['detail'],
-                    'url' => "/api/ai/image-proxy?prompt=" . rawurlencode($prompts['detail']) . "&seed=" . ($seedBase + 2) . "&width=1280&height=720",
+                    'url' => "/api/v1/public/ai/image-proxy?prompt=" . rawurlencode($prompts['detail']) . "&seed=" . ($seedBase + 2) . "&width=1280&height=720",
                     'directUrl' => "https://image.pollinations.ai/prompt/" . rawurlencode($prompts['detail']) . "?width=1280&height=720&seed=" . ($seedBase + 2) . "&model=turbo&nologo=true",
                 ],
                 [
@@ -180,7 +180,7 @@ class AiCatalogController extends Controller
                     'badge' => 'Key Features',
                     'desc' => 'Tampilan infografis modern menyajikan poin keunggulan dan alasan mengapa produk ini layak dipilih.',
                     'prompt' => $prompts['benefit'],
-                    'url' => "/api/ai/image-proxy?prompt=" . rawurlencode($prompts['benefit']) . "&seed=" . ($seedBase + 3) . "&width=1280&height=720",
+                    'url' => "/api/v1/public/ai/image-proxy?prompt=" . rawurlencode($prompts['benefit']) . "&seed=" . ($seedBase + 3) . "&width=1280&height=720",
                     'directUrl' => "https://image.pollinations.ai/prompt/" . rawurlencode($prompts['benefit']) . "?width=1280&height=720&seed=" . ($seedBase + 3) . "&model=turbo&nologo=true",
                 ],
                 [
@@ -190,7 +190,7 @@ class AiCatalogController extends Controller
                     'badge' => 'Real Context',
                     'desc' => 'Fotografi kontekstual penggunaan nyata produk sesuai kategori (meja kerja, lab, konsumsi, atau aktivitas sehari-hari).',
                     'prompt' => $prompts['lifestyle'],
-                    'url' => "/api/ai/image-proxy?prompt=" . rawurlencode($prompts['lifestyle']) . "&seed=" . ($seedBase + 4) . "&width=1280&height=720",
+                    'url' => "/api/v1/public/ai/image-proxy?prompt=" . rawurlencode($prompts['lifestyle']) . "&seed=" . ($seedBase + 4) . "&width=1280&height=720",
                     'directUrl' => "https://image.pollinations.ai/prompt/" . rawurlencode($prompts['lifestyle']) . "?width=1280&height=720&seed=" . ($seedBase + 4) . "&model=turbo&nologo=true",
                 ],
             ];
@@ -270,5 +270,63 @@ class AiCatalogController extends Controller
                 'message' => 'Kesalahan koneksi: ' . $err->getMessage(),
             ], 500);
         }
+    }
+
+    /**
+     * Proxy image generator without Referer header to bypass 402 payment wall
+     */
+    public function proxyImage(Request $request)
+    {
+        $prompt = $request->query('prompt', 'commercial product photography');
+        $seed = $request->query('seed', '42');
+        $width = $request->query('width', '1280');
+        $height = $request->query('height', '720');
+
+        $encoded = rawurlencode($prompt);
+        $fetchUrl = "https://image.pollinations.ai/prompt/{$encoded}?width={$width}&height={$height}&seed={$seed}&model=turbo&nologo=true";
+
+        try {
+            // Request strictly without Referer header to bypass x402 paywall
+            $response = Http::withoutHeader('Referer')
+                ->withHeaders([
+                    'User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
+                    'Accept' => 'image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8',
+                ])
+                ->timeout(25)
+                ->get($fetchUrl);
+
+            if ($response->successful()) {
+                return response($response->body(), 200)
+                    ->header('Content-Type', $response->header('Content-Type') ?: 'image/jpeg')
+                    ->header('Cache-Control', 'public, max-age=86400, stale-while-revalidate=43200')
+                    ->header('Access-Control-Allow-Origin', '*');
+            }
+
+            // Fallback without model parameter
+            $fallbackUrl = "https://image.pollinations.ai/prompt/{$encoded}?width={$width}&height={$height}&seed={$seed}&nologo=true";
+            $fallbackRes = Http::withoutHeader('Referer')
+                ->withHeaders(['User-Agent' => 'Mozilla/5.0'])
+                ->timeout(20)
+                ->get($fallbackUrl);
+
+            if ($fallbackRes->successful()) {
+                return response($fallbackRes->body(), 200)
+                    ->header('Content-Type', $fallbackRes->header('Content-Type') ?: 'image/jpeg')
+                    ->header('Cache-Control', 'public, max-age=86400');
+            }
+        } catch (\Throwable $e) {
+            Log::warning('Laravel proxyImage error: ' . $e->getMessage());
+        }
+
+        // SVG fallback placeholder
+        $svg = '<svg width="1280" height="720" viewBox="0 0 1280 720" xmlns="http://www.w3.org/2000/svg">
+            <rect width="100%" height="100%" fill="#07192C"/>
+            <circle cx="640" cy="320" r="80" fill="#0F4C81"/>
+            <text x="640" y="335" font-family="system-ui, sans-serif" font-size="48" fill="#C5A059" text-anchor="middle">&#128248;</text>
+            <text x="640" y="440" font-family="system-ui, sans-serif" font-size="28" font-weight="bold" fill="#FFFFFF" text-anchor="middle">Katalog Foto Marketplace Vokasi UNS</text>
+            <text x="640" y="480" font-family="system-ui, sans-serif" font-size="18" fill="#94A3B8" text-anchor="middle">Resolusi HD 1280x720 &bull; Standar Komersial</text>
+        </svg>';
+
+        return response($svg, 200)->header('Content-Type', 'image/svg+xml');
     }
 }
