@@ -15,6 +15,7 @@ import { useSiteSettings } from "../../../../context/SiteSettingsContext";
 import { MediaUploader } from "../../../../components/ui/MediaUploader";
 import { SearchableProdiDropdown } from "../../../../components/ui/CustomCatalogSelect";
 import { Prodi } from "../../../../types/catalog";
+import { generateStudioMarketplacePhotos } from "../../../../lib/studioMarketplaceGenerator";
 
 export default function CreateProdiItem() {
   const router = useRouter();
@@ -143,8 +144,34 @@ export default function CreateProdiItem() {
     setSpecs(updated);
   };
 
-  const handleGenerateAiPhotos = async () => {
+  const handleGenerateAiPhotos = async (forceAi = false) => {
     setAiLoading(true);
+    const rawImg = aiRawPhotoBase64 || aiRawPhoto || (thumbnailUrl && !thumbnailUrl.startsWith("blob:") ? thumbnailUrl : undefined);
+
+    // 1. Prioritaskan Studio Komposisi Produk Asli (100% Presisi tanpa Distorsi AI)
+    if (rawImg && !forceAi) {
+      try {
+        const studioPhotos = await generateStudioMarketplacePhotos({
+          imageSrc: rawImg,
+          namaItem: namaItem.trim() || "Produk Inovasi Vokasi UNS",
+          kategori: aiKategori,
+          detailTags: aiDetailLabels,
+          benefitHeadline: aiBenefitHeadline,
+        });
+
+        setAiPhotos(studioPhotos);
+        toast.success(
+          "4 Foto Marketplace Siap!",
+          "Produk asli Anda berhasil dikomposisikan ke 4 standar marketplace HD (Hero, Macro Detail, Infografis, Lifestyle) secara presisi 100%!"
+        );
+        setAiLoading(false);
+        return;
+      } catch (err: any) {
+        console.warn("Studio generator fallback to backend:", err);
+      }
+    }
+
+    // 2. Generator AI Backend (Gemini 2.5 Flash)
     try {
       const API_BASE = typeof window !== "undefined" ? "/api/v1" : (process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000/api/v1");
       const payload = {
@@ -154,7 +181,7 @@ export default function CreateProdiItem() {
         kategori: aiKategori,
         detailLabels: aiDetailLabels,
         benefitHeadline: aiBenefitHeadline,
-        rawImageBase64: aiRawPhotoBase64 || aiRawPhoto || (thumbnailUrl && !thumbnailUrl.startsWith("blob:") ? thumbnailUrl : undefined),
+        rawImageBase64: rawImg,
         customPrompt: aiPrompt,
         templateHero: settings.ai_prompt_1_hero,
         templateDetail: settings.ai_prompt_2_detail,
@@ -678,16 +705,30 @@ export default function CreateProdiItem() {
                     </div>
 
                     {/* 5. Tombol Generate */}
-                    <button
-                      type="button"
-                      onClick={handleGenerateAiPhotos}
-                      disabled={aiLoading}
-                      style={{ borderRadius: "9999px" }}
-                      className="w-full py-2.5 rounded-full bg-gradient-to-r from-amber-500 via-[#C5A059] to-[#0F4C81] hover:brightness-105 text-white font-black text-xs shadow-md transition flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
-                    >
-                      <RefreshCw className={`w-3.5 h-3.5 ${aiLoading ? "animate-spin" : ""}`} />
-                      <span>{aiLoading ? "Memproses 4 Foto Marketplace..." : "Hasilkan 4 Foto Marketplace (Hero, Detail, Fitur & Lifestyle)"}</span>
-                    </button>
+                    <div className="flex flex-col sm:flex-row gap-2.5">
+                      <button
+                        type="button"
+                        onClick={() => handleGenerateAiPhotos(false)}
+                        disabled={aiLoading}
+                        style={{ borderRadius: "9999px" }}
+                        className="flex-1 py-3 px-4 rounded-full bg-gradient-to-r from-amber-500 via-[#C5A059] to-[#0F4C81] hover:brightness-105 text-white font-black text-xs shadow-md transition flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+                      >
+                        <RefreshCw className={`w-3.5 h-3.5 ${aiLoading ? "animate-spin" : ""}`} />
+                        <span>{aiLoading ? "Memproses 4 Foto Marketplace..." : "✨ Hasilkan 4 Foto Marketplace (100% Produk Asli Presisi)"}</span>
+                      </button>
+
+                      <button
+                        type="button"
+                        onClick={() => handleGenerateAiPhotos(true)}
+                        disabled={aiLoading}
+                        style={{ borderRadius: "9999px" }}
+                        title="Hasilkan variasi visual alternatif menggunakan Google Gemini 2.5 Flash"
+                        className="py-3 px-4 rounded-full bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700 font-bold text-xs transition flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-50"
+                      >
+                        <Camera className="w-3.5 h-3.5 text-amber-500" />
+                        <span>Sintesis AI (Gemini)</span>
+                      </button>
+                    </div>
 
                     {/* 6. Hasil 4 Foto Produk */}
                     {aiPhotos.length > 0 && (
