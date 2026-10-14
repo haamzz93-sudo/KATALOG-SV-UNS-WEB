@@ -1,8 +1,8 @@
 /**
- * Studio Marketplace Photo Generator (100% Produk Asli Presisi)
- * Membangun 4 foto standar marketplace komersial (1280x720 HD) langsung dari
- * foto produk asli yang diunggah pengguna, mempertahankan bentuk, warna, logo,
- * dan identitas produk 100% tanpa distorsi halusinasi AI.
+ * Studio Marketplace Photo Generator (Format Portrait 3:4 - 960x1280 HD)
+ * Membangun 4 foto standar marketplace komersial berformat vertikal 3:4
+ * (standar e-commerce Shopee, Tokopedia, Instagram & Amazon) langsung dari
+ * foto produk asli yang diunggah pengguna.
  */
 
 export interface MarketplacePhotoResult {
@@ -89,6 +89,60 @@ export const loadImage = async (src: string): Promise<HTMLImageElement> => {
 };
 
 /**
+ * Memotong margin kosong/transparan di sekitar produk sehingga
+ * produk terbingkai penuh (bounding-box cropping) dengan proporsi hero yang pas.
+ */
+export const trimTransparentBorders = (canvas: HTMLCanvasElement): HTMLCanvasElement => {
+  const ctx = canvas.getContext("2d");
+  if (!ctx) return canvas;
+
+  const w = canvas.width;
+  const h = canvas.height;
+  try {
+    const imgData = ctx.getImageData(0, 0, w, h);
+    const data = imgData.data;
+
+    let minX = w, minY = h, maxX = 0, maxY = 0;
+    let found = false;
+
+    for (let y = 0; y < h; y++) {
+      for (let x = 0; x < w; x++) {
+        const alpha = data[(y * w + x) * 4 + 3];
+        if (alpha > 14) {
+          if (x < minX) minX = x;
+          if (x > maxX) maxX = x;
+          if (y < minY) minY = y;
+          if (y > maxY) maxY = y;
+          found = true;
+        }
+      }
+    }
+
+    if (!found || minX >= maxX || minY >= maxY) return canvas;
+
+    const pad = 6;
+    minX = Math.max(0, minX - pad);
+    minY = Math.max(0, minY - pad);
+    maxX = Math.min(w - 1, maxX + pad);
+    maxY = Math.min(h - 1, maxY + pad);
+
+    const cropW = maxX - minX + 1;
+    const cropH = maxY - minY + 1;
+
+    const cropped = document.createElement("canvas");
+    cropped.width = cropW;
+    cropped.height = cropH;
+    const croppedCtx = cropped.getContext("2d");
+    if (!croppedCtx) return canvas;
+
+    croppedCtx.drawImage(canvas, minX, minY, cropW, cropH, 0, 0, cropW, cropH);
+    return cropped;
+  } catch {
+    return canvas;
+  }
+};
+
+/**
  * Isolasi Foreground Produk (Smart Background Removal / Studio Isolation)
  * Menggunakan algoritma BFS Flood-Fill dari tepi border gambar untuk memotong
  * background studio/meja berwarna terang secara presisi tanpa merusak detail
@@ -96,7 +150,7 @@ export const loadImage = async (src: string): Promise<HTMLImageElement> => {
  */
 export const isolateProductForeground = (
   sourceImg: HTMLImageElement | HTMLCanvasElement,
-  tolerance = 34
+  tolerance = 36
 ): HTMLCanvasElement => {
   const canvas = document.createElement("canvas");
   const w = sourceImg.width;
@@ -109,12 +163,10 @@ export const isolateProductForeground = (
 
   ctx.drawImage(sourceImg, 0, 0);
 
-  // Jika resolusi sangat besar, batasi untuk performa real-time
   try {
     const imgData = ctx.getImageData(0, 0, w, h);
     const data = imgData.data;
 
-    // 1. Sampling warna background dari 4 sudut & tepi atas
     const sampleCorner = (px: number, py: number) => {
       const idx = (py * w + px) * 4;
       return [data[idx], data[idx + 1], data[idx + 2]];
@@ -132,13 +184,11 @@ export const isolateProductForeground = (
     const avgBgG = corners.reduce((acc, c) => acc + c[1], 0) / corners.length;
     const avgBgB = corners.reduce((acc, c) => acc + c[2], 0) / corners.length;
 
-    // Hanya potong jika background bertipe studio/terang (brightness > 120)
     const brightness = (avgBgR + avgBgG + avgBgB) / 3;
-    if (brightness < 110) {
-      return canvas; // Kembalikan apa adanya jika foto background gelap pekat
+    if (brightness < 105) {
+      return trimTransparentBorders(canvas);
     }
 
-    // 2. BFS Flood-fill dari seluruh tepi luar (Border Pixels)
     const totalPixels = w * h;
     const visited = new Uint8Array(totalPixels);
     const queue = new Int32Array(totalPixels);
@@ -162,31 +212,26 @@ export const isolateProductForeground = (
       }
     };
 
-    // Border atas & bawah
     for (let x = 0; x < w; x++) {
       enqueue(x, 0);
       enqueue(x, h - 1);
     }
-    // Border kiri & kanan
     for (let y = 0; y < h; y++) {
       enqueue(0, y);
       enqueue(w - 1, y);
     }
 
-    // Eksekusi BFS
     while (head < tail) {
       const curr = queue[head++];
       const cx = curr % w;
       const cy = Math.floor(curr / w);
 
-      // Tetangga 4 arah
       if (cx > 0) enqueue(cx - 1, cy);
       if (cx < w - 1) enqueue(cx + 1, cy);
       if (cy > 0) enqueue(cx, cy - 1);
       if (cy < h - 1) enqueue(cx, cy + 1);
     }
 
-    // 3. Ubah seluruh pixel background terhubung menjadi transparan (Alpha = 0)
     for (let i = 0; i < totalPixels; i++) {
       if (visited[i]) {
         data[i * 4 + 3] = 0;
@@ -202,61 +247,6 @@ export const isolateProductForeground = (
 };
 
 /**
- * Memotong margin kosong/transparan di sekitar produk sehingga
- * produk terbingkai penuh (bounding-box cropping) dengan proporsi hero yang pas.
- */
-export const trimTransparentBorders = (canvas: HTMLCanvasElement): HTMLCanvasElement => {
-  const ctx = canvas.getContext("2d");
-  if (!ctx) return canvas;
-
-  const w = canvas.width;
-  const h = canvas.height;
-  try {
-    const imgData = ctx.getImageData(0, 0, w, h);
-    const data = imgData.data;
-
-    let minX = w, minY = h, maxX = 0, maxY = 0;
-    let found = false;
-
-    for (let y = 0; y < h; y++) {
-      for (let x = 0; x < w; x++) {
-        const alpha = data[(y * w + x) * 4 + 3];
-        if (alpha > 12) {
-          if (x < minX) minX = x;
-          if (x > maxX) maxX = x;
-          if (y < minY) minY = y;
-          if (y > maxY) maxY = y;
-          found = true;
-        }
-      }
-    }
-
-    if (!found || minX >= maxX || minY >= maxY) return canvas;
-
-    // Beri sedikit padding 4px
-    const pad = 4;
-    minX = Math.max(0, minX - pad);
-    minY = Math.max(0, minY - pad);
-    maxX = Math.min(w - 1, maxX + pad);
-    maxY = Math.min(h - 1, maxY + pad);
-
-    const cropW = maxX - minX + 1;
-    const cropH = maxY - minY + 1;
-
-    const cropped = document.createElement("canvas");
-    cropped.width = cropW;
-    cropped.height = cropH;
-    const croppedCtx = cropped.getContext("2d");
-    if (!croppedCtx) return canvas;
-
-    croppedCtx.drawImage(canvas, minX, minY, cropW, cropH, 0, 0, cropW, cropH);
-    return cropped;
-  } catch {
-    return canvas;
-  }
-};
-
-/**
  * Menggambar bayangan kontak elips realistis di bawah produk
  */
 const drawContactShadow = (
@@ -265,7 +255,7 @@ const drawContactShadow = (
   cy: number,
   rx: number,
   ry: number,
-  opacity = 0.32
+  opacity = 0.36
 ) => {
   ctx.save();
   const grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, rx);
@@ -280,8 +270,8 @@ const drawContactShadow = (
 };
 
 /**
- * 1. FOTO UTAMA / HERO PRODUCT (1280x720)
- * Center focal point, podium ivory minimalis, studio lighting
+ * 1. FOTO UTAMA / HERO PRODUCT (FORMAT PORTRAIT 3:4 - 960x1280)
+ * Center focal point, podium ivory 3D, studio spotlight
  */
 export const generateHeroPhoto = (
   img: HTMLImageElement | HTMLCanvasElement,
@@ -289,38 +279,38 @@ export const generateHeroPhoto = (
   kategori: string
 ): string => {
   const canvas = document.createElement("canvas");
-  canvas.width = 1280;
-  canvas.height = 720;
+  canvas.width = 960;
+  canvas.height = 1280;
   const ctx = canvas.getContext("2d");
   if (!ctx) return "";
 
-  // 1. Studio Backdrop (Clean Light Grey to White Gradient)
-  const bgGrad = ctx.createLinearGradient(0, 0, 0, 720);
+  // 1. Studio Backdrop (Clean Vertical Gradient)
+  const bgGrad = ctx.createLinearGradient(0, 0, 0, 1280);
   bgGrad.addColorStop(0, "#F8FAFC");
   bgGrad.addColorStop(0.65, "#EDF2F7");
   bgGrad.addColorStop(1, "#E2E8F0");
   ctx.fillStyle = bgGrad;
-  ctx.fillRect(0, 0, 1280, 720);
+  ctx.fillRect(0, 0, 960, 1280);
 
   // Soft Radial Spotlight
-  const spotGrad = ctx.createRadialGradient(640, 300, 50, 640, 300, 550);
-  spotGrad.addColorStop(0, "rgba(255, 255, 255, 0.95)");
-  spotGrad.addColorStop(0.7, "rgba(255, 255, 255, 0.3)");
+  const spotGrad = ctx.createRadialGradient(480, 520, 60, 480, 520, 620);
+  spotGrad.addColorStop(0, "rgba(255, 255, 255, 0.96)");
+  spotGrad.addColorStop(0.7, "rgba(255, 255, 255, 0.35)");
   spotGrad.addColorStop(1, "rgba(255, 255, 255, 0)");
   ctx.fillStyle = spotGrad;
-  ctx.fillRect(0, 0, 1280, 720);
+  ctx.fillRect(0, 0, 960, 1280);
 
   // 2. Podium Minimalis Putih / Ivory (3D Cylindrical Pedestal)
-  const podX = 640;
-  const podY = 530;
-  const podRx = 330;
-  const podRy = 50;
-  const podH = 55;
+  const podX = 480;
+  const podY = 960;
+  const podRx = 380;
+  const podRy = 65;
+  const podH = 80;
 
   // Podium Drop Shadow
   ctx.save();
   ctx.beginPath();
-  ctx.ellipse(podX, podY + podH + 10, podRx + 25, podRy + 15, 0, 0, Math.PI * 2);
+  ctx.ellipse(podX, podY + podH + 12, podRx + 25, podRy + 15, 0, 0, Math.PI * 2);
   ctx.fillStyle = "rgba(15, 23, 42, 0.08)";
   ctx.fill();
   ctx.restore();
@@ -350,18 +340,18 @@ export const generateHeroPhoto = (
   ctx.ellipse(podX, podY, podRx, podRy, 0, 0, Math.PI * 2);
   ctx.fillStyle = podTopGrad;
   ctx.fill();
-  ctx.strokeStyle = "rgba(226, 232, 240, 0.8)";
+  ctx.strokeStyle = "rgba(226, 232, 240, 0.85)";
   ctx.lineWidth = 2;
   ctx.stroke();
 
   // 3. Product Contact Shadow on Podium
-  const prodTargetH = 430;
+  const prodTargetH = 740;
   const prodRatio = img.width / img.height;
   const prodW = prodTargetH * prodRatio;
-  const prodX = 640 - prodW / 2;
-  const prodY = podY - prodTargetH + 12;
+  const prodX = 480 - prodW / 2;
+  const prodY = podY - prodTargetH + 18;
 
-  drawContactShadow(ctx, 640, podY + 5, prodW * 0.45, 18, 0.35);
+  drawContactShadow(ctx, 480, podY + 5, prodW * 0.46, 22, 0.38);
 
   // 4. Gambar Produk Asli
   ctx.drawImage(img, prodX, prodY, prodW, prodTargetH);
@@ -369,91 +359,91 @@ export const generateHeroPhoto = (
   // 5. Header Branding Badge
   ctx.fillStyle = "rgba(15, 76, 129, 0.92)";
   ctx.beginPath();
-  drawRoundRect(ctx, 40, 35, 340, 34, 17);
+  drawRoundRect(ctx, 40, 40, 360, 42, 21);
   ctx.fill();
 
   ctx.fillStyle = "#FFFFFF";
-  ctx.font = "bold 13px system-ui, -apple-system, sans-serif";
-  ctx.fillText("1. FOTO UTAMA • HERO MARKETPLACE", 58, 57);
+  ctx.font = "bold 14px system-ui, -apple-system, sans-serif";
+  ctx.fillText("1. FOTO UTAMA • HERO MARKETPLACE", 60, 66);
 
   // Category Tag Top Right
   if (kategori) {
-    ctx.fillStyle = "rgba(255, 255, 255, 0.9)";
-    ctx.strokeStyle = "rgba(197, 160, 89, 0.6)";
+    ctx.fillStyle = "rgba(255, 255, 255, 0.92)";
+    ctx.strokeStyle = "rgba(197, 160, 89, 0.7)";
     ctx.lineWidth = 1.5;
     ctx.beginPath();
-    drawRoundRect(ctx, 1020, 35, 220, 34, 17);
+    drawRoundRect(ctx, 680, 40, 240, 42, 21);
     ctx.fill();
     ctx.stroke();
 
     ctx.fillStyle = "#0F4C81";
-    ctx.font = "bold 12px system-ui, -apple-system, sans-serif";
+    ctx.font = "bold 13px system-ui, -apple-system, sans-serif";
     ctx.textAlign = "center";
-    ctx.fillText(`Kategori: ${kategori}`, 1130, 57);
+    ctx.fillText(`${kategori}`, 800, 66);
     ctx.textAlign = "left";
   }
 
   // Bottom Label
   ctx.fillStyle = "rgba(15, 23, 42, 0.55)";
-  ctx.font = "11px system-ui, -apple-system, sans-serif";
-  ctx.fillText("Standar Foto Marketplace Komersial • 100% Keaslian Identitas & Warna Produk Terjaga", 45, 690);
+  ctx.font = "12px system-ui, -apple-system, sans-serif";
+  ctx.fillText("Standar Foto Marketplace Komersial (3:4) • 100% Keaslian Identitas & Warna Terjaga", 45, 1240);
 
   return canvas.toDataURL("image/jpeg", 0.92);
 };
 
 /**
- * 2. DETAIL & QUALITY (MACRO SHOT) (1280x720)
- * Macro zoom 1.75x pada produk asli, overlay tag karakter kualitas
+ * 2. DETAIL & QUALITY (MACRO SHOT) (FORMAT PORTRAIT 3:4 - 960x1280)
+ * Macro zoom 1.85x pada produk asli, overlay tag karakter kualitas
  */
 export const generateDetailPhoto = (
   img: HTMLImageElement | HTMLCanvasElement,
   detailTags: string[]
 ): string => {
   const canvas = document.createElement("canvas");
-  canvas.width = 1280;
-  canvas.height = 720;
+  canvas.width = 960;
+  canvas.height = 1280;
   const ctx = canvas.getContext("2d");
   if (!ctx) return "";
 
   // 1. Studio Editorial Background
-  const bg = ctx.createLinearGradient(0, 0, 1280, 720);
+  const bg = ctx.createLinearGradient(0, 0, 960, 1280);
   bg.addColorStop(0, "#F1F5F9");
   bg.addColorStop(0.5, "#E2E8F0");
   bg.addColorStop(1, "#CBD5E1");
   ctx.fillStyle = bg;
-  ctx.fillRect(0, 0, 1280, 720);
+  ctx.fillRect(0, 0, 960, 1280);
 
   // Diagonal Light Accent
   ctx.save();
   ctx.beginPath();
   ctx.moveTo(0, 0);
-  ctx.lineTo(800, 0);
-  ctx.lineTo(480, 720);
-  ctx.lineTo(0, 720);
+  ctx.lineTo(600, 0);
+  ctx.lineTo(360, 1280);
+  ctx.lineTo(0, 1280);
   ctx.closePath();
   ctx.fillStyle = "rgba(255, 255, 255, 0.4)";
   ctx.fill();
   ctx.restore();
 
-  // 2. Macro Zoom pada Produk Asli (Scale 1.75x)
-  const macroH = 560;
+  // 2. Macro Zoom pada Produk Asli (Scale 1.85x)
+  const macroH = 1000;
   const macroW = (macroH * img.width) / img.height;
-  const macroX = 640 - macroW / 2;
-  const macroY = 100;
+  const macroX = 480 - macroW / 2;
+  const macroY = 140;
 
   // Shadow belakang produk
-  drawContactShadow(ctx, 640, 640, macroW * 0.48, 25, 0.25);
+  drawContactShadow(ctx, 480, 1140, macroW * 0.48, 35, 0.28);
 
   ctx.drawImage(img, macroX, macroY, macroW, macroH);
 
   // 3. Header Badge
   ctx.fillStyle = "rgba(15, 76, 129, 0.92)";
   ctx.beginPath();
-  drawRoundRect(ctx, 40, 35, 360, 36, 18);
+  drawRoundRect(ctx, 40, 40, 390, 42, 21);
   ctx.fill();
   ctx.fillStyle = "#FFFFFF";
-  ctx.font = "bold 13px system-ui, -apple-system, sans-serif";
-  ctx.fillText("2. DETAIL & KUALITAS • MACRO CRAFTSMANSHIP", 56, 58);
+  ctx.font = "bold 14px system-ui, -apple-system, sans-serif";
+  ctx.fillText("2. DETAIL & KUALITAS • MACRO CRAFTSMANSHIP", 58, 66);
 
   // 4. Feature Callout Badges (Glassmorphism Pills)
   const tags = detailTags && detailTags.length > 0
@@ -461,22 +451,22 @@ export const generateDetailPhoto = (
     : ["Detail Material", "Finishing Rapi", "Desain Presisi", "Kemasan Premium"];
 
   const badgePositions = [
-    { x: 60, y: 160 },
-    { x: 920, y: 190 },
-    { x: 60, y: 480 },
-    { x: 920, y: 510 },
+    { x: 50, y: 130 },
+    { x: 560, y: 130 },
+    { x: 50, y: 1060 },
+    { x: 560, y: 1060 },
   ];
 
   tags.forEach((tag, idx) => {
-    const pos = badgePositions[idx] || { x: 60, y: 200 + idx * 80 };
+    const pos = badgePositions[idx] || { x: 50, y: 200 + idx * 80 };
 
     // Glass pill background
     ctx.save();
-    ctx.fillStyle = "rgba(255, 255, 255, 0.92)";
-    ctx.strokeStyle = "rgba(197, 160, 89, 0.75)";
+    ctx.fillStyle = "rgba(255, 255, 255, 0.94)";
+    ctx.strokeStyle = "rgba(197, 160, 89, 0.8)";
     ctx.lineWidth = 1.8;
     ctx.beginPath();
-    drawRoundRect(ctx, pos.x, pos.y, 280, 48, 24);
+    drawRoundRect(ctx, pos.x, pos.y, 350, 52, 26);
     ctx.fill();
     ctx.stroke();
     ctx.restore();
@@ -484,29 +474,29 @@ export const generateDetailPhoto = (
     // Check indicator icon circle
     ctx.fillStyle = "#10B981";
     ctx.beginPath();
-    ctx.arc(pos.x + 24, pos.y + 24, 10, 0, Math.PI * 2);
+    ctx.arc(pos.x + 28, pos.y + 26, 12, 0, Math.PI * 2);
     ctx.fill();
     ctx.fillStyle = "#FFFFFF";
-    ctx.font = "bold 11px system-ui, sans-serif";
-    ctx.fillText("✓", pos.x + 20.5, pos.y + 28);
+    ctx.font = "bold 13px system-ui, sans-serif";
+    ctx.fillText("✓", pos.x + 23.5, pos.y + 31);
 
     // Text
     ctx.fillStyle = "#0F172A";
-    ctx.font = "bold 13.5px system-ui, -apple-system, sans-serif";
-    ctx.fillText(tag, pos.x + 44, pos.y + 29);
+    ctx.font = "bold 14px system-ui, -apple-system, sans-serif";
+    ctx.fillText(tag, pos.x + 50, pos.y + 31);
   });
 
   // Footer note
   ctx.fillStyle = "rgba(15, 23, 42, 0.6)";
-  ctx.font = "11px system-ui, sans-serif";
-  ctx.fillText("Fokus Macro 1.8x • Menampilkan Detail Material, Tekstur Permukaan & Presisi Kemasan Asli", 45, 690);
+  ctx.font = "12px system-ui, sans-serif";
+  ctx.fillText("Fokus Macro 1.8x • Menampilkan Detail Material, Tekstur Permukaan & Presisi Kemasan Asli", 45, 1240);
 
   return canvas.toDataURL("image/jpeg", 0.92);
 };
 
 /**
- * 3. INFOGRAFIS FITUR & KEUNGGULAN (1280x720)
- * Headline komersial, kartu keunggulan di sisi kiri, produk asli di sisi kanan
+ * 3. INFOGRAFIS FITUR & KEUNGGULAN (FORMAT PORTRAIT 3:4 - 960x1280)
+ * Headline komersial, display produk di tengah, 3 kartu keunggulan di bawah
  */
 export const generateBenefitPhoto = (
   img: HTMLImageElement | HTMLCanvasElement,
@@ -515,38 +505,61 @@ export const generateBenefitPhoto = (
   kategori: string
 ): string => {
   const canvas = document.createElement("canvas");
-  canvas.width = 1280;
-  canvas.height = 720;
+  canvas.width = 960;
+  canvas.height = 1280;
   const ctx = canvas.getContext("2d");
   if (!ctx) return "";
 
   // 1. Studio Clean Tech Background
-  const bg = ctx.createLinearGradient(0, 0, 1280, 720);
+  const bg = ctx.createLinearGradient(0, 0, 960, 1280);
   bg.addColorStop(0, "#FFFFFF");
   bg.addColorStop(0.5, "#F8FAFC");
   bg.addColorStop(1, "#EDF2F7");
   ctx.fillStyle = bg;
-  ctx.fillRect(0, 0, 1280, 720);
+  ctx.fillRect(0, 0, 960, 1280);
 
   // Left Blue Accent Stripe
   ctx.fillStyle = "#0F4C81";
-  ctx.fillRect(0, 0, 8, 720);
+  ctx.fillRect(0, 0, 10, 1280);
 
-  // 2. Headline & Section Header
+  // 2. Headline & Section Header (Top)
   ctx.fillStyle = "#C5A059";
-  ctx.font = "bold 12px system-ui, -apple-system, sans-serif";
-  ctx.fillText("INFOGRAFIS HILIRISASI PRODUK INOVASI VOKASI UNS", 55, 52);
+  ctx.font = "bold 13px system-ui, -apple-system, sans-serif";
+  ctx.fillText("INFOGRAFIS HILIRISASI PRODUK INOVASI VOKASI UNS", 50, 56);
 
   const mainHeadline = headline || "KENAPA PRODUK INI LAYAK DIPILIH?";
   ctx.fillStyle = "#0F172A";
-  ctx.font = "bold 26px system-ui, -apple-system, sans-serif";
-  ctx.fillText(mainHeadline, 55, 88);
+  ctx.font = "bold 28px system-ui, -apple-system, sans-serif";
+  ctx.fillText(mainHeadline, 50, 96);
 
   ctx.fillStyle = "#64748B";
-  ctx.font = "13px system-ui, -apple-system, sans-serif";
-  ctx.fillText("3 Alasan Utama Mengapa Produk Inovasi Ini Memiliki Nilai Jual & Keunggulan Tinggi:", 55, 115);
+  ctx.font = "14px system-ui, -apple-system, sans-serif";
+  ctx.fillText("3 Alasan Utama Mengapa Produk Inovasi Ini Memiliki Nilai Jual & Mutu Tinggi:", 50, 126);
 
-  // 3. 3 Kartu Keunggulan (Left Side: x=55 to 580)
+  // 3. Product Display in Showcase Frame (y = 150 to 650)
+  const prodH = 460;
+  const prodW = (prodH * img.width) / img.height;
+  const prodX = 480 - prodW / 2;
+  const prodY = 160;
+
+  // Podium Ellipse
+  ctx.save();
+  ctx.beginPath();
+  ctx.ellipse(480, 620, 280, 40, 0, 0, Math.PI * 2);
+  ctx.fillStyle = "rgba(15, 76, 129, 0.08)";
+  ctx.fill();
+  ctx.strokeStyle = "rgba(197, 160, 89, 0.5)";
+  ctx.lineWidth = 2;
+  ctx.stroke();
+  ctx.restore();
+
+  // Contact shadow
+  drawContactShadow(ctx, 480, 615, prodW * 0.44, 20, 0.35);
+
+  // Draw product
+  ctx.drawImage(img, prodX, prodY, prodW, prodH);
+
+  // 4. 3 Kartu Keunggulan (Stacked Vertically at Bottom: y = 670 to 1190)
   const features = [
     {
       title: "Kualitas & Formula Terverifikasi Lab",
@@ -569,7 +582,7 @@ export const generateBenefitPhoto = (
   ];
 
   features.forEach((feat, i) => {
-    const cardY = 145 + i * 145;
+    const cardY = 670 + i * 165;
 
     // Card background
     ctx.save();
@@ -577,7 +590,7 @@ export const generateBenefitPhoto = (
     ctx.strokeStyle = "rgba(226, 232, 240, 0.9)";
     ctx.lineWidth = 1.5;
     ctx.beginPath();
-    drawRoundRect(ctx, 55, cardY, 520, 125, 16);
+    drawRoundRect(ctx, 50, cardY, 860, 140, 20);
     ctx.fill();
     ctx.stroke();
     ctx.restore();
@@ -585,145 +598,122 @@ export const generateBenefitPhoto = (
     // Number Badge Circle
     ctx.fillStyle = feat.color + "18";
     ctx.beginPath();
-    ctx.arc(95, cardY + 45, 24, 0, Math.PI * 2);
+    ctx.arc(105, cardY + 50, 28, 0, Math.PI * 2);
     ctx.fill();
 
     ctx.fillStyle = feat.color;
-    ctx.font = "bold 15px system-ui, -apple-system, sans-serif";
+    ctx.font = "bold 18px system-ui, -apple-system, sans-serif";
     ctx.textAlign = "center";
-    ctx.fillText(feat.badge, 95, cardY + 50);
+    ctx.fillText(feat.badge, 105, cardY + 57);
     ctx.textAlign = "left";
 
     // Card Title
     ctx.fillStyle = "#0F172A";
-    ctx.font = "bold 15px system-ui, -apple-system, sans-serif";
-    ctx.fillText(feat.title, 135, cardY + 42);
+    ctx.font = "bold 17px system-ui, -apple-system, sans-serif";
+    ctx.fillText(feat.title, 155, cardY + 48);
 
     // Card Description
     ctx.fillStyle = "#475569";
-    ctx.font = "12px system-ui, -apple-system, sans-serif";
+    ctx.font = "14px system-ui, -apple-system, sans-serif";
     const words = feat.desc.split(" ");
     let line1 = "";
     let line2 = "";
     for (const w of words) {
-      if ((line1 + w).length < 46) {
+      if ((line1 + w).length < 65) {
         line1 += w + " ";
       } else {
         line2 += w + " ";
       }
     }
-    ctx.fillText(line1.trim(), 135, cardY + 68);
-    if (line2) ctx.fillText(line2.trim(), 135, cardY + 88);
+    ctx.fillText(line1.trim(), 155, cardY + 78);
+    if (line2) ctx.fillText(line2.trim(), 155, cardY + 102);
   });
-
-  // 4. Product Display Podium di Sisi Kanan (x = 880, y = 520)
-  const prodH = 430;
-  const prodW = (prodH * img.width) / img.height;
-  const prodX = 930 - prodW / 2;
-  const prodY = 150;
-
-  // Podium Ellipse
-  ctx.save();
-  ctx.beginPath();
-  ctx.ellipse(930, 560, 260, 42, 0, 0, Math.PI * 2);
-  ctx.fillStyle = "rgba(15, 76, 129, 0.08)";
-  ctx.fill();
-  ctx.strokeStyle = "rgba(197, 160, 89, 0.5)";
-  ctx.lineWidth = 2;
-  ctx.stroke();
-  ctx.restore();
-
-  // Contact shadow
-  drawContactShadow(ctx, 930, 555, prodW * 0.44, 18, 0.32);
-
-  // Draw product
-  ctx.drawImage(img, prodX, prodY, prodW, prodH);
 
   // Bottom Footer
   ctx.fillStyle = "rgba(15, 23, 42, 0.55)";
-  ctx.font = "11px system-ui, sans-serif";
-  ctx.fillText("Standar Infografis Edukatif & Promotif • Membantu Calon Pembeli Memahami Manfaat Utama Produk", 55, 690);
+  ctx.font = "12px system-ui, sans-serif";
+  ctx.fillText("Standar Infografis Edukatif & Promotif • Membantu Calon Pembeli Memahami Manfaat Utama Produk", 50, 1240);
 
   return canvas.toDataURL("image/jpeg", 0.92);
 };
 
 /**
- * 4. KONTEKS LIFESTYLE (REAL USE TABLETOP) (1280x720)
- * Permukaan kayu hangat, pencahayaan alami jendela, produk asli berdiri natural
+ * 4. KONTEKS LIFESTYLE (REAL USE TABLETOP) (FORMAT PORTRAIT 3:4 - 960x1280)
+ * Permukaan meja kayu hangat, pencahayaan alami jendela, produk asli berdiri natural
  */
 export const generateLifestylePhoto = (
   img: HTMLImageElement | HTMLCanvasElement,
   kategori: string
 ): string => {
   const canvas = document.createElement("canvas");
-  canvas.width = 1280;
-  canvas.height = 720;
+  canvas.width = 960;
+  canvas.height = 1280;
   const ctx = canvas.getContext("2d");
   if (!ctx) return "";
 
-  // 1. Warm Ambient Studio Backdrop (Top 60%)
-  const wallGrad = ctx.createLinearGradient(0, 0, 0, 440);
+  // 1. Warm Ambient Studio Backdrop (Top 55%: y = 0 to 700)
+  const wallGrad = ctx.createLinearGradient(0, 0, 0, 700);
   wallGrad.addColorStop(0, "#F1ECE6");
   wallGrad.addColorStop(0.5, "#E8DFD5");
   wallGrad.addColorStop(1, "#D6C8B8");
   ctx.fillStyle = wallGrad;
-  ctx.fillRect(0, 0, 1280, 440);
+  ctx.fillRect(0, 0, 960, 700);
 
   // Soft morning sunlight window beam
   ctx.save();
   ctx.beginPath();
   ctx.moveTo(0, 0);
-  ctx.lineTo(650, 0);
-  ctx.lineTo(950, 440);
-  ctx.lineTo(250, 440);
+  ctx.lineTo(500, 0);
+  ctx.lineTo(720, 700);
+  ctx.lineTo(180, 700);
   ctx.closePath();
-  const sunGrad = ctx.createLinearGradient(300, 0, 600, 440);
+  const sunGrad = ctx.createLinearGradient(200, 0, 450, 700);
   sunGrad.addColorStop(0, "rgba(255, 250, 240, 0.45)");
   sunGrad.addColorStop(1, "rgba(255, 250, 240, 0.05)");
   ctx.fillStyle = sunGrad;
   ctx.fill();
   ctx.restore();
 
-  // 2. Warm Wooden Table Surface (Bottom 40%: y = 440 to 720)
-  const woodGrad = ctx.createLinearGradient(0, 440, 0, 720);
+  // 2. Warm Wooden Table Surface (Bottom 45%: y = 700 to 1280)
+  const woodGrad = ctx.createLinearGradient(0, 700, 0, 1280);
   woodGrad.addColorStop(0, "#C79C6F");
   woodGrad.addColorStop(0.4, "#B58455");
   woodGrad.addColorStop(1, "#8A582F");
   ctx.fillStyle = woodGrad;
-  ctx.fillRect(0, 440, 1280, 280);
+  ctx.fillRect(0, 700, 960, 580);
 
   // Subtle wood planks lines
   ctx.strokeStyle = "rgba(110, 65, 30, 0.18)";
   ctx.lineWidth = 1.5;
-  for (let y = 475; y < 720; y += 45) {
+  for (let y = 745; y < 1280; y += 50) {
     ctx.beginPath();
     ctx.moveTo(0, y);
-    ctx.lineTo(1280, y);
+    ctx.lineTo(960, y);
     ctx.stroke();
   }
 
   // Table edge shadow transition
-  const edgeShadow = ctx.createLinearGradient(0, 440, 0, 460);
+  const edgeShadow = ctx.createLinearGradient(0, 700, 0, 725);
   edgeShadow.addColorStop(0, "rgba(0, 0, 0, 0.18)");
   edgeShadow.addColorStop(1, "rgba(0, 0, 0, 0)");
   ctx.fillStyle = edgeShadow;
-  ctx.fillRect(0, 440, 1280, 20);
+  ctx.fillRect(0, 700, 960, 25);
 
-  // 3. Product Placement on Table (x = 640, y = 480)
-  const prodH = 410;
+  // 3. Product Placement on Table (x = 480, y = 720)
+  const prodH = 680;
   const prodRatio = img.width / img.height;
   const prodW = prodH * prodRatio;
-  const prodX = 640 - prodW / 2;
-  const prodY = 470 - prodH + 20;
+  const prodX = 480 - prodW / 2;
+  const prodY = 720 - prodH + 20;
 
   // Realistic contact shadow on wood
-  drawContactShadow(ctx, 640, 475, prodW * 0.46, 20, 0.45);
+  drawContactShadow(ctx, 480, 725, prodW * 0.46, 24, 0.45);
 
   // Soft subtle reflection on polished wood
   ctx.save();
-  ctx.translate(640, 470);
+  ctx.translate(480, 720);
   ctx.scale(1, -0.32);
-  ctx.translate(-640, -470);
+  ctx.translate(-480, -720);
   ctx.globalAlpha = 0.14;
   ctx.drawImage(img, prodX, prodY, prodW, prodH);
   ctx.restore();
@@ -734,27 +724,27 @@ export const generateLifestylePhoto = (
   // 4. Header Badge
   ctx.fillStyle = "rgba(15, 76, 129, 0.9)";
   ctx.beginPath();
-  drawRoundRect(ctx, 40, 35, 380, 36, 18);
+  drawRoundRect(ctx, 40, 40, 390, 42, 21);
   ctx.fill();
   ctx.fillStyle = "#FFFFFF";
-  ctx.font = "bold 13px system-ui, -apple-system, sans-serif";
-  ctx.fillText("4. KONTEKS LIFESTYLE • REAL USE DISPLAY", 56, 58);
+  ctx.font = "bold 14px system-ui, -apple-system, sans-serif";
+  ctx.fillText("4. KONTEKS LIFESTYLE • REAL USE DISPLAY", 58, 66);
 
   // Bottom Label
-  ctx.fillStyle = "rgba(255, 255, 255, 0.85)";
-  ctx.font = "11px system-ui, sans-serif";
-  ctx.fillText("Display Meja Komersial Estetik • Menampilkan Kesan Produk Digunakan dalam Kehidupan Nyata", 45, 690);
+  ctx.fillStyle = "rgba(255, 255, 255, 0.88)";
+  ctx.font = "12px system-ui, sans-serif";
+  ctx.fillText("Display Meja Komersial Estetik (3:4) • Menampilkan Kesan Produk Digunakan dalam Kehidupan Nyata", 45, 1240);
 
   return canvas.toDataURL("image/jpeg", 0.92);
 };
 
 /**
- * Fungsi Utama: Menghasilkan 4 Foto Marketplace Secara Instan dari Foto Asli
+ * Fungsi Utama: Menghasilkan 4 Foto Marketplace Secara Instan dari Foto Asli (Format 3:4)
  */
 export async function generateStudioMarketplacePhotos(
   options: GeneratorOptions
 ): Promise<MarketplacePhotoResult[]> {
-  const { imageSrc, namaItem = "Produk Inovasi Vokasi UNS", kategori = "Produk", detailTags = [], benefitHeadline = "KENAPA PRODUK INI LAYAK DIPILIH?" } = options;
+  const { imageSrc, namaItem = "Produk Inovasi Vokasi UNS", kategori = "PRODUK", detailTags = [], benefitHeadline = "KENAPA PRODUK INI LAYAK DIPILIH?" } = options;
 
   if (!imageSrc) {
     throw new Error("Foto produk mentahan belum diunggah.");
@@ -766,7 +756,7 @@ export async function generateStudioMarketplacePhotos(
   // 2. Isolasi foreground produk (potong background studio secara otomatis jika latar terang)
   const isolatedImg = isolateProductForeground(img);
 
-  // 3. Render 4 standar marketplace
+  // 3. Render 4 standar marketplace portrait 3:4 (960x1280 HD)
   const heroUrl = generateHeroPhoto(isolatedImg, namaItem, kategori);
   const detailUrl = generateDetailPhoto(isolatedImg, detailTags);
   const benefitUrl = generateBenefitPhoto(isolatedImg, benefitHeadline, namaItem, kategori);
@@ -778,7 +768,7 @@ export async function generateStudioMarketplacePhotos(
       title: "1. Foto Utama (Hero Marketplace)",
       angle: "Foto Utama",
       badge: "100% Produk Asli",
-      desc: "Fokus utama produk asli di atas podium studio putih ivory bersih, pencahayaan lembut, bentuk & warna 100% presisi.",
+      desc: "Fokus utama produk asli di atas podium studio putih ivory bersih, pencahayaan lembut, proporsi portrait 3:4 rapi.",
       url: heroUrl,
       directUrl: heroUrl,
     },
@@ -796,7 +786,7 @@ export async function generateStudioMarketplacePhotos(
       title: "3. Keunggulan & Fitur (Infografis)",
       angle: "Alasan Membeli",
       badge: "Infografis Komersial",
-      desc: "Tata letak infografis modern menyajikan headline dan 3 poin keunggulan utama produk inovasi.",
+      desc: "Tata letak infografis portrait menyajikan headline dan 3 poin keunggulan utama produk inovasi.",
       url: benefitUrl,
       directUrl: benefitUrl,
     },

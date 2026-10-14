@@ -74,7 +74,7 @@ export default function CreateProdiItem() {
   const [aiBenefitHeadline, setAiBenefitHeadline] = useState<string>("KENAPA PRODUK INI LAYAK DIPILIH?");
   const [aiPrompt, setAiPrompt] = useState(
     settings.ai_default_prompt ||
-      "Pencahayaan studio komersial lembut, resolusi HD 8k, aspect ratio landscape 16:9, clean minimalis, pertahankan keaslian warna, logo, dan identitas visual konsisten di seluruh 4 foto."
+      "Pencahayaan studio komersial lembut, resolusi HD 8k, format portrait 3:4, clean minimalis, pertahankan keaslian warna, logo, dan identitas visual konsisten di seluruh 4 foto."
   );
   const [aiRawPhoto, setAiRawPhoto] = useState<string>("");
   const [aiRawPhotoBase64, setAiRawPhotoBase64] = useState<string>("");
@@ -519,7 +519,7 @@ export default function CreateProdiItem() {
                     <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-2">
                       <span className="text-xs font-bold text-amber-600 dark:text-amber-400 flex items-center gap-1.5">
                         <SlidersHorizontal className="w-4 h-4" />
-                        <span>Generator 4 Foto Marketplace Komersial (HD 1280x720)</span>
+                        <span>Generator 4 Foto Marketplace Komersial (Format Portrait 3:4)</span>
                       </span>
                       <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-amber-100 dark:bg-amber-950/80 text-amber-800 dark:text-amber-300 font-bold">
                         Target: {settings.ai_default_domain || "spsbu.unsmadiun.id"}
@@ -714,7 +714,7 @@ export default function CreateProdiItem() {
                             4 Foto Marketplace Siap Digunakan (Klik untuk Memilih Mockup Utama):
                           </span>
                           <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-bold">
-                            ✓ Resolusi HD 1280x720
+                            ✓ Format Marketplace Portrait (3:4)
                           </span>
                         </div>
 
@@ -730,7 +730,7 @@ export default function CreateProdiItem() {
                               }`}
                             >
                               <div>
-                                <div className="relative w-full aspect-video min-h-[135px] rounded-xl overflow-hidden bg-slate-100 dark:bg-slate-950/80 mb-2.5 flex items-center justify-center border border-slate-200/60 dark:border-slate-700/60">
+                                <div className="relative w-full aspect-[3/4] min-h-[190px] rounded-xl overflow-hidden bg-slate-100 dark:bg-slate-950/80 mb-2.5 flex items-center justify-center border border-slate-200/60 dark:border-slate-700/60">
                                   <img
                                     src={photo.url}
                                     alt={photo.title}
