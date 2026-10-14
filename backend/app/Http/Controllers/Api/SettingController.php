@@ -130,6 +130,7 @@ class SettingController extends Controller
             $extension = $file->getClientOriginalExtension() ?: ($isImage ? 'png' : 'mp4');
             $fileName = ($isImage ? 'img_' : 'vid_') . time() . '_' . Str::random(8) . '.' . $extension;
 
+            // Target locations to attempt saving
             $targetDir = public_path('uploads');
             if (!is_dir($targetDir)) {
                 @mkdir($targetDir, 0777, true);
@@ -140,27 +141,18 @@ class SettingController extends Controller
             $fileUrl = '/uploads/' . $fileName;
 
             // Strategy 1: Direct move to public/uploads
-            if (is_dir($targetDir) && is_writable($targetDir)) {
+            if (is_dir($targetDir)) {
                 try {
                     $file->move($targetDir, $fileName);
-                    $saved = true;
+                    if (file_exists($targetDir . DIRECTORY_SEPARATOR . $fileName)) {
+                        $saved = true;
+                    }
                 } catch (\Throwable $moveEx) {
                     \Illuminate\Support\Facades\Log::warning("Direct upload move failed: " . $moveEx->getMessage());
                 }
             }
 
-            // Strategy 2: If direct move failed or folder not writable, use Laravel Storage disk ('public')
-            if (!$saved) {
-                try {
-                    $path = \Illuminate\Support\Facades\Storage::disk('public')->putFileAs('uploads', $file, $fileName);
-                    $fileUrl = '/storage/' . $path;
-                    $saved = true;
-                } catch (\Throwable $storageEx) {
-                    \Illuminate\Support\Facades\Log::warning("Storage disk putFileAs failed: " . $storageEx->getMessage());
-                }
-            }
-
-            // Strategy 3: Direct file_put_contents if bytes available
+            // Strategy 2: If direct move failed, try file_put_contents if bytes available
             if (!$saved && $fileBytes !== null) {
                 try {
                     if (is_dir($targetDir)) {
@@ -175,37 +167,58 @@ class SettingController extends Controller
                 }
             }
 
-            // Strategy 4: Safe Base64 Data URL fallback (100% resilient)
+            // Strategy 3: Try frontend/public/uploads directly
             if (!$saved) {
-                if ($fileBytes !== null) {
-                    $base64 = base64_encode($fileBytes);
-                    $dataUrl = 'data:' . $mime . ';base64,' . $base64;
-                    return response()->json([
-                        'success' => true,
-                        'url' => $dataUrl,
-                        'message' => 'File diproses aman sebagai data URL.',
-                    ]);
-                } else {
-                    return response()->json([
-                        'success' => false,
-                        'message' => 'Gagal membaca isi berkas untuk disimpan ke server.',
-                    ], 500);
+                try {
+                    $frontendDir = base_path('../frontend/public/uploads');
+                    if (!is_dir($frontendDir)) {
+                        @mkdir($frontendDir, 0777, true);
+                    }
+                    if ($fileBytes !== null && is_dir($frontendDir)) {
+                        @file_put_contents($frontendDir . DIRECTORY_SEPARATOR . $fileName, $fileBytes);
+                        if (file_exists($frontendDir . DIRECTORY_SEPARATOR . $fileName)) {
+                            $fileUrl = '/uploads/' . $fileName;
+                            $saved = true;
+                        }
+                    }
+                } catch (\Throwable $feEx) {
+                    \Illuminate\Support\Facades\Log::warning("Frontend upload failed: " . $feEx->getMessage());
+                }
+            }
+
+            // Strategy 4: If still not saved, use Laravel Storage disk ('public')
+            if (!$saved) {
+                try {
+                    $path = \Illuminate\Support\Facades\Storage::disk('public')->putFileAs('uploads', $file, $fileName);
+                    if ($path) {
+                        $fileUrl = '/storage/' . $path;
+                        $saved = true;
+                    }
+                } catch (\Throwable $storageEx) {
+                    \Illuminate\Support\Facades\Log::warning("Storage disk putFileAs failed: " . $storageEx->getMessage());
                 }
             }
 
             // Auto-sync ke frontend/public/uploads jika folder frontend tersedia
-            try {
-                $frontendPublic = base_path('../frontend/public/uploads');
-                if (file_exists(base_path('../frontend/public'))) {
-                    if (!is_dir($frontendPublic)) {
-                        @mkdir($frontendPublic, 0777, true);
-                    }
-                    if (file_exists($targetDir . DIRECTORY_SEPARATOR . $fileName)) {
+            if ($saved && file_exists($targetDir . DIRECTORY_SEPARATOR . $fileName)) {
+                try {
+                    $frontendPublic = base_path('../frontend/public/uploads');
+                    if (file_exists(base_path('../frontend/public'))) {
+                        if (!is_dir($frontendPublic)) {
+                            @mkdir($frontendPublic, 0777, true);
+                        }
                         @copy($targetDir . DIRECTORY_SEPARATOR . $fileName, $frontendPublic . DIRECTORY_SEPARATOR . $fileName);
                     }
+                } catch (\Throwable $syncEx) {
+                    // Ignore non-critical sync errors
                 }
-            } catch (\Throwable $syncEx) {
-                // Ignore non-critical sync errors
+            }
+
+            if (!$saved) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Folder uploads di server belum memiliki izin tulis. Jalankan perintah: chmod -R 777 /www/wwwroot/katalog.unsmadiun.id/backend/public/uploads',
+                ], 422);
             }
 
             return response()->json([
@@ -220,8 +233,8 @@ class SettingController extends Controller
             \Illuminate\Support\Facades\Log::error('Upload exception: ' . $e->getMessage());
             return response()->json([
                 'success' => false,
-                'message' => 'Terjadi kesalahan sistem saat unggah: ' . $e->getMessage(),
-            ], 500);
+                'message' => 'Terjadi kesalahan saat unggah: ' . $e->getMessage(),
+            ], 422);
         }
     }
 }

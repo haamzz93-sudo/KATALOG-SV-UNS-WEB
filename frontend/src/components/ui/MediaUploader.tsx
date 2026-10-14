@@ -124,22 +124,6 @@ export const MediaUploader: React.FC<MediaUploaderProps> = ({
         body: formData,
       });
 
-      // Fallback endpoint if /api/v1/public/upload not reachable
-      if (!res.ok && API_BASE.includes("/api/v1")) {
-        try {
-          const directRes = await fetch(`/api/public/upload`, {
-            method: "POST",
-            headers: { Accept: "application/json" },
-            body: formData,
-          });
-          if (directRes.ok) {
-            res = directRes;
-          }
-        } catch {
-          // Ignore secondary fallback
-        }
-      }
-
       if (res.ok) {
         const json = await res.json();
         const serverUrl = json.url || localUrl;
