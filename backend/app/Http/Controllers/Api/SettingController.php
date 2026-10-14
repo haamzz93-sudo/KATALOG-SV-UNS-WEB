@@ -80,39 +80,53 @@ class SettingController extends Controller
      */
     public function upload(Request $request): JsonResponse
     {
-        $request->validate([
-            'file' => 'required|file|max:51200', // Max 50MB
-        ]);
-
-        $file = $request->file('file');
-        $mime = $file->getMimeType();
-        $isImage = str_starts_with($mime, 'image/');
-        $isVideo = str_starts_with($mime, 'video/');
-
-        if (!$isImage && !$isVideo) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Format file tidak didukung. Harap upload gambar (JPG, PNG, WEBP, SVG) atau video (MP4, WEBM).',
-            ], 422);
-        }
-
-        // Limit images to max 10MB
-        if ($isImage && $file->getSize() > 10 * 1024 * 1024) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Ukuran foto melebihi batas maksimal 10MB.',
-            ], 422);
-        }
-
-        // Limit videos to max 50MB
-        if ($isVideo && $file->getSize() > 50 * 1024 * 1024) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Ukuran video melebihi batas maksimal 50MB.',
-            ], 422);
-        }
-
         try {
+            if (!$request->hasFile('file')) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Tidak ada berkas yang diunggah.',
+                ], 422);
+            }
+
+            $file = $request->file('file');
+            if (!$file || !$file->isValid()) {
+                $err = $file ? $file->getErrorMessage() : 'Berkas tidak ditemukan.';
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Unggahan berkas tidak valid: ' . $err,
+                ], 422);
+            }
+
+            $realPath = $file->getRealPath();
+            $fileBytes = ($realPath && file_exists($realPath)) ? @file_get_contents($realPath) : null;
+
+            $mime = $file->getMimeType() ?: ($file->getClientMimeType() ?: 'application/octet-stream');
+            $isImage = str_starts_with($mime, 'image/');
+            $isVideo = str_starts_with($mime, 'video/');
+
+            if (!$isImage && !$isVideo) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Format file tidak didukung. Harap upload gambar (JPG, PNG, WEBP, SVG) atau video (MP4, WEBM).',
+                ], 422);
+            }
+
+            // Limit images to max 10MB
+            if ($isImage && $file->getSize() > 10 * 1024 * 1024) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Ukuran foto melebihi batas maksimal 10MB.',
+                ], 422);
+            }
+
+            // Limit videos to max 50MB
+            if ($isVideo && $file->getSize() > 50 * 1024 * 1024) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Ukuran video melebihi batas maksimal 50MB.',
+                ], 422);
+            }
+
             $extension = $file->getClientOriginalExtension() ?: ($isImage ? 'png' : 'mp4');
             $fileName = ($isImage ? 'img_' : 'vid_') . time() . '_' . Str::random(8) . '.' . $extension;
 
@@ -146,34 +160,35 @@ class SettingController extends Controller
                 }
             }
 
-            // Strategy 3: Direct file_put_contents if move failed
-            if (!$saved) {
+            // Strategy 3: Direct file_put_contents if bytes available
+            if (!$saved && $fileBytes !== null) {
                 try {
-                    $bytes = file_get_contents($file->getRealPath());
                     if (is_dir($targetDir)) {
-                        file_put_contents($targetDir . DIRECTORY_SEPARATOR . $fileName, $bytes);
-                        $fileUrl = '/uploads/' . $fileName;
-                        $saved = true;
+                        @file_put_contents($targetDir . DIRECTORY_SEPARATOR . $fileName, $fileBytes);
+                        if (file_exists($targetDir . DIRECTORY_SEPARATOR . $fileName)) {
+                            $fileUrl = '/uploads/' . $fileName;
+                            $saved = true;
+                        }
                     }
                 } catch (\Throwable $putEx) {
                     \Illuminate\Support\Facades\Log::warning("file_put_contents failed: " . $putEx->getMessage());
                 }
             }
 
+            // Strategy 4: Safe Base64 Data URL fallback (100% resilient)
             if (!$saved) {
-                try {
-                    $bytes = file_get_contents($file->getRealPath());
-                    $base64 = base64_encode($bytes);
+                if ($fileBytes !== null) {
+                    $base64 = base64_encode($fileBytes);
                     $dataUrl = 'data:' . $mime . ';base64,' . $base64;
                     return response()->json([
                         'success' => true,
                         'url' => $dataUrl,
                         'message' => 'File diproses aman sebagai data URL.',
                     ]);
-                } catch (\Throwable $dataEx) {
+                } else {
                     return response()->json([
                         'success' => false,
-                        'message' => 'Gagal menyimpan file ke server: ' . $dataEx->getMessage(),
+                        'message' => 'Gagal membaca isi berkas untuk disimpan ke server.',
                     ], 500);
                 }
             }

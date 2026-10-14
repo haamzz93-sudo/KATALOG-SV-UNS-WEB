@@ -425,9 +425,42 @@ export default function CreateProdiItem() {
                   if (url) setThumbnailUrl(url);
                 }}
               />
-              {/* AI STUDIO EDIT FOTO KATALOG (GEMINI AI) */}
-              <div className="pt-2">
-                <button
+            </div>
+
+            <div className="space-y-4">
+              <MediaUploader
+                label="Video Demo / Walkthrough (Drag & Drop)"
+                description="Upload video MP4/WEBM (Maks 50MB, durasi maks 2 menit)"
+                acceptedType="video"
+                maxSizeMb={50}
+                maxDurationSeconds={120}
+                currentUrl={liveDemoUrl && liveDemoUrl.match(/\.(mp4|webm)$/i) ? liveDemoUrl : undefined}
+                onUploadSuccess={(url) => {
+                  if (url) setLiveDemoUrl(url);
+                }}
+              />
+
+              <div>
+                <label className="text-xs sm:text-sm font-bold text-slate-700 dark:text-slate-300 block mb-1">
+                  Atau URL Live Demo Sandbox / 3D Embed
+                </label>
+                <input
+                  type="url"
+                  value={liveDemoUrl}
+                  onChange={(e) => setLiveDemoUrl(e.target.value)}
+                  placeholder="https://demo-aplikasi.vokasi.uns.ac.id"
+                  className="w-full px-4 py-2 text-sm rounded-full border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-white focus:outline-none focus:border-[#C5A059]"
+                />
+                <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1">
+                  Tautan web interaktif (iframe Sandbox) atau link embed Spline 3D.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          {/* AI STUDIO EDIT FOTO KATALOG (GEMINI AI) - FULL WIDTH */}
+          <div className="pt-3 border-t border-slate-100 dark:border-slate-800/80">
+            <button
                   type="button"
                   onClick={() => setIsAiStudioOpen(!isAiStudioOpen)}
                   style={{ borderRadius: "9999px" }}
@@ -706,38 +739,6 @@ export default function CreateProdiItem() {
                   </div>
                 )}
               </div>
-            </div>
-
-            <div className="space-y-4">
-              <MediaUploader
-                label="Video Demo / Walkthrough (Drag & Drop)"
-                description="Upload video MP4/WEBM (Maks 50MB, durasi maks 2 menit)"
-                acceptedType="video"
-                maxSizeMb={50}
-                maxDurationSeconds={120}
-                currentUrl={liveDemoUrl && liveDemoUrl.match(/\.(mp4|webm)$/i) ? liveDemoUrl : undefined}
-                onUploadSuccess={(url) => {
-                  if (url) setLiveDemoUrl(url);
-                }}
-              />
-
-              <div>
-                <label className="text-xs sm:text-sm font-bold text-slate-700 dark:text-slate-300 block mb-1">
-                  Atau URL Live Demo Sandbox / 3D Embed
-                </label>
-                <input
-                  type="url"
-                  value={liveDemoUrl}
-                  onChange={(e) => setLiveDemoUrl(e.target.value)}
-                  placeholder="https://demo-aplikasi.vokasi.uns.ac.id"
-                  className="w-full px-4 py-2 text-sm rounded-full border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-white focus:outline-none focus:border-[#C5A059]"
-                />
-                <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-1">
-                  Tautan web interaktif (iframe Sandbox) atau link embed Spline 3D.
-                </p>
-              </div>
-            </div>
-          </div>
         </div>
 
         {/* Card 3: Spesifikasi Teknis Dinamis (Elemen 4) */}
