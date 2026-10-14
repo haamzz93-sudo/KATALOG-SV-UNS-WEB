@@ -99,7 +99,7 @@ export default function CreateProdiItem() {
         rawImageBase64: aiRawPhoto || thumbnailUrl || undefined,
         customPrompt: aiPrompt,
         namaItem: namaItem.trim() || "Produk Inovasi Vokasi UNS",
-        domain: settings.ai_default_domain || "spsbu.unsmadiun.id",
+        domain: settings.ai_default_domain || "katalog.unsmadiun.id",
       };
 
       let res = await fetch(`${API_BASE}/public/ai/catalog-photo`, {
@@ -397,7 +397,7 @@ export default function CreateProdiItem() {
                         <span>Generator 3 Foto Multi-Sudut (HD Landscape)</span>
                       </span>
                       <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-amber-100 dark:bg-amber-950/80 text-amber-800 dark:text-amber-300 font-bold">
-                        Domain: {settings.ai_default_domain || "spsbu.unsmadiun.id"}
+                        Domain: {settings.ai_default_domain || "katalog.unsmadiun.id"}
                       </span>
                     </div>
 

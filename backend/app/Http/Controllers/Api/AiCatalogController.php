@@ -33,7 +33,7 @@ class AiCatalogController extends Controller
 
             $domain = $request->input('domain', '');
             if (empty($domain)) {
-                $domain = SiteSetting::get('ai_default_domain') ?: 'spsbu.unsmadiun.id';
+                $domain = SiteSetting::get('ai_default_domain') ?: 'katalog.unsmadiun.id';
             }
 
             // 1. Konsultasi / Pembuatan Prompt Presisi via Gemini 2.5 Flash jika API Key tersedia
@@ -95,7 +95,7 @@ class AiCatalogController extends Controller
                 'tampak_display' => $geminiEnhancedPrompt['display_prompt'] ?? "Dynamic aesthetic marketplace lifestyle hero display of {$baseSubject}, modern presentation setup, premium commercial showcase",
             ];
 
-            // 3. Generate 3 Foto Dinamis HD Landscape (1280x720)
+            // 3. Generate 3 Foto Dinamis HD Landscape (1280x720) via Turbo Model (No Paywall)
             $seedBase = time();
             $photos = [
                 [
@@ -103,21 +103,21 @@ class AiCatalogController extends Controller
                     'title' => 'Tampak Depan (Front View)',
                     'angle' => 'Sudut Depan Presisi',
                     'prompt' => $prompts['tampak_depan'],
-                    'url' => "https://image.pollinations.ai/prompt/" . rawurlencode($prompts['tampak_depan']) . "?width=1280&height=720&seed=" . ($seedBase + 1) . "&nologo=true&enhance=true",
+                    'url' => "https://image.pollinations.ai/prompt/" . rawurlencode($prompts['tampak_depan']) . "?width=1280&height=720&seed=" . ($seedBase + 1) . "&model=turbo&nologo=true",
                 ],
                 [
                     'id' => 'side',
                     'title' => 'Tampak Samping (Isometric / Side Angle)',
                     'angle' => 'Sudut Samping 45°',
                     'prompt' => $prompts['tampak_samping'],
-                    'url' => "https://image.pollinations.ai/prompt/" . rawurlencode($prompts['tampak_samping']) . "?width=1280&height=720&seed=" . ($seedBase + 2) . "&nologo=true&enhance=true",
+                    'url' => "https://image.pollinations.ai/prompt/" . rawurlencode($prompts['tampak_samping']) . "?width=1280&height=720&seed=" . ($seedBase + 2) . "&model=turbo&nologo=true",
                 ],
                 [
                     'id' => 'display',
                     'title' => 'Display Marketplace (Hero Showcase)',
                     'angle' => 'Display Komersial HD',
                     'prompt' => $prompts['tampak_display'],
-                    'url' => "https://image.pollinations.ai/prompt/" . rawurlencode($prompts['tampak_display']) . "?width=1280&height=720&seed=" . ($seedBase + 3) . "&nologo=true&enhance=true",
+                    'url' => "https://image.pollinations.ai/prompt/" . rawurlencode($prompts['tampak_display']) . "?width=1280&height=720&seed=" . ($seedBase + 3) . "&model=turbo&nologo=true",
                 ],
             ];
 

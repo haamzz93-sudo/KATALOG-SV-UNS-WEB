@@ -12,7 +12,7 @@ export async function POST(req: NextRequest) {
       rawImageBase64,
       customPrompt,
       namaItem = "Produk Inovasi Vokasi",
-      domain = "spsbu.unsmadiun.id"
+      domain = "katalog.unsmadiun.id"
     } = body;
 
     const activeKey = (apiKey && apiKey.trim()) || DEFAULT_GEMINI_API_KEY;
@@ -76,7 +76,7 @@ Format respon HANYA berupa JSON valid dengan struktur:
       tampak_display: (geminiEnhancedPrompt as any)?.display_prompt || `Dynamic aesthetic marketplace lifestyle hero display of ${baseSubject}, modern presentation setup, premium commercial showcase`,
     };
 
-    // 3. Generate 3 Foto Dinamis HD Landscape (1280x720)
+    // 3. Generate 3 Foto Dinamis HD Landscape (1280x720) via Turbo Model (No Paywall)
     const seedBase = Date.now();
     const photos = [
       {
@@ -84,21 +84,21 @@ Format respon HANYA berupa JSON valid dengan struktur:
         title: "Tampak Depan (Front View)",
         angle: "Sudut Depan Presisi",
         prompt: prompts.tampak_depan,
-        url: `https://image.pollinations.ai/prompt/${encodeURIComponent(prompts.tampak_depan)}?width=1280&height=720&seed=${seedBase + 1}&nologo=true&enhance=true`,
+        url: `https://image.pollinations.ai/prompt/${encodeURIComponent(prompts.tampak_depan)}?width=1280&height=720&seed=${seedBase + 1}&model=turbo&nologo=true`,
       },
       {
         id: "side",
         title: "Tampak Samping (Isometric / Side Angle)",
         angle: "Sudut Samping 45°",
         prompt: prompts.tampak_samping,
-        url: `https://image.pollinations.ai/prompt/${encodeURIComponent(prompts.tampak_samping)}?width=1280&height=720&seed=${seedBase + 2}&nologo=true&enhance=true`,
+        url: `https://image.pollinations.ai/prompt/${encodeURIComponent(prompts.tampak_samping)}?width=1280&height=720&seed=${seedBase + 2}&model=turbo&nologo=true`,
       },
       {
         id: "display",
         title: "Display Marketplace (Hero Showcase)",
         angle: "Display Komersial HD",
         prompt: prompts.tampak_display,
-        url: `https://image.pollinations.ai/prompt/${encodeURIComponent(prompts.tampak_display)}?width=1280&height=720&seed=${seedBase + 3}&nologo=true&enhance=true`,
+        url: `https://image.pollinations.ai/prompt/${encodeURIComponent(prompts.tampak_display)}?width=1280&height=720&seed=${seedBase + 3}&model=turbo&nologo=true`,
       },
     ];
 

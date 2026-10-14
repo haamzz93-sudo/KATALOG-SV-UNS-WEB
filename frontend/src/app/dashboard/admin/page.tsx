@@ -81,7 +81,7 @@ function AdminDashboardContent() {
 
   // AI Prompt Studio Setting State
   const [aiApiKey, setAiApiKey] = useState(settings.gemini_api_key || process.env.NEXT_PUBLIC_GEMINI_API_KEY || "");
-  const [aiDomain, setAiDomain] = useState(settings.ai_default_domain || "spsbu.unsmadiun.id");
+  const [aiDomain, setAiDomain] = useState(settings.ai_default_domain || "katalog.unsmadiun.id");
   const [aiPromptTemplate, setAiPromptTemplate] = useState(
     settings.ai_default_prompt || "Tolong buatkan gambar dinamis ukuran landscape (1280x720 pixel), produk untuk display katalog produk pada marketplace. Pastikan hasilnya menjadi produk bagus, dinamis, kualitas HD, layak jual. Desain clean, tidak terlalu banyak kalimat."
   );
@@ -5881,11 +5881,11 @@ function AdminDashboardContent() {
                     type="text"
                     value={aiDomain}
                     onChange={(e) => setAiDomain(e.target.value)}
-                    placeholder="spsbu.unsmadiun.id"
+                    placeholder="katalog.unsmadiun.id"
                     className="w-full px-4 py-2.5 text-xs sm:text-sm font-medium rounded-full border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-white focus:outline-none focus:border-[#C5A059]"
                   />
                   <p className="text-[11px] text-slate-400 mt-1">
-                    Domain resmi hilirisasi bisnis (misal: <code>spsbu.unsmadiun.id</code> atau <code>katalog.unsmadiun.id</code>).
+                    Domain resmi hilirisasi bisnis (misal: <code>katalog.unsmadiun.id</code>).
                   </p>
                 </div>
 
