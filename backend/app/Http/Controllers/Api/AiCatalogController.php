@@ -186,8 +186,114 @@ class AiCatalogController extends Controller
                 }
             }
 
-            // 3. Susun 4 Prompt Fotografi Marketplace
-            $displayItem = (!empty($namaItem) && !str_contains($namaItem, 'Belum diisi')) ? "\"{$namaItem}\"" : "innovation product";
+            // 2b. Mesin Fotografi Produk AI Photoroom (Presisi 100% Produk Fisik Asli)
+            $photoroomKey = $request->input('photoroom_api_key')
+                ?: SiteSetting::get('photoroom_api_key')
+                ?: env('PHOTOROOM_API_KEY', 'sandbox_sk_pr_kataloguns_1dba88ad21d6609f8fd00ac6058273fae7de8253');
+
+            if (!empty($photoroomKey) && !empty($rawImageBase64)) {
+                try {
+                    $cleanBase64 = preg_replace('#^data:image/\w+;base64,#i', '', $rawImageBase64);
+                    $rawBytes = base64_decode($cleanBase64);
+
+                    if ($rawBytes && strlen($rawBytes) > 500) {
+                        $photoroomScenes = [
+                            'hero' => [
+                                'title' => '1. Foto Utama (Hero Marketplace)',
+                                'angle' => 'Foto Utama',
+                                'badge' => 'Studio 3D Pedestal',
+                                'desc' => 'Fokus utama produk asli di atas podium studio ivory 3D, pencahayaan komersial, bayangan kontak halus.',
+                                'prompt' => 'commercial hero product photography, stand-up pouch on clean minimalist white cylindrical studio pedestal, soft studio rim lighting, clean light grey background, photorealistic 8k',
+                                'padding' => '0.2',
+                            ],
+                            'detail' => [
+                                'title' => '2. Detail & Kualitas (Macro Shot)',
+                                'angle' => 'Meyakinkan Kualitas',
+                                'badge' => 'Macro Craftsmanship',
+                                'desc' => 'Macro close-up produk menonjolkan kerapian finishing, tekstur material, dan ketajaman printing.',
+                                'prompt' => 'editorial macro photography, extreme close up on product, soft studio lighting, clean background, sharp textures',
+                                'padding' => '0.05',
+                            ],
+                            'benefit' => [
+                                'title' => '3. Keunggulan & Fitur (Infografis)',
+                                'angle' => 'Alasan Membeli',
+                                'badge' => 'Modern Presentation',
+                                'desc' => 'Presentasi produk modern pada platform kaca studio minimalis dengan pencahayaan bersih.',
+                                'prompt' => 'commercial high-end product presentation on modern floating glass platform, pure white minimalist studio backdrop, soft lighting',
+                                'padding' => '0.15',
+                            ],
+                            'lifestyle' => [
+                                'title' => '4. Konteks Penggunaan (Lifestyle)',
+                                'angle' => 'Konteks Real Use',
+                                'badge' => 'Real Tabletop',
+                                'desc' => 'Fotografi gaya hidup realistis produk asli di atas meja kayu hangat dengan cahaya alami jendela pagi.',
+                                'prompt' => 'commercial lifestyle product photography, pouch on warm natural oak wood table, soft natural sunlight from window, beautiful interior, soft shadow',
+                                'padding' => '0.18',
+                            ],
+                        ];
+
+                        $prPhotos = [];
+                        $timestamp = time();
+
+                        foreach ($photoroomScenes as $sceneKey => $sceneCfg) {
+                            try {
+                                $prRes = Http::timeout(45)
+                                    ->withHeaders(['x-api-key' => $photoroomKey])
+                                    ->attach('imageFile', $rawBytes, 'product.png')
+                                    ->post('https://image-api.photoroom.com/v2/edit', [
+                                        'background.prompt' => $sceneCfg['prompt'],
+                                        'shadow.mode' => 'ai.soft',
+                                        'padding' => $sceneCfg['padding'],
+                                    ]);
+
+                                if ($prRes->successful() && strlen($prRes->body()) > 1000) {
+                                    $fileName = 'pr_' . $sceneKey . '_' . $timestamp . '_' . Str::random(6) . '.png';
+                                    $targetPath = public_path('uploads/' . $fileName);
+                                    @file_put_contents($targetPath, $prRes->body());
+
+                                    // Sinkron ke frontend public uploads
+                                    $fePath = base_path('../frontend/public/uploads/' . $fileName);
+                                    @file_put_contents($fePath, $prRes->body());
+
+                                    $photoUrl = '/api/v1/public/file/' . $fileName;
+                                    $prPhotos[] = [
+                                        'id' => $sceneKey,
+                                        'title' => $sceneCfg['title'],
+                                        'angle' => $sceneCfg['angle'],
+                                        'badge' => $sceneCfg['badge'],
+                                        'desc' => $sceneCfg['desc'],
+                                        'url' => $photoUrl,
+                                        'directUrl' => $photoUrl,
+                                        'prompt' => $sceneCfg['prompt'],
+                                    ];
+                                }
+                            } catch (\Throwable $prEx) {
+                                Log::warning("Photoroom {$sceneKey} call error: " . $prEx->getMessage());
+                            }
+                        }
+
+                        if (count($prPhotos) === 4) {
+                            return response()->json([
+                                'success' => true,
+                                'message' => '4 foto marketplace fotorealistik berhasil dihasilkan dengan Photoroom AI!',
+                                'data' => [
+                                    'nama_item' => $namaItem,
+                                    'tagline' => $tagline,
+                                    'kategori' => $kategori,
+                                    'detail_labels' => $detailLabels,
+                                    'benefit_headline' => $benefitHeadline,
+                                    'photos' => $prPhotos,
+                                    'engine' => 'photoroom_ai',
+                                ],
+                            ]);
+                        }
+                    }
+                } catch (\Throwable $prOuterEx) {
+                    Log::warning('Photoroom outer exception: ' . $prOuterEx->getMessage());
+                }
+            }
+
+            // 3. Susun 4 Prompt Fotografi Marketplace (Fallback Diffusions)
             $baseSubject = !empty($rawImageBase64)
                 ? "commercial product packaging for {$displayItem} ({$kategori}), clean studio lighting, 8k resolution, photorealistic, sharp focus, 16:9 landscape aspect ratio, premium marketplace catalog showcase"
                 : "commercial {$kategori} product {$displayItem}, high quality commercial product photography for {$domain}, clean studio lighting, 8k resolution, photorealistic, sharp focus, 16:9 landscape aspect ratio, premium marketplace catalog showcase";

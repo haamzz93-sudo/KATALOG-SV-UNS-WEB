@@ -147,7 +147,57 @@ export default function CreateProdiItem() {
       return;
     }
 
-    // 1. Prioritaskan Studio Komposisi Produk Asli (100% Presisi tanpa Distorsi AI)
+    // 1. Prioritaskan Backend Photoroom AI (Fotografi Produk AI Fotorealistik 3D)
+    if (rawImg) {
+      try {
+        const API_BASE = typeof window !== "undefined" ? "/api/v1" : (process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000/api/v1");
+        const payload = {
+          apiKey: settings.gemini_api_key,
+          photoroom_api_key: settings.photoroom_api_key || "sandbox_sk_pr_kataloguns_1dba88ad21d6609f8fd00ac6058273fae7de8253",
+          namaItem: namaItem.trim() || "Produk Inovasi Vokasi UNS",
+          tagline: tagline.trim() || undefined,
+          kategori: aiKategori,
+          detailLabels: aiDetailLabels,
+          benefitHeadline: aiBenefitHeadline,
+          rawImageBase64: rawImg,
+          customPrompt: aiPrompt,
+        };
+
+        let res = await fetch(`${API_BASE}/public/ai/catalog-photo`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json", Accept: "application/json" },
+          body: JSON.stringify(payload),
+        });
+
+        if (!res.ok) {
+          res = await fetch("/api/ai/catalog-photo", {
+            method: "POST",
+            headers: { "Content-Type": "application/json", Accept: "application/json" },
+            body: JSON.stringify(payload),
+          });
+        }
+
+        if (res.ok) {
+          const data = await res.json();
+          if (data.success && (data.data?.photos || data.photos)) {
+            const resultPhotos = data.data?.photos || data.photos;
+            setAiPhotos(resultPhotos);
+            toast.success(
+              "4 Foto Marketplace Siap!",
+              data.data?.engine === "photoroom_ai"
+                ? "Foto produk marketplace fotorealistik berhasil dihasilkan dengan Photoroom AI!"
+                : "4 foto katalog standar marketplace profesional berhasil diproses!"
+            );
+            setAiLoading(false);
+            return;
+          }
+        }
+      } catch (backendErr) {
+        console.warn("Backend Photoroom call error, falling back to local studio generator:", backendErr);
+      }
+    }
+
+    // 2. Fallback Studio Komposisi Produk Asli Presisi (Local Canvas Generator)
     if (rawImg && !forceAi) {
       try {
         const studioPhotos = await generateStudioMarketplacePhotos({
@@ -163,72 +213,16 @@ export default function CreateProdiItem() {
           "4 Foto Marketplace Siap!",
           "Produk asli Anda berhasil dikomposisikan ke 4 standar marketplace HD (Hero, Macro Detail, Infografis, Lifestyle) secara presisi 100%!"
         );
-        setAiLoading(false);
-        return;
       } catch (err: any) {
         console.error("Studio generator error:", err);
         toast.error(
           "Gagal Komposisi Studio Foto",
           err?.message || "Terjadi kendala saat memproses gambar produk mentah."
         );
+      } finally {
         setAiLoading(false);
-        return;
       }
-    }
-
-    // 2. Generator AI Backend (Gemini 2.5 Flash)
-    try {
-      const API_BASE = typeof window !== "undefined" ? "/api/v1" : (process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000/api/v1");
-      const payload = {
-        apiKey: settings.gemini_api_key,
-        namaItem: namaItem.trim() || "Produk Inovasi Vokasi UNS",
-        tagline: tagline.trim() || undefined,
-        kategori: aiKategori,
-        detailLabels: aiDetailLabels,
-        benefitHeadline: aiBenefitHeadline,
-        rawImageBase64: rawImg,
-        customPrompt: aiPrompt,
-        templateHero: settings.ai_prompt_1_hero,
-        templateDetail: settings.ai_prompt_2_detail,
-        templateBenefit: settings.ai_prompt_3_benefit,
-        templateLifestyle: settings.ai_prompt_4_lifestyle,
-        templateConsistency: settings.ai_prompt_consistency,
-        domain: settings.ai_default_domain || "spsbu.unsmadiun.id",
-      };
-
-      let res = await fetch(`${API_BASE}/public/ai/catalog-photo`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json", Accept: "application/json" },
-        body: JSON.stringify(payload),
-      });
-
-      if (!res.ok) {
-        // Fallback endpoint
-        res = await fetch("/api/ai/catalog-photo", {
-          method: "POST",
-          headers: { "Content-Type": "application/json", Accept: "application/json" },
-          body: JSON.stringify(payload),
-        });
-      }
-
-      let data: any = {};
-      try {
-        data = await res.json();
-      } catch (jsonErr) {
-        throw new Error("Respon server bukan JSON yang valid. Pastikan server backend aktif.");
-      }
-
-      if (res.ok && data.success && (data.data?.photos || data.photos)) {
-        const resultPhotos = data.data?.photos || data.photos;
-        setAiPhotos(resultPhotos);
-        toast.success("Foto Marketplace Siap", "4 foto katalog standar marketplace profesional berhasil dihasilkan!");
-      } else {
-        toast.error("Gagal Studio Foto", data.message || "Gagal memproses gambar");
-      }
-    } catch (e: any) {
-      toast.error("Error Studio Foto", e.message || "Terjadi kesalahan koneksi");
-    } finally {
-      setAiLoading(false);
+      return;
     }
   };
 
