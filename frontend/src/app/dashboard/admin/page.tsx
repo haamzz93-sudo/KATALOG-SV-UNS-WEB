@@ -10,7 +10,7 @@ import {
   Globe, Palette, Settings2, UploadCloud, Key, Search, Lock, Award, Laptop,
   Briefcase, Handshake, ExternalLink, ExternalLink as ExtLink, TrendingUp, Box, Cpu, Wrench, Building2, Package,
   GraduationCap, Navigation, X, LayoutGrid, SlidersHorizontal, AlignLeft, AlignRight,
-  Star, Quote, Camera, Image as ImageIcon, Wand2, Bot
+  Star, Quote, Camera, Image as ImageIcon
 } from "lucide-react";
 import { api } from "../../../lib/api";
 import { CatalogItem } from "../../../types/catalog";
@@ -99,22 +99,41 @@ function AdminDashboardContent() {
     setIsAiTesting(true);
     setAiTestResult(null);
     try {
-      const res = await fetch("/api/ai/test-key", {
+      const API_BASE = process.env.NEXT_PUBLIC_API_URL || (typeof window !== "undefined" ? "/api/v1" : "http://127.0.0.1:8000/api/v1");
+      const payload = { apiKey: aiApiKey };
+
+      let res = await fetch(`${API_BASE}/public/ai/test-key`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ apiKey: aiApiKey }),
+        headers: { "Content-Type": "application/json", Accept: "application/json" },
+        body: JSON.stringify(payload),
       });
-      const data = await res.json();
+
+      if (!res.ok) {
+        // Fallback endpoint
+        res = await fetch("/api/ai/test-key", {
+          method: "POST",
+          headers: { "Content-Type": "application/json", Accept: "application/json" },
+          body: JSON.stringify(payload),
+        });
+      }
+
+      let data: any = {};
+      try {
+        data = await res.json();
+      } catch (jsonErr) {
+        throw new Error("Respon server bukan JSON yang valid. Pastikan server backend aktif.");
+      }
+
       if (res.ok && data.success) {
-        setAiTestResult({ success: true, message: data.message + ` (${data.model})` });
+        setAiTestResult({ success: true, message: data.message + ` (${data.model || "gemini-2.5-flash"})` });
         toast.success("Koneksi Gemini Berhasil", data.message);
       } else {
         setAiTestResult({ success: false, message: data.message || "Gagal menghubungi Gemini API" });
-        toast.error("Gagal Koneksi", data.message);
+        toast.error("Gagal Koneksi", data.message || "Gagal menghubungi Gemini API");
       }
     } catch (e: any) {
       setAiTestResult({ success: false, message: e.message || "Kesalahan jaringan" });
-      toast.error("Error", e.message);
+      toast.error("Error", e.message || "Kesalahan jaringan");
     } finally {
       setIsAiTesting(false);
     }
@@ -1676,8 +1695,8 @@ function AdminDashboardContent() {
               : "text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-white/50 dark:hover:bg-white/10"
           }`}
         >
-          <Wand2 className="w-4 h-4 shrink-0 text-amber-300" />
-          <span>Setting Prompt AI Studio</span>
+          <SlidersHorizontal className="w-4 h-4 shrink-0 text-amber-300" />
+          <span>Prompt Studio Visual</span>
         </button>
       </div>
 
@@ -5766,11 +5785,11 @@ function AdminDashboardContent() {
           <div className="p-6 rounded-3xl bg-white dark:bg-[#07192C] border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
               <span className="text-xs font-bold uppercase tracking-wider text-amber-500 flex items-center gap-1.5">
-                <Wand2 className="w-4 h-4 text-amber-500" />
-                <span>Google Gemini 2.5 Flash Studio & AI Editor</span>
+                <Camera className="w-4 h-4 text-amber-500" />
+                <span>Google Gemini 2.5 Flash Studio Visual</span>
               </span>
               <h3 className="font-extrabold text-xl text-slate-900 dark:text-white mt-0.5">
-                Setting Prompt AI Edit Foto Katalog
+                Setting Prompt & Visual Studio Foto Katalog
               </h3>
               <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1">
                 Kelola API Key Google Gemini, domain display marketplace hilirisasi, serta konfigurasi prompt dinamis untuk generator 3 foto katalog (Tampak Depan, Tampak Samping, & Display Komersial).
@@ -5892,8 +5911,8 @@ function AdminDashboardContent() {
             <div className="space-y-6">
               <div className="p-6 rounded-3xl bg-gradient-to-br from-amber-500/10 via-amber-500/5 to-transparent border border-amber-500/20 shadow-sm space-y-4">
                 <h4 className="font-extrabold text-sm sm:text-base text-amber-700 dark:text-amber-300 flex items-center gap-2">
-                  <Bot className="w-5 h-5 text-amber-500" />
-                  <span>Spesifikasi Output AI Studio</span>
+                  <Camera className="w-5 h-5 text-amber-500" />
+                  <span>Spesifikasi Output Visual Studio</span>
                 </h4>
                 <div className="space-y-3 text-xs text-slate-600 dark:text-slate-300">
                   <div className="p-3 rounded-2xl bg-white/70 dark:bg-slate-900/70 border border-amber-500/20">

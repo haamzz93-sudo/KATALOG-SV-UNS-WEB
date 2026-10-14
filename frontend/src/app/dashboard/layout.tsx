@@ -7,7 +7,7 @@ import {
   LayoutDashboard, PlusCircle, BarChart3, Users, 
   LogOut, Sun, Moon, ArrowLeft, Shield, Building2,
   ExternalLink, Bell, Search, CheckCircle2, ChevronRight,
-  Menu, X, Pin, PinOff, Globe, Film, HelpCircle, ShieldCheck, Handshake, GraduationCap, Wand2
+  Menu, X, Pin, PinOff, Globe, Film, HelpCircle, ShieldCheck, Handshake, GraduationCap, Camera
 } from "lucide-react";
 import { useApp } from "../../context/AppContext";
 import { useToast } from "../../context/ToastContext";
@@ -452,7 +452,7 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
                   <Link
                     href="/dashboard/admin?tab=ai_prompt"
                     onClick={() => setMobileMenuOpen(false)}
-                    title="Setting Prompt AI (Gemini Studio)"
+                    title="Studio Visual & Prompt Setting"
                     style={{ borderRadius: "9999px" }}
                     className={`flex items-center transition-all ${
                       isExpanded ? "justify-between px-3.5 py-2.5 rounded-full" : "justify-center w-11 h-11 rounded-2xl mx-auto"
@@ -463,8 +463,8 @@ function DashboardLayoutContent({ children }: { children: React.ReactNode }) {
                     }`}
                   >
                     <div className="flex items-center gap-3">
-                      <Wand2 className="w-4 h-4 text-amber-400 shrink-0" />
-                      {isExpanded && <span className="whitespace-nowrap !text-white font-semibold">Setting Prompt AI</span>}
+                      <Camera className="w-4 h-4 text-amber-400 shrink-0" />
+                      {isExpanded && <span className="whitespace-nowrap !text-white font-semibold">Studio Visual & Prompt</span>}
                     </div>
                     {isExpanded && pathname === "/dashboard/admin" && activeAdminTab === "ai_prompt" && (
                       <ChevronRight className="w-3.5 h-3.5 text-sky-300 shrink-0" />

@@ -6,7 +6,7 @@ import Link from "next/link";
 import { 
   ArrowLeft, Plus, Trash2, CheckCircle2, 
   Laptop, Cpu, Wrench, Save, GraduationCap,
-  Wand2, Bot, RefreshCw, Eye, Download, Check, UploadCloud, ChevronDown
+  Camera, SlidersHorizontal, RefreshCw, Eye, Download, Check, UploadCloud, ChevronDown
 } from "lucide-react";
 import { api } from "../../../../lib/api";
 import { useToast } from "../../../../context/ToastContext";
@@ -91,29 +91,48 @@ export default function CreateProdiItem() {
   const handleGenerateAiPhotos = async () => {
     setAiLoading(true);
     try {
-      const res = await fetch("/api/ai/catalog-photo", {
+      const API_BASE = process.env.NEXT_PUBLIC_API_URL || (typeof window !== "undefined" ? "/api/v1" : "http://127.0.0.1:8000/api/v1");
+      const payload = {
+        apiKey: settings.gemini_api_key,
+        jenis: aiJenis,
+        subJenis: aiSubJenis,
+        rawImageBase64: aiRawPhoto || thumbnailUrl || undefined,
+        customPrompt: aiPrompt,
+        namaItem: namaItem.trim() || "Produk Inovasi Vokasi UNS",
+        domain: settings.ai_default_domain || "spsbu.unsmadiun.id",
+      };
+
+      let res = await fetch(`${API_BASE}/public/ai/catalog-photo`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          apiKey: settings.gemini_api_key,
-          jenis: aiJenis,
-          subJenis: aiSubJenis,
-          rawImageBase64: aiRawPhoto || thumbnailUrl || undefined,
-          customPrompt: aiPrompt,
-          namaItem: namaItem.trim() || "Produk Inovasi Vokasi UNS",
-          domain: settings.ai_default_domain || "spsbu.unsmadiun.id",
-        }),
+        headers: { "Content-Type": "application/json", Accept: "application/json" },
+        body: JSON.stringify(payload),
       });
 
-      const data = await res.json();
-      if (res.ok && data.success && data.data?.photos) {
-        setAiPhotos(data.data.photos);
-        toast.success("Foto AI Siap", "3 sudut foto produk katalog kualitas HD berhasil dihasilkan!");
+      if (!res.ok) {
+        // Fallback endpoint
+        res = await fetch("/api/ai/catalog-photo", {
+          method: "POST",
+          headers: { "Content-Type": "application/json", Accept: "application/json" },
+          body: JSON.stringify(payload),
+        });
+      }
+
+      let data: any = {};
+      try {
+        data = await res.json();
+      } catch (jsonErr) {
+        throw new Error("Respon server bukan JSON yang valid. Pastikan server backend aktif.");
+      }
+
+      if (res.ok && data.success && (data.data?.photos || data.photos)) {
+        const resultPhotos = data.data?.photos || data.photos;
+        setAiPhotos(resultPhotos);
+        toast.success("Foto Studio Siap", "3 sudut foto produk katalog kualitas HD berhasil dihasilkan!");
       } else {
-        toast.error("Gagal AI Studio", data.message || "Gagal memproses gambar");
+        toast.error("Gagal Studio Foto", data.message || "Gagal memproses gambar");
       }
     } catch (e: any) {
-      toast.error("Error AI Studio", e.message || "Terjadi kesalahan koneksi");
+      toast.error("Error Studio Foto", e.message || "Terjadi kesalahan koneksi");
     } finally {
       setAiLoading(false);
     }
@@ -364,8 +383,8 @@ export default function CreateProdiItem() {
                   className="w-full py-2.5 px-4 rounded-full bg-gradient-to-r from-amber-500/15 to-[#0F4C81]/15 hover:from-amber-500/25 hover:to-[#0F4C81]/25 text-[#0F4C81] dark:text-amber-300 font-extrabold text-xs border border-amber-400/40 dark:border-amber-500/30 flex items-center justify-between transition cursor-pointer shadow-xs"
                 >
                   <div className="flex items-center gap-2">
-                    <Wand2 className="w-4 h-4 text-amber-500" />
-                    <span>✨ AI Studio: Edit & Generate Foto Katalog (Gemini AI)</span>
+                    <Camera className="w-4 h-4 text-amber-500" />
+                    <span>Studio Foto Visual Katalog (Multi-Angle Studio)</span>
                   </div>
                   <ChevronDown className={`w-4 h-4 text-slate-500 transition-transform duration-200 ${isAiStudioOpen ? "rotate-180" : ""}`} />
                 </button>
@@ -374,7 +393,7 @@ export default function CreateProdiItem() {
                   <div className="mt-3 p-4 sm:p-5 rounded-2xl bg-slate-50 dark:bg-slate-900/90 border border-amber-400/30 dark:border-amber-500/20 space-y-4 text-left shadow-inner">
                     <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-2">
                       <span className="text-xs font-bold text-amber-600 dark:text-amber-400 flex items-center gap-1.5">
-                        <Bot className="w-4 h-4" />
+                        <SlidersHorizontal className="w-4 h-4" />
                         <span>Generator 3 Foto Multi-Sudut (HD Landscape)</span>
                       </span>
                       <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-amber-100 dark:bg-amber-950/80 text-amber-800 dark:text-amber-300 font-bold">
@@ -510,14 +529,14 @@ export default function CreateProdiItem() {
                       className="w-full py-2.5 rounded-full bg-gradient-to-r from-amber-500 to-[#0F4C81] hover:from-amber-600 hover:to-[#135996] text-white font-black text-xs shadow-md transition flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
                     >
                       <RefreshCw className={`w-3.5 h-3.5 ${aiLoading ? "animate-spin" : ""}`} />
-                      <span>{aiLoading ? "Memproses 3 Foto AI..." : "Proses AI: Hasilkan 3 Foto HD (Tampak Depan, Samping & Display)"}</span>
+                      <span>{aiLoading ? "Memproses 3 Foto Studio..." : "Hasilkan 3 Foto HD (Tampak Depan, Samping & Display)"}</span>
                     </button>
 
                     {/* 6. Hasil 3 Foto Produk */}
                     {aiPhotos.length > 0 && (
                       <div className="pt-2 space-y-3">
                         <span className="text-xs font-black text-slate-900 dark:text-white block border-b border-slate-200 dark:border-slate-800 pb-1">
-                          📸 Hasil Foto AI (Klik untuk Memilih Mockup Utama):
+                          📸 Hasil Foto Studio (Klik untuk Memilih Mockup Utama):
                         </span>
                         <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                           {aiPhotos.map((photo) => (

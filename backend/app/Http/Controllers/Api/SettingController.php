@@ -112,33 +112,90 @@ class SettingController extends Controller
             ], 422);
         }
 
-        $extension = $file->getClientOriginalExtension() ?: ($isImage ? 'png' : 'mp4');
-        $fileName = ($isImage ? 'img_' : 'vid_') . time() . '_' . Str::random(8) . '.' . $extension;
+        try {
+            $extension = $file->getClientOriginalExtension() ?: ($isImage ? 'png' : 'mp4');
+            $fileName = ($isImage ? 'img_' : 'vid_') . time() . '_' . Str::random(8) . '.' . $extension;
 
-        $targetDir = public_path('uploads');
-        if (!file_exists($targetDir)) {
-            mkdir($targetDir, 0755, true);
-        }
-
-        $file->move($targetDir, $fileName);
-        $fileUrl = '/uploads/' . $fileName;
-
-        // Auto-sync ke frontend/public/uploads jika tersedia (baik lokal maupun struktur VPS)
-        $frontendPublic = base_path('../frontend/public/uploads');
-        if (file_exists(base_path('../frontend/public'))) {
-            if (!file_exists($frontendPublic)) {
-                @mkdir($frontendPublic, 0755, true);
+            $targetDir = public_path('uploads');
+            if (!is_dir($targetDir)) {
+                @mkdir($targetDir, 0777, true);
             }
-            @copy($targetDir . DIRECTORY_SEPARATOR . $fileName, $frontendPublic . DIRECTORY_SEPARATOR . $fileName);
-        }
+            @chmod($targetDir, 0777);
 
-        return response()->json([
-            'success' => true,
-            'message' => ($isImage ? 'Foto' : 'Video') . ' berhasil diunggah.',
-            'url' => $fileUrl,
-            'type' => $isImage ? 'image' : 'video',
-            'file_name' => $fileName,
-            'size_bytes' => $file->getSize(),
-        ]);
+            $saved = false;
+            $fileUrl = '/uploads/' . $fileName;
+
+            // Strategy 1: Direct move to public/uploads
+            if (is_dir($targetDir) && is_writable($targetDir)) {
+                try {
+                    $file->move($targetDir, $fileName);
+                    $saved = true;
+                } catch (\Throwable $moveEx) {
+                    \Illuminate\Support\Facades\Log::warning("Direct upload move failed: " . $moveEx->getMessage());
+                }
+            }
+
+            // Strategy 2: If direct move failed or folder not writable, use Laravel Storage disk ('public')
+            if (!$saved) {
+                try {
+                    $path = \Illuminate\Support\Facades\Storage::disk('public')->putFileAs('uploads', $file, $fileName);
+                    $fileUrl = '/storage/' . $path;
+                    $saved = true;
+                } catch (\Throwable $storageEx) {
+                    \Illuminate\Support\Facades\Log::warning("Storage disk putFileAs failed: " . $storageEx->getMessage());
+                }
+            }
+
+            // Strategy 3: Direct file_put_contents if move failed
+            if (!$saved) {
+                try {
+                    $bytes = file_get_contents($file->getRealPath());
+                    if (is_dir($targetDir)) {
+                        file_put_contents($targetDir . DIRECTORY_SEPARATOR . $fileName, $bytes);
+                        $fileUrl = '/uploads/' . $fileName;
+                        $saved = true;
+                    }
+                } catch (\Throwable $putEx) {
+                    \Illuminate\Support\Facades\Log::warning("file_put_contents failed: " . $putEx->getMessage());
+                }
+            }
+
+            if (!$saved) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Gagal menyimpan file ke server (Folder uploads tidak dapat ditulisi).',
+                ], 500);
+            }
+
+            // Auto-sync ke frontend/public/uploads jika folder frontend tersedia
+            try {
+                $frontendPublic = base_path('../frontend/public/uploads');
+                if (file_exists(base_path('../frontend/public'))) {
+                    if (!is_dir($frontendPublic)) {
+                        @mkdir($frontendPublic, 0777, true);
+                    }
+                    if (file_exists($targetDir . DIRECTORY_SEPARATOR . $fileName)) {
+                        @copy($targetDir . DIRECTORY_SEPARATOR . $fileName, $frontendPublic . DIRECTORY_SEPARATOR . $fileName);
+                    }
+                }
+            } catch (\Throwable $syncEx) {
+                // Ignore non-critical sync errors
+            }
+
+            return response()->json([
+                'success' => true,
+                'message' => ($isImage ? 'Foto' : 'Video') . ' berhasil diunggah.',
+                'url' => $fileUrl,
+                'type' => $isImage ? 'image' : 'video',
+                'file_name' => $fileName,
+                'size_bytes' => $file->getSize(),
+            ]);
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error('Upload exception: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Terjadi kesalahan sistem saat unggah: ' . $e->getMessage(),
+            ], 500);
+        }
     }
 }

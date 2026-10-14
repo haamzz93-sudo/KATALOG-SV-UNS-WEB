@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\AdminController;
+use App\Http\Controllers\Api\AiCatalogController;
 use App\Http\Controllers\Api\AuthController;
 use App\Http\Controllers\Api\PimpinanController;
 use App\Http\Controllers\Api\ProdiCatalogController;
@@ -20,6 +21,8 @@ $registerRoutes = function () {
         Route::get('/settings', [SettingController::class, 'index']);
         Route::post('/upload', [SettingController::class, 'upload']);
         Route::get('/stats', [PimpinanController::class, 'dashboardStats']);
+        Route::post('/ai/catalog-photo', [AiCatalogController::class, 'generatePhotos']);
+        Route::post('/ai/test-key', [AiCatalogController::class, 'testKey']);
     });
 
     // 2. Auth Endpoints
@@ -64,11 +67,13 @@ $registerRoutes = function () {
         });
     });
 
-    // Public fallback for settings & prodi update
+    // Public fallback for settings & prodi update & direct AI endpoints
     Route::post('/settings', [SettingController::class, 'update']);
     Route::post('/admin/prodis', [AdminController::class, 'storeProdi']);
     Route::put('/admin/prodis/{id}', [AdminController::class, 'updateProdi']);
     Route::delete('/admin/prodis/{id}', [AdminController::class, 'deleteProdi']);
+    Route::post('/ai/catalog-photo', [AiCatalogController::class, 'generatePhotos']);
+    Route::post('/ai/test-key', [AiCatalogController::class, 'testKey']);
 };
 
 Route::prefix('v1')->group($registerRoutes);

@@ -101,18 +101,44 @@ export const MediaUploader: React.FC<MediaUploaderProps> = ({
     setPreviewUrl(localUrl);
     setMediaType(isVid ? "video" : "image");
 
+    // Helper for self-contained data URL fallback
+    const readAsDataUrl = (f: File): Promise<string> =>
+      new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result as string);
+        reader.onerror = () => resolve(localUrl);
+        reader.readAsDataURL(f);
+      });
+
     try {
       const formData = new FormData();
       formData.append("file", file);
 
-      const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000/api/v1";
-      const res = await fetch(`${API_BASE}/public/upload`, {
+      const API_BASE = process.env.NEXT_PUBLIC_API_URL || (typeof window !== "undefined" ? "/api/v1" : "http://127.0.0.1:8000/api/v1");
+      
+      let res = await fetch(`${API_BASE}/public/upload`, {
         method: "POST",
         headers: {
           Accept: "application/json",
         },
         body: formData,
       });
+
+      // Fallback endpoint if /api/v1/public/upload not reachable
+      if (!res.ok && API_BASE.includes("/api/v1")) {
+        try {
+          const directRes = await fetch(`/api/public/upload`, {
+            method: "POST",
+            headers: { Accept: "application/json" },
+            body: formData,
+          });
+          if (directRes.ok) {
+            res = directRes;
+          }
+        } catch {
+          // Ignore secondary fallback
+        }
+      }
 
       if (res.ok) {
         const json = await res.json();
@@ -124,16 +150,20 @@ export const MediaUploader: React.FC<MediaUploaderProps> = ({
           sizeMb: Number(sizeMb.toFixed(2)),
         });
       } else {
-        // Fallback to local object URL
-        onUploadSuccess(localUrl, {
+        // Fallback to data URL so the media persists across reloads and database saves
+        const safeDataUrl = !isVid ? await readAsDataUrl(file) : localUrl;
+        setPreviewUrl(safeDataUrl);
+        onUploadSuccess(safeDataUrl, {
           type: isVid ? "video" : "image",
           duration: videoDuration || undefined,
           sizeMb: Number(sizeMb.toFixed(2)),
         });
       }
     } catch {
-      // Offline fallback: Use object URL so user workflow is uninterrupted
-      onUploadSuccess(localUrl, {
+      // Offline fallback: Use data URL so user workflow is uninterrupted
+      const safeDataUrl = !isVid ? await readAsDataUrl(file) : localUrl;
+      setPreviewUrl(safeDataUrl);
+      onUploadSuccess(safeDataUrl, {
         type: isVid ? "video" : "image",
         duration: videoDuration || undefined,
         sizeMb: Number(sizeMb.toFixed(2)),
