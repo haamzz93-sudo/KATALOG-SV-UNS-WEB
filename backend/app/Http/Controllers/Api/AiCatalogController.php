@@ -286,16 +286,14 @@ class AiCatalogController extends Controller
         $fetchUrl = "https://image.pollinations.ai/prompt/{$encoded}?width={$width}&height={$height}&seed={$seed}&model=turbo&nologo=true";
 
         try {
-            // Request strictly without Referer header to bypass x402 paywall
-            $response = Http::withoutHeader('Referer')
-                ->withHeaders([
+            $response = Http::withHeaders([
                     'User-Agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36',
                     'Accept' => 'image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8',
                 ])
-                ->timeout(25)
+                ->timeout(30)
                 ->get($fetchUrl);
 
-            if ($response->successful()) {
+            if ($response->successful() && strlen($response->body()) > 500) {
                 return response($response->body(), 200)
                     ->header('Content-Type', $response->header('Content-Type') ?: 'image/jpeg')
                     ->header('Cache-Control', 'public, max-age=86400, stale-while-revalidate=43200')
@@ -304,15 +302,18 @@ class AiCatalogController extends Controller
 
             // Fallback without model parameter
             $fallbackUrl = "https://image.pollinations.ai/prompt/{$encoded}?width={$width}&height={$height}&seed={$seed}&nologo=true";
-            $fallbackRes = Http::withoutHeader('Referer')
-                ->withHeaders(['User-Agent' => 'Mozilla/5.0'])
-                ->timeout(20)
+            $fallbackRes = Http::withHeaders([
+                    'User-Agent' => 'Mozilla/5.0',
+                    'Accept' => 'image/*',
+                ])
+                ->timeout(25)
                 ->get($fallbackUrl);
 
-            if ($fallbackRes->successful()) {
+            if ($fallbackRes->successful() && strlen($fallbackRes->body()) > 500) {
                 return response($fallbackRes->body(), 200)
                     ->header('Content-Type', $fallbackRes->header('Content-Type') ?: 'image/jpeg')
-                    ->header('Cache-Control', 'public, max-age=86400');
+                    ->header('Cache-Control', 'public, max-age=86400')
+                    ->header('Access-Control-Allow-Origin', '*');
             }
         } catch (\Throwable $e) {
             Log::warning('Laravel proxyImage error: ' . $e->getMessage());

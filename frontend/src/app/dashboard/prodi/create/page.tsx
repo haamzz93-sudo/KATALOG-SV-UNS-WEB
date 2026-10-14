@@ -684,8 +684,8 @@ export default function CreateProdiItem() {
                                     onError={(e) => {
                                       // Fallback jika upstream memblokir: load via direct proxy
                                       const target = e.currentTarget;
-                                      if (!target.src.includes("/api/ai/image-proxy") && photo.prompt) {
-                                        target.src = `/api/ai/image-proxy?prompt=${encodeURIComponent(photo.prompt)}&width=1280&height=720`;
+                                      if (!target.src.includes("/api/v1/public/ai/image-proxy") && photo.prompt) {
+                                        target.src = `/api/v1/public/ai/image-proxy?prompt=${encodeURIComponent(photo.prompt)}&width=1280&height=720`;
                                       }
                                     }}
                                   />

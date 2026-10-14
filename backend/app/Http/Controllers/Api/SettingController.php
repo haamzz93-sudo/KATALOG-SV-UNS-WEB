@@ -215,6 +215,19 @@ class SettingController extends Controller
             }
 
             if (!$saved) {
+                if ($fileBytes !== null) {
+                    $base64 = base64_encode($fileBytes);
+                    $dataUrl = 'data:' . $mime . ';base64,' . $base64;
+                    return response()->json([
+                        'success' => true,
+                        'message' => ($isImage ? 'Foto' : 'Video') . ' berhasil diproses.',
+                        'url' => $dataUrl,
+                        'type' => $isImage ? 'image' : 'video',
+                        'file_name' => $fileName,
+                        'size_bytes' => strlen($fileBytes),
+                    ]);
+                }
+
                 return response()->json([
                     'success' => false,
                     'message' => 'Folder uploads di server belum memiliki izin tulis. Jalankan perintah: chmod -R 777 /www/wwwroot/katalog.unsmadiun.id/backend/public/uploads',
