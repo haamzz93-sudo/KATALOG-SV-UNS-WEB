@@ -161,10 +161,21 @@ class SettingController extends Controller
             }
 
             if (!$saved) {
-                return response()->json([
-                    'success' => false,
-                    'message' => 'Gagal menyimpan file ke server (Folder uploads tidak dapat ditulisi).',
-                ], 500);
+                try {
+                    $bytes = file_get_contents($file->getRealPath());
+                    $base64 = base64_encode($bytes);
+                    $dataUrl = 'data:' . $mime . ';base64,' . $base64;
+                    return response()->json([
+                        'success' => true,
+                        'url' => $dataUrl,
+                        'message' => 'File diproses aman sebagai data URL.',
+                    ]);
+                } catch (\Throwable $dataEx) {
+                    return response()->json([
+                        'success' => false,
+                        'message' => 'Gagal menyimpan file ke server: ' . $dataEx->getMessage(),
+                    ], 500);
+                }
             }
 
             // Auto-sync ke frontend/public/uploads jika folder frontend tersedia

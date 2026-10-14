@@ -629,37 +629,47 @@ export default function CreateProdiItem() {
                           </span>
                         </div>
 
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                           {aiPhotos.map((photo) => (
                             <div
                               key={photo.id}
-                              className={`rounded-2xl p-2.5 border transition flex flex-col justify-between ${
+                              style={{ borderRadius: "20px" }}
+                              className={`p-3 border transition-all duration-200 flex flex-col justify-between shadow-xs ${
                                 thumbnailUrl === photo.url
-                                  ? "border-emerald-500 bg-emerald-50/50 dark:bg-emerald-950/40 ring-2 ring-emerald-500/30"
-                                  : "border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 hover:border-amber-400"
+                                  ? "border-emerald-500 bg-emerald-50/60 dark:bg-emerald-950/40 ring-2 ring-emerald-500/40 shadow-sm"
+                                  : "border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/90 hover:border-amber-400"
                               }`}
                             >
                               <div>
-                                <div className="relative aspect-video rounded-xl overflow-hidden bg-slate-100 dark:bg-slate-900 mb-2">
+                                <div className="relative w-full aspect-video min-h-[135px] rounded-xl overflow-hidden bg-slate-100 dark:bg-slate-950/80 mb-2.5 flex items-center justify-center border border-slate-200/60 dark:border-slate-700/60">
                                   <img
                                     src={photo.url}
                                     alt={photo.title}
-                                    className="w-full h-full object-cover"
+                                    referrerPolicy="no-referrer"
+                                    loading="lazy"
+                                    className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
+                                    onError={(e) => {
+                                      // Fallback jika upstream memblokir: load via direct proxy
+                                      const target = e.currentTarget;
+                                      if (!target.src.includes("/api/ai/image-proxy") && photo.prompt) {
+                                        target.src = `/api/ai/image-proxy?prompt=${encodeURIComponent(photo.prompt)}&width=1280&height=720`;
+                                      }
+                                    }}
                                   />
-                                  <span className="absolute top-1.5 left-1.5 px-2 py-0.5 rounded-full bg-slate-950/80 text-[9.5px] font-bold text-white shadow-xs">
+                                  <span className="absolute top-1.5 left-1.5 px-2 py-0.5 rounded-full bg-slate-950/85 backdrop-blur-xs text-[9.5px] font-bold text-white shadow-xs z-10">
                                     {photo.angle || photo.badge}
                                   </span>
                                 </div>
-                                <h5 className="font-bold text-[11px] text-slate-900 dark:text-white truncate mb-1">
+                                <h5 className="font-bold text-xs text-slate-900 dark:text-white truncate mb-1">
                                   {photo.title}
                                 </h5>
                                 {photo.desc && (
-                                  <p className="text-[10px] text-slate-500 dark:text-slate-400 leading-snug line-clamp-2 mb-2">
+                                  <p className="text-[10px] text-slate-500 dark:text-slate-400 leading-snug line-clamp-2 mb-2.5">
                                     {photo.desc}
                                   </p>
                                 )}
                               </div>
-                              <div className="flex items-center gap-1.5 pt-1 border-t border-slate-100 dark:border-slate-700/60">
+                              <div className="flex items-center gap-2 pt-2 border-t border-slate-100 dark:border-slate-700/60 mt-auto">
                                 <button
                                   type="button"
                                   onClick={() => {
@@ -667,25 +677,25 @@ export default function CreateProdiItem() {
                                     toast.success("Foto Dipilih", `Foto "${photo.title}" dijadikan sebagai mockup produk.`);
                                   }}
                                   style={{ borderRadius: "9999px" }}
-                                  className={`flex-1 py-1 px-2 rounded-full text-[10px] font-bold transition flex items-center justify-center gap-1 cursor-pointer ${
+                                  className={`flex-1 py-1.5 px-3 rounded-full text-xs font-bold transition flex items-center justify-center gap-1.5 cursor-pointer shadow-xs ${
                                     thumbnailUrl === photo.url
-                                      ? "bg-emerald-600 text-white"
+                                      ? "bg-emerald-600 text-white hover:bg-emerald-700"
                                       : "bg-[#0F4C81] text-white hover:bg-[#135996]"
                                   }`}
                                 >
-                                  <Check className="w-3 h-3" />
+                                  <Check className="w-3.5 h-3.5" />
                                   <span>{thumbnailUrl === photo.url ? "Terpilih" : "Gunakan"}</span>
                                 </button>
                                 <a
                                   href={photo.url}
                                   target="_blank"
-                                  rel="noopener noreferrer"
+                                  rel="noreferrer noopener"
                                   download
                                   style={{ borderRadius: "9999px" }}
-                                  className="p-1 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:text-amber-500"
-                                  title="Buka / Unduh HD"
+                                  className="p-1.5 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:text-amber-500 hover:bg-amber-50 dark:hover:bg-amber-950/40 transition cursor-pointer"
+                                  title="Buka / Unduh HD 1280x720"
                                 >
-                                  <Download className="w-3 h-3" />
+                                  <Download className="w-3.5 h-3.5" />
                                 </a>
                               </div>
                             </div>
