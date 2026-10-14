@@ -111,6 +111,7 @@ class SettingController extends Controller
 
             $realPath = $file->getRealPath();
             $fileBytes = ($realPath && file_exists($realPath)) ? @file_get_contents($realPath) : null;
+            $fileSize = $fileBytes !== null ? strlen($fileBytes) : (@$file->getSize() ?: 0);
 
             $mime = $file->getMimeType() ?: ($file->getClientMimeType() ?: 'application/octet-stream');
             $isImage = str_starts_with($mime, 'image/');
@@ -124,7 +125,7 @@ class SettingController extends Controller
             }
 
             // Limit images to max 10MB
-            if ($isImage && $file->getSize() > 10 * 1024 * 1024) {
+            if ($isImage && $fileSize > 10 * 1024 * 1024) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Ukuran foto melebihi batas maksimal 10MB.',
@@ -132,7 +133,7 @@ class SettingController extends Controller
             }
 
             // Limit videos to max 50MB
-            if ($isVideo && $file->getSize() > 50 * 1024 * 1024) {
+            if ($isVideo && $fileSize > 50 * 1024 * 1024) {
                 return response()->json([
                     'success' => false,
                     'message' => 'Ukuran video melebihi batas maksimal 50MB.',
@@ -252,7 +253,7 @@ class SettingController extends Controller
                 'url' => $fileUrl,
                 'type' => $isImage ? 'image' : 'video',
                 'file_name' => $fileName,
-                'size_bytes' => $file->getSize(),
+                'size_bytes' => $fileSize,
             ]);
         } catch (\Throwable $e) {
             \Illuminate\Support\Facades\Log::error('Upload exception: ' . $e->getMessage());

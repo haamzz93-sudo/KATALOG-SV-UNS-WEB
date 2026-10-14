@@ -722,8 +722,12 @@ export default function CreateProdiItem() {
                                     className="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
                                     onError={(e) => {
                                       const target = e.currentTarget;
-                                      if (photo.directUrl && target.src !== photo.directUrl) {
-                                        target.src = photo.directUrl;
+                                      const currentSrc = target.src;
+                                      if (!currentSrc.includes("retry=2")) {
+                                        const retryCount = currentSrc.includes("retry=1") ? "retry=2" : "retry=1";
+                                        setTimeout(() => {
+                                          target.src = photo.url + (photo.url.includes("?") ? "&" : "?") + retryCount;
+                                        }, 1200);
                                       }
                                     }}
                                   />

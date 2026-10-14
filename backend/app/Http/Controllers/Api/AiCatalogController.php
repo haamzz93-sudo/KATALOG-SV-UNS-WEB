@@ -209,8 +209,8 @@ class AiCatalogController extends Controller
                     'badge' => 'Hero Product',
                     'desc' => 'Fokus utama, background bersih (putih/ivory), pencahayaan studio lembut, identitas logo & warna presisi.',
                     'prompt' => $prompts['hero'],
-                    'url' => "/api/v1/public/ai/image-proxy?prompt=" . rawurlencode($prompts['hero']) . "&seed=" . ($seedBase + 1) . "&width=1280&height=720",
-                    'directUrl' => "https://image.pollinations.ai/prompt/" . rawurlencode($prompts['hero']) . "?width=1280&height=720&seed=" . ($seedBase + 1) . "&model=turbo&nologo=true",
+                    'url' => "/api/v1/public/ai/image-proxy?prompt=" . rawurlencode($prompts['hero']) . "&seed=" . ($seedBase + 1) . "&width=1024&height=576",
+                    'directUrl' => "/api/v1/public/ai/image-proxy?prompt=" . rawurlencode($prompts['hero']) . "&seed=" . ($seedBase + 1) . "&width=1280&height=720",
                 ],
                 [
                     'id' => 'detail',
@@ -219,8 +219,8 @@ class AiCatalogController extends Controller
                     'badge' => 'Detail & Quality',
                     'desc' => 'Macro shot tekstur, material, kerapian finishing & kemasan untuk meyakinkan calon pembeli/mitra.',
                     'prompt' => $prompts['detail'],
-                    'url' => "/api/v1/public/ai/image-proxy?prompt=" . rawurlencode($prompts['detail']) . "&seed=" . ($seedBase + 2) . "&width=1280&height=720",
-                    'directUrl' => "https://image.pollinations.ai/prompt/" . rawurlencode($prompts['detail']) . "?width=1280&height=720&seed=" . ($seedBase + 2) . "&model=turbo&nologo=true",
+                    'url' => "/api/v1/public/ai/image-proxy?prompt=" . rawurlencode($prompts['detail']) . "&seed=" . ($seedBase + 2) . "&width=1024&height=576",
+                    'directUrl' => "/api/v1/public/ai/image-proxy?prompt=" . rawurlencode($prompts['detail']) . "&seed=" . ($seedBase + 2) . "&width=1280&height=720",
                 ],
                 [
                     'id' => 'benefit',
@@ -229,8 +229,8 @@ class AiCatalogController extends Controller
                     'badge' => 'Key Features',
                     'desc' => 'Tampilan infografis modern menyajikan poin keunggulan dan alasan mengapa produk ini layak dipilih.',
                     'prompt' => $prompts['benefit'],
-                    'url' => "/api/v1/public/ai/image-proxy?prompt=" . rawurlencode($prompts['benefit']) . "&seed=" . ($seedBase + 3) . "&width=1280&height=720",
-                    'directUrl' => "https://image.pollinations.ai/prompt/" . rawurlencode($prompts['benefit']) . "?width=1280&height=720&seed=" . ($seedBase + 3) . "&model=turbo&nologo=true",
+                    'url' => "/api/v1/public/ai/image-proxy?prompt=" . rawurlencode($prompts['benefit']) . "&seed=" . ($seedBase + 3) . "&width=1024&height=576",
+                    'directUrl' => "/api/v1/public/ai/image-proxy?prompt=" . rawurlencode($prompts['benefit']) . "&seed=" . ($seedBase + 3) . "&width=1280&height=720",
                 ],
                 [
                     'id' => 'lifestyle',
@@ -239,8 +239,8 @@ class AiCatalogController extends Controller
                     'badge' => 'Real Context',
                     'desc' => 'Fotografi kontekstual penggunaan nyata produk sesuai kategori (meja kerja, lab, konsumsi, atau aktivitas sehari-hari).',
                     'prompt' => $prompts['lifestyle'],
-                    'url' => "/api/v1/public/ai/image-proxy?prompt=" . rawurlencode($prompts['lifestyle']) . "&seed=" . ($seedBase + 4) . "&width=1280&height=720",
-                    'directUrl' => "https://image.pollinations.ai/prompt/" . rawurlencode($prompts['lifestyle']) . "?width=1280&height=720&seed=" . ($seedBase + 4) . "&model=turbo&nologo=true",
+                    'url' => "/api/v1/public/ai/image-proxy?prompt=" . rawurlencode($prompts['lifestyle']) . "&seed=" . ($seedBase + 4) . "&width=1024&height=576",
+                    'directUrl' => "/api/v1/public/ai/image-proxy?prompt=" . rawurlencode($prompts['lifestyle']) . "&seed=" . ($seedBase + 4) . "&width=1280&height=720",
                 ],
             ];
 
@@ -373,6 +373,10 @@ class AiCatalogController extends Controller
                 ->get($fallbackUrl);
 
             if ($fallbackRes->successful() && strlen($fallbackRes->body()) > 500) {
+                try {
+                    @file_put_contents($targetPath, $fallbackRes->body());
+                } catch (\Throwable $cEx) {}
+
                 return response($fallbackRes->body(), 200)
                     ->header('Content-Type', $fallbackRes->header('Content-Type') ?: 'image/jpeg')
                     ->header('Cache-Control', 'public, max-age=86400')
