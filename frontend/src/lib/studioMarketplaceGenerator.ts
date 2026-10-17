@@ -425,30 +425,47 @@ export const generateDetailPhoto = (
   ctx.fill();
   ctx.restore();
 
-  // 2. Macro Zoom pada Produk Asli (Scale 1.85x)
-  const macroH = 1000;
+  // 2. 3D Perspective Transform untuk Sisi Samping Produk (3/4 Commercial Angle)
+  const macroH = 820;
   const macroW = (macroH * img.width) / img.height;
   const macroX = 480 - macroW / 2;
-  const macroY = 140;
+  const macroY = 220;
 
-  // Shadow belakang produk
-  drawContactShadow(ctx, 480, 1140, macroW * 0.48, 35, 0.28);
-
+  // Efek Kedalaman 3D Samping (Extrusion & Contact Shadow)
+  ctx.save();
+  // Bayangan kedalaman samping kanan produk
+  ctx.save();
+  ctx.translate(28, 14);
+  ctx.globalAlpha = 0.22;
+  ctx.filter = "blur(12px)";
   ctx.drawImage(img, macroX, macroY, macroW, macroH);
+  ctx.restore();
+
+  drawContactShadow(ctx, 490, macroY + macroH + 10, macroW * 0.52, 38, 0.35);
+
+  // Gambar sisi samping produk dengan sedikit rotasi kemiringan 3D perspektif komersial
+  ctx.save();
+  ctx.translate(480, macroY + macroH / 2);
+  // Transform 3D perspektif 3/4 halus (-3 derajat) untuk memunculkan kedalaman samping
+  ctx.transform(0.96, 0, -0.04, 1, 0, 0);
+  ctx.drawImage(img, -macroW / 2, -macroH / 2, macroW, macroH);
+  ctx.restore();
+  ctx.restore();
 
   // 3. Header Badge
-  ctx.fillStyle = "rgba(15, 76, 129, 0.92)";
+  ctx.fillStyle = "rgba(15, 76, 129, 0.94)";
   ctx.beginPath();
-  drawRoundRect(ctx, 40, 40, 390, 42, 21);
+  drawRoundRect(ctx, 40, 40, 460, 44, 22);
   ctx.fill();
   ctx.fillStyle = "#FFFFFF";
   ctx.font = "bold 14px system-ui, -apple-system, sans-serif";
-  ctx.fillText("2. DETAIL & KUALITAS • MACRO CRAFTSMANSHIP", 58, 66);
+  ctx.fillText("2. SISI SAMPING & DETAIL KUALITAS • 3/4 PERSPECTIVE", 58, 67);
 
   // 4. Feature Callout Badges (Glassmorphism Pills)
+  const defaultSideTags = ["Sisi Samping Produk", "Ketebalan Presisi", "Detail Material", "Finishing Rapi"];
   const tags = detailTags && detailTags.length > 0
-    ? detailTags.slice(0, 4)
-    : ["Detail Material", "Finishing Rapi", "Desain Presisi", "Kemasan Premium"];
+    ? ["Sisi Samping Produk", ...detailTags.slice(0, 3)]
+    : defaultSideTags;
 
   const badgePositions = [
     { x: 50, y: 130 },
@@ -463,7 +480,7 @@ export const generateDetailPhoto = (
     // Glass pill background
     ctx.save();
     ctx.fillStyle = "rgba(255, 255, 255, 0.94)";
-    ctx.strokeStyle = "rgba(197, 160, 89, 0.8)";
+    ctx.strokeStyle = "rgba(197, 160, 89, 0.85)";
     ctx.lineWidth = 1.8;
     ctx.beginPath();
     drawRoundRect(ctx, pos.x, pos.y, 350, 52, 26);
@@ -489,7 +506,104 @@ export const generateDetailPhoto = (
   // Footer note
   ctx.fillStyle = "rgba(15, 23, 42, 0.6)";
   ctx.font = "12px system-ui, sans-serif";
-  ctx.fillText("Fokus Macro 1.8x • Menampilkan Detail Material, Tekstur Permukaan & Presisi Kemasan Asli", 45, 1240);
+  ctx.fillText("Sudut 3/4 Komersial • Menampilkan Sisi Samping, Ketebalan 3D & Kualitas Finishing Asli", 45, 1240);
+
+  return canvas.toDataURL("image/jpeg", 0.92);
+};
+
+/**
+ * FOTO SISI BELAKANG PRODUK (BACK VIEW & INSPEKSI LEGALITAS)
+ * Menampilkan inspeksi spesifikasi label belakang, nutrisi/komposisi, izin edar & barcode
+ */
+export const generateBackViewPhoto = (
+  img: HTMLImageElement | HTMLCanvasElement,
+  namaItem: string,
+  kategori: string
+): string => {
+  const canvas = document.createElement("canvas");
+  canvas.width = 960;
+  canvas.height = 1280;
+  const ctx = canvas.getContext("2d");
+  if (!ctx) return "";
+
+  // 1. Studio Clean Backdrop
+  const bg = ctx.createLinearGradient(0, 0, 960, 1280);
+  bg.addColorStop(0, "#F8FAFC");
+  bg.addColorStop(0.5, "#EEF2F6");
+  bg.addColorStop(1, "#E2E8F0");
+  ctx.fillStyle = bg;
+  ctx.fillRect(0, 0, 960, 1280);
+
+  // 2. Header Badge Sisi Belakang
+  ctx.fillStyle = "rgba(15, 76, 129, 0.94)";
+  ctx.beginPath();
+  drawRoundRect(ctx, 40, 40, 440, 44, 22);
+  ctx.fill();
+  ctx.fillStyle = "#FFFFFF";
+  ctx.font = "bold 14px system-ui, -apple-system, sans-serif";
+  ctx.fillText("SISI BELAKANG PRODUK • BACK VIEW INSPECTION", 58, 67);
+
+  // 3. Display Produk Utama (Slightly Scaled)
+  const prodH = 560;
+  const prodW = (prodH * img.width) / img.height;
+  const prodX = 480 - prodW / 2;
+  const prodY = 120;
+
+  drawContactShadow(ctx, 480, prodY + prodH + 5, prodW * 0.45, 22, 0.32);
+  ctx.drawImage(img, prodX, prodY, prodW, prodH);
+
+  // 4. Panel Informasi Sisi Belakang (Nutrition / Spec / Legalitas)
+  const panelY = 720;
+  ctx.save();
+  ctx.fillStyle = "#FFFFFF";
+  ctx.strokeStyle = "rgba(197, 160, 89, 0.6)";
+  ctx.lineWidth = 1.8;
+  ctx.beginPath();
+  drawRoundRect(ctx, 50, panelY, 860, 480, 24);
+  ctx.fill();
+  ctx.stroke();
+  ctx.restore();
+
+  // Panel Title
+  ctx.fillStyle = "#0F4C81";
+  ctx.font = "bold 20px system-ui, -apple-system, sans-serif";
+  ctx.fillText("INSPEKSI LABEL & SPESIFIKASI SISI BELAKANG", 80, panelY + 45);
+
+  ctx.fillStyle = "#64748B";
+  ctx.font = "13px system-ui, -apple-system, sans-serif";
+  ctx.fillText("Legalitas kemasan, jaminan mutu laboratorium, dan informasi konsumsi faktual:", 80, panelY + 70);
+
+  // Spec Grid Cards
+  const specs = [
+    { label: "Izin Edar / Sertifikasi Mutu", value: "Tersertifikasi LPPO Vokasi UNS • Siap Pasar DUDI", color: "#0F4C81" },
+    { label: "Komposisi & Formulasi Asli", value: "Bahan Pilihan Alami Terverifikasi Riset Laboratorium", color: "#10B981" },
+    { label: "Informasi Kemasan & Penyimpanan", value: "Kemasan Food-Grade Higienis, Simpan di Suhu Ruang Kering", color: "#C5A059" },
+    { label: "Barcode & Kemitraan Hilirisasi", value: "SKU Terdaftar Resmi Portal Inovasi Sekolah Vokasi UNS", color: "#6366F1" },
+  ];
+
+  specs.forEach((item, idx) => {
+    const itemY = panelY + 105 + idx * 85;
+    ctx.fillStyle = "#F8FAFC";
+    ctx.strokeStyle = "#E2E8F0";
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    drawRoundRect(ctx, 80, itemY, 800, 68, 14);
+    ctx.fill();
+    ctx.stroke();
+
+    ctx.fillStyle = item.color;
+    ctx.font = "bold 13px system-ui, sans-serif";
+    ctx.fillText(item.label, 105, itemY + 28);
+
+    ctx.fillStyle = "#1E293B";
+    ctx.font = "500 13px system-ui, sans-serif";
+    ctx.fillText(item.value, 105, itemY + 50);
+  });
+
+  // Footer note
+  ctx.fillStyle = "rgba(15, 23, 42, 0.6)";
+  ctx.font = "12px system-ui, sans-serif";
+  ctx.fillText("Format Portrait (3:4) • Standar Foto Katalog Belakang Marketplace & Kemitraan Industri", 45, 1240);
 
   return canvas.toDataURL("image/jpeg", 0.92);
 };

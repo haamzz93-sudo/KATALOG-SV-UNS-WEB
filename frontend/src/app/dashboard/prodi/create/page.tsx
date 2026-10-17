@@ -23,6 +23,7 @@ import {
   generateDetailPhoto,
   generateBenefitPhoto,
   generateLifestylePhoto,
+  generateBackViewPhoto,
 } from "../../../../lib/studioMarketplaceGenerator";
 
 export default function CreateProdiItem() {
@@ -147,6 +148,19 @@ export default function CreateProdiItem() {
   const [aiPhotos, setAiPhotos] = useState<any[]>([]);
   const [fullscreenPhoto, setFullscreenPhoto] = useState<any | null>(null);
   const [fullscreenIndex, setFullscreenIndex] = useState<number>(0);
+
+  // Kunci scroll halaman saat modal lightbox aktif agar tidak tembus
+  useEffect(() => {
+    if (typeof document === "undefined") return;
+    if (fullscreenPhoto) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "unset";
+    }
+    return () => {
+      document.body.style.overflow = "unset";
+    };
+  }, [fullscreenPhoto]);
 
   // Clean dynamic specs (Bebas dari data dummy)
   const [specs, setSpecs] = useState([
@@ -479,16 +493,16 @@ export default function CreateProdiItem() {
       setAiPhotos([...sequentialPhotos]);
       await delay(700);
 
-      // Step 2: Detail & Kualitas (Macro Shot)
+      // Step 2: Sisi Samping Produk (3/4 Perspective) & Detail Kualitas
       setGenerationStep(2);
-      setStepMessage("Langkah 2/4: Memproses Detail & Kualitas (Macro Craftsmanship Shot)...");
+      setStepMessage("Langkah 2/4: Memproses Sisi Samping Produk (3/4 Perspective) & Detail Finishing...");
       const detailUrl = generateDetailPhoto(isolatedImg, aiDetailLabels);
       const detailPhoto = {
         id: "detail",
-        title: "2. Detail & Kualitas (Macro Shot)",
-        angle: "Meyakinkan Kualitas",
-        badge: "Macro Shot 1.8x",
-        desc: "Macro zoom tajam pada tekstur material, finishing kemasan, dan badge karakter kualitas terlihat.",
+        title: "2. Sisi Samping & Detail Kualitas (3/4 Perspective)",
+        angle: "Sisi Samping 3/4",
+        badge: "3/4 Side Angle",
+        desc: "Sudut 3/4 komersial memperlihatkan sisi samping, ketebalan fisik 3D, dan kerapian finishing kemasan asli.",
         url: detailUrl,
         directUrl: detailUrl,
       };
@@ -496,19 +510,38 @@ export default function CreateProdiItem() {
       setAiPhotos([...sequentialPhotos]);
       await delay(700);
 
-      // Step 3: Keunggulan & Fitur Utama (Infografis)
+      // Step 3: Sisi Belakang Produk (Back View) ATAU Infografis Keunggulan
       setGenerationStep(3);
-      setStepMessage("Langkah 3/4: Menyusun Infografis Fitur & Alasan Membeli...");
-      const benefitUrl = generateBenefitPhoto(isolatedImg, aiBenefitHeadline, namaItem.trim() || "Produk Inovasi Vokasi UNS", aiKategori);
-      const benefitPhoto = {
-        id: "benefit",
-        title: "3. Keunggulan & Fitur (Infografis)",
-        angle: "Alasan Membeli",
-        badge: "Infografis Komersial",
-        desc: "Tata letak infografis portrait menyajikan headline dan 3 poin keunggulan utama produk inovasi.",
-        url: benefitUrl,
-        directUrl: benefitUrl,
-      };
+      const isBackSelected = aiSelectedAngles.some((a) => a.toLowerCase().includes("belakang") || a.toLowerCase().includes("back"));
+      
+      let benefitUrl: string;
+      let benefitPhoto: any;
+
+      if (isBackSelected) {
+        setStepMessage("Langkah 3/4: Membangun Foto Sisi Belakang (Back View & Inspeksi Legalitas)...");
+        benefitUrl = generateBackViewPhoto(isolatedImg, namaItem.trim() || "Produk Inovasi Vokasi UNS", aiKategori);
+        benefitPhoto = {
+          id: "back_view",
+          title: "3. Sisi Belakang Produk (Back View Inspection)",
+          angle: "Sisi Belakang",
+          badge: "Back View",
+          desc: "Inspeksi sisi belakang produk: label legalitas kemasan, jaminan mutu laboratorium, komposisi asli, dan barcode hilirisasi.",
+          url: benefitUrl,
+          directUrl: benefitUrl,
+        };
+      } else {
+        setStepMessage("Langkah 3/4: Menyusun Infografis Fitur & Alasan Membeli...");
+        benefitUrl = generateBenefitPhoto(isolatedImg, aiBenefitHeadline, namaItem.trim() || "Produk Inovasi Vokasi UNS", aiKategori);
+        benefitPhoto = {
+          id: "benefit",
+          title: "3. Keunggulan & Fitur (Infografis)",
+          angle: "Alasan Membeli",
+          badge: "Infografis Komersial",
+          desc: "Tata letak infografis portrait menyajikan headline dan 3 poin keunggulan utama produk inovasi.",
+          url: benefitUrl,
+          directUrl: benefitUrl,
+        };
+      }
       sequentialPhotos.push(benefitPhoto);
       setAiPhotos([...sequentialPhotos]);
       await delay(700);
@@ -622,25 +655,24 @@ export default function CreateProdiItem() {
           </p>
         </div>
 
-        {/* Auto-Save Draft Status Per Akun */}
-        <div className="flex items-center gap-2">
+        {/* Auto-Save Draft Status & Hapus Semua Button */}
+        <div className="flex flex-wrap items-center gap-2.5">
           {draftSavedAt && (
             <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-200 dark:border-emerald-800 text-[11px] font-semibold text-emerald-700 dark:text-emerald-300 shadow-xs">
               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
               <span>Draft tersimpan ({draftSavedAt})</span>
             </div>
           )}
-          {draftSavedAt && (
-            <button
-              type="button"
-              onClick={handleClearDraft}
-              title="Kosongkan formulir dan hapus draft akun ini"
-              className="px-3 py-1.5 rounded-full bg-slate-100 hover:bg-rose-50 text-slate-600 hover:text-rose-600 dark:bg-slate-800 dark:hover:bg-rose-950/40 dark:text-slate-300 dark:hover:text-rose-400 border border-slate-200 dark:border-slate-700 text-xs font-semibold transition flex items-center gap-1.5 cursor-pointer"
-            >
-              <Trash2 className="w-3.5 h-3.5" />
-              <span>Reset Form</span>
-            </button>
-          )}
+          <button
+            type="button"
+            onClick={handleClearDraft}
+            title="Kosongkan seluruh isian formulir, foto mockup, dan draft akun ini"
+            style={{ borderRadius: "9999px" }}
+            className="px-4 py-2 rounded-full bg-rose-50 hover:bg-rose-100 text-rose-600 dark:bg-rose-950/50 dark:hover:bg-rose-900/60 dark:text-rose-300 border border-rose-200 dark:border-rose-800 text-xs font-bold transition flex items-center gap-1.5 cursor-pointer shadow-xs"
+          >
+            <Trash2 className="w-3.5 h-3.5" />
+            <span>Hapus Semua Isian (Reset Draft)</span>
+          </button>
         </div>
       </div>
 
@@ -1347,19 +1379,19 @@ export default function CreateProdiItem() {
         {/* Fullscreen Lightbox Modal untuk Review Foto Marketplace */}
         {fullscreenPhoto && (
           <div
-            className="fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-6 pt-14 sm:pt-20 pb-6 sm:pb-8 bg-slate-950/85 backdrop-blur-md animate-in fade-in duration-200"
+            className="fixed inset-0 z-[9999] w-screen h-screen min-h-screen bg-slate-950/95 backdrop-blur-2xl flex items-center justify-center p-3 sm:p-6 overflow-hidden animate-in fade-in duration-200 select-none"
             onClick={() => setFullscreenPhoto(null)}
           >
             <div
-              className="relative w-full max-w-4xl max-h-[84vh] bg-white dark:bg-[#07192C] border border-slate-200 dark:border-slate-800 rounded-3xl shadow-2xl overflow-hidden flex flex-col md:flex-row text-left my-auto"
+              className="relative w-full max-w-4xl max-h-[88vh] bg-white dark:bg-[#07192C] border border-slate-200 dark:border-slate-800 rounded-3xl shadow-2xl overflow-hidden flex flex-col md:flex-row text-left my-auto"
               onClick={(e) => e.stopPropagation()}
             >
               {/* Left Column: Big Image Display */}
-              <div className="relative w-full md:w-1/2 bg-slate-950/95 flex items-center justify-center p-4 min-h-[280px] md:min-h-[460px]">
+              <div className="relative w-full md:w-1/2 bg-slate-950 flex items-center justify-center p-4 min-h-[300px] md:min-h-[480px]">
                 <img
                   src={fullscreenPhoto.url}
                   alt={fullscreenPhoto.title}
-                  className="max-h-[66vh] w-auto max-w-full object-contain rounded-xl shadow-2xl"
+                  className="max-h-[70vh] w-auto max-w-full object-contain rounded-xl shadow-2xl"
                 />
                 <span className="absolute top-4 left-4 px-3 py-1 rounded-full bg-slate-950/80 backdrop-blur-md text-xs font-bold text-white border border-white/20">
                   {fullscreenPhoto.angle || fullscreenPhoto.badge}
@@ -1399,7 +1431,7 @@ export default function CreateProdiItem() {
               </div>
 
               {/* Right Column: Full Details & Actions */}
-              <div className="w-full md:w-1/2 p-5 sm:p-7 flex flex-col justify-between overflow-y-auto max-h-[50vh] md:max-h-[84vh] space-y-4">
+              <div className="w-full md:w-1/2 p-5 sm:p-7 flex flex-col justify-between overflow-y-auto max-h-[50vh] md:max-h-[88vh] space-y-4">
                 <div className="space-y-3.5">
                   <div className="flex items-center justify-between pb-2.5 border-b border-slate-100 dark:border-slate-800">
                     <div className="flex items-center gap-2">
