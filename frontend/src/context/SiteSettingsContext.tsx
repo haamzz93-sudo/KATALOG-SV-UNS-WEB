@@ -447,47 +447,45 @@ export const DEFAULT_SITE_SETTINGS: SiteSettings = {
   gemini_api_key: process.env.NEXT_PUBLIC_GEMINI_API_KEY || "",
   openai_api_key: process.env.NEXT_PUBLIC_OPENAI_API_KEY || "",
   ai_default_domain: "spsbu.unsmadiun.id",
-  ai_default_prompt: "Pencahayaan studio komersial lembut, resolusi HD 8k, format portrait 3:4 (960x1280), clean minimalis, pertahankan keaslian warna, logo, dan identitas visual konsisten di seluruh 4 foto.",
+  ai_default_prompt: "Pencahayaan studio komersial lembut, resolusi Ultra HD 8K super tajam (razor-sharp focus), format portrait 3:4 (960x1280), sudut 3/4 komersial memperlihatkan sisi depan dan sisi samping kanan produk, clean minimalis, bebas blur, pertahankan keaslian warna, logo, dan identitas visual konsisten di seluruh foto.",
 
   // 4 Marketplace Photos Paten Prompts & Master Consistency
-  ai_prompt_1_hero: `Gunakan foto produk yang diberikan sebagai referensi utama. Identifikasi otomatis jenis produk, bentuk, warna, material, label, kemasan, logo, tulisan, serta karakter visualnya. Buat foto produk marketplace premium dengan komposisi hero product photography.
+  ai_prompt_1_hero: `Gunakan foto produk yang diberikan sebagai referensi utama. Identifikasi otomatis jenis produk, bentuk, warna, material, label, kemasan, logo, tulisan, serta karakter visualnya. Buat foto produk marketplace premium dengan komposisi hero product photography beresolusi Ultra-HD 8K super tajam.
 Ketentuan Paten:
-- Pertahankan bentuk, warna, logo, label, tulisan, kemasan, dan proporsi produk secara akurat.
-- Jangan mengubah identitas produk dan jangan menambahkan fitur yang sebenarnya tidak ada.
-- Tampilkan produk dalam angle terbaik sesuai kategorinya.
-- Bila produk memiliki bagian depan dan belakang penting, tampilkan secara proporsional. Bila berupa paket/set, susun semua item dengan rapi.
-- Background: putih bersih, ivory, light grey, atau gradient lembut yang clean dan tidak ramai sesuai tone produk.
-- Lighting: soft studio lighting, natural highlight, realistic soft shadow, detail tajam.
+- Kualitas Visual: Wajib Ultra-HD 8K, razor-sharp focus, zero blur, zero noise, pencahayaan studio komersial dengan detail tekstur sangat jernih setara kamera medium format Hasselblad.
+- Sudut Pandang (Angle): Tampilkan dalam sudut 3/4 komersial yang memperlihatkan sisi depan dan sisi samping kanan produk secara jelas dan proporsional sehingga tampak berdimensi 3D nyata.
+- Sisi Belakang / Kelengkapan: Bila produk memiliki sisi belakang penting (label komposisi, nutrisi, port soket), tampilkan secara teratur di samping produk utama.
+- Pertahankan bentuk, warna, logo, label, tulisan, kemasan, dan proporsi produk secara akurat tanpa halusinasi.
+- Background: putih bersih, ivory, light grey, atau gradient lembut yang clean dan tidak ramai sesuai tone produk di atas podium studio.
+- Lighting: soft studio rim lighting, natural highlight, realistic soft shadow, detail tajam.
 - Komposisi: produk menjadi focal point utama, center composition atau slightly off-center, whitespace cukup.
-- Mood: premium, trustworthy, professional, clean, modern, commercial, high-end marketplace photography HD.
-- Hindari: background berlebihan, logo/warna/tulisan berubah, bentuk terdistorsi, efek terlalu dramatis.`,
+- Mood: premium, trustworthy, professional, clean, modern, commercial, high-end marketplace photography HD.`,
 
-  ai_prompt_2_detail: `Gunakan produk yang sama sebagai referensi utama. Buat foto kedua yang fokus pada detail kualitas dan craftsmanship produk.
+  ai_prompt_2_detail: `Gunakan produk yang sama sebagai referensi utama. Buat foto kedua yang fokus pada detail kualitas, tekstur material, sisi samping, dan craftsmanship produk dalam resolusi Ultra-HD 8K kristal jernih.
 Ketentuan Paten:
-- Identifikasi otomatis elemen paling penting berdasarkan kategori produk (tekstur bahan, detail jahitan, finishing permukaan, material, kemasan, tutup/botol, layar/tombol, konektor, struktur, tekstur makanan, kandungan visual, detail printing, bagian fungsional penting).
+- Kualitas Visual: Wajib Ultra-HD 8K macro shot, razor-sharp focus, tidak boleh buram atau berpiksel.
+- Fokus Sudut: Zoom tajam pada detail material, kerapian finishing, sisi samping produk (side view), tekstur permukaan, penutup/tutup botol, jahitan, atau bagian fungsional penting.
 - Tampilkan 3–5 close-up detail dalam layout editorial modern.
-- Tambahkan label singkat yang hanya menyebut karakter yang benar-benar terlihat dari produk: "Detail Material", "Finishing Rapi", "Desain Presisi", "Tekstur Berkualitas", "Kemasan Premium", "Detail Fungsional". Jangan membuat klaim teknis fiktif.
+- Tambahkan label singkat yang hanya menyebut karakter yang benar-benar terlihat dari produk: "Detail Material", "Finishing Rapi", "Desain Presisi", "Tekstur Berkualitas", "Kemasan Premium", "Detail Sisi Fungsional".
 - Background: putih / light grey / warna netral premium dengan aksen warna menyesuaikan produk.
 - Gaya: premium detail photography, macro product shot, commercial catalog, clean infographic, sharp realistic texture.`,
 
-  ai_prompt_3_benefit: `Gunakan produk asli sebagai fokus utama. Buat foto ketiga dalam format modern benefit infographic yang menjelaskan alasan utama calon pembeli memilih produk.
+  ai_prompt_3_benefit: `Gunakan produk asli sebagai fokus utama. Buat foto ketiga dalam format modern benefit infographic beresolusi Ultra-HD 8K yang menjelaskan alasan utama calon pembeli memilih produk.
 Ketentuan Paten:
+- Kualitas Visual: Wajib grafis & foto Ultra-HD 8K kristal tajam, teks terbaca jelas dan kontras tinggi di layar mobile tanpa blur.
 - Analisis kategori produk terlebih dahulu, lalu tampilkan maksimal 3–5 benefit atau fitur utama yang relevan dan aman berdasarkan informasi produk yang tersedia.
-- Adaptasi kategori: fashion (nyaman, ringan, fit), elektronik (fungsi utama, konektivitas), makanan (rasa, kemasan, penyajian), alat/mesin (fungsi, efisiensi), pertanian/kimia (cara dan target penggunaan).
-- Jangan mengarang spesifikasi, sertifikasi, klaim kesehatan atau performa yang tidak tersedia.
-- Komposisi: produk besar di tengah atau kanan, feature cards kecil di sekeliling, icon minimalis, teks sangat singkat, hierarchy kuat, mudah dibaca di smartphone.
-- Headline universal: "KENAPA PRODUK INI LAYAK DIPILIH?" atau "WHY YOU'LL LOVE IT".
+- Komposisi: produk besar di tengah atau kanan (memperlihatkan sisi depan dan samping), feature cards kecil di sekeliling, icon minimalis, teks sangat singkat, hierarchy kuat, mudah dibaca.
+- Headline universal pilihan: "KENAPA PRODUK INI LAYAK DIPILIH?" (untuk pasar B2B, inovasi riset & instansi) atau "WHY YOU'LL LOVE IT" (untuk pasar lifestyle, ritel F&B & konsumen modern).
 - Gaya: clean product infographic, premium marketplace advertising, modern, concise, trustworthy, visually persuasive.`,
 
-  ai_prompt_4_lifestyle: `Gunakan produk asli sebagai referensi dan pertahankan desainnya secara akurat. Buat foto lifestyle profesional yang menunjukkan produk digunakan dalam konteks nyata sesuai kategorinya.
+  ai_prompt_4_lifestyle: `Gunakan produk asli sebagai referensi dan pertahankan desainnya secara akurat. Buat foto lifestyle profesional beresolusi Ultra-HD 8K yang menunjukkan produk digunakan dalam konteks nyata sesuai kategorinya.
 Ketentuan Paten:
-- Sistem menentukan konteks penggunaan paling natural: pakaian (dikenakan model), tumbler (meja kerja/gym), skincare (meja vanity), elektronik/teknologi (meja kerja/lab/kantor), makanan (disajikan secara appetizing), pertanian/alat (digunakan di kebun/ruang kerja).
-- Ketentuan: produk tetap identik dengan referensi, skala realistis, penggunaan masuk akal, tidak mengubah fungsi, manusia jika ada terlihat natural dan profesional, tidak terlalu banyak objek.
-- Lighting: natural premium lighting, cinematic ringan realistis, shallow depth of field bila sesuai.
-- Mood: aspirational, premium, authentic, modern lifestyle, professional commercial photography.
-- Tujuan: membuat calon pembeli langsung membayangkan produk digunakan dalam kehidupan nyata.`,
+- Kualitas Visual: Wajib Ultra-HD 8K, sinematik realistis dengan pencahayaan alami premium, detail produk tetap tajam dan bebas buram.
+- Konteks Penggunaan: pakaian (dikenakan model), tumbler (meja kerja/gym), skincare (meja vanity), elektronik/teknologi (meja kerja/lab/kantor), makanan (disajikan secara appetizing di atas meja kayu hangat), pertanian/alat (digunakan di kebun/ruang kerja).
+- Sudut Pemotretan: Menunjukkan produk dari sudut dinamis (sisi depan, samping kanan, atau konteks penggunaan tangan nyata).
+- Ketentuan: produk tetap identik dengan referensi, skala realistis, penggunaan masuk akal, tidak mengubah fungsi asli produk.`,
 
-  ai_prompt_consistency: `Gunakan satu visual identity yang konsisten untuk seluruh 4 foto. Pertahankan warna produk yang sama, tone lighting seragam, proporsi produk konsisten, dan kualitas fotografi setara katalog brand profesional. Jangan mengubah logo, label, teks, bentuk, warna, material, jumlah item, atau fitur produk dari referensi asli.`,
+  ai_prompt_consistency: `Wajib konsistensi visual 100% dan resolusi Ultra-HD 8K super tajam untuk seluruh 4 foto. Gunakan satu visual identity yang konsisten: pertahankan warna produk yang sama, sudut pencahayaan studio seragam, proporsi produk konsisten, sisi depan dan samping presisi, dan kualitas fotografi setara katalog brand kelas dunia. Jangan mengubah logo, label, teks, bentuk, warna, material, jumlah item, atau fitur produk dari referensi asli.`,
 };
 
 const sanitizeBlobSetting = (val: any, fallback: string): string => {

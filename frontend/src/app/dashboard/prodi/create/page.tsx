@@ -67,12 +67,51 @@ export default function CreateProdiItem() {
     "Detail Fungsional",
   ];
 
-  const AI_BENEFIT_HEADLINES = [
-    "KENAPA PRODUK INI LAYAK DIPILIH?",
-    "WHY YOU'LL LOVE IT",
+  const AI_ANGLE_OPTIONS = [
+    {
+      id: "front",
+      label: "Sisi Depan / Hero (Front View)",
+      badge: "Utama",
+      desc: "Menampilkan muka produk, logo, dan identitas brand secara presisi & simetris.",
+    },
+    {
+      id: "right_side",
+      label: "Sisi Samping Kanan (3/4 Perspective)",
+      badge: "Rekomendasi 3D",
+      desc: "Menonjolkan kedalaman fisik 3D, ketebalan kemasan/alat, dan detail estetika samping.",
+    },
+    {
+      id: "back",
+      label: "Sisi Belakang Produk (Back View)",
+      badge: "Info Lengkap",
+      desc: "Menampilkan informasi legalitas/komposisi, nutrisi faktual, izin edar, barcode, atau port belakang.",
+    },
+    {
+      id: "left_side",
+      label: "Sisi Samping Kiri (Left Profile)",
+      badge: "Alternatif",
+      desc: "Menampilkan sudut profil samping kiri untuk produk berkarakter asimetris.",
+    },
   ];
 
-  const DEFAULT_AI_PROMPT = "Pencahayaan studio komersial lembut, resolusi HD 8k, format portrait 3:4 (960x1280), clean minimalis, pertahankan keaslian warna, logo, dan identitas visual konsisten di seluruh 4 foto.";
+  const AI_BENEFIT_HEADLINES = [
+    {
+      id: "KENAPA PRODUK INI LAYAK DIPILIH?",
+      title: "KENAPA PRODUK INI LAYAK DIPILIH?",
+      lang: "Bahasa Indonesia",
+      badge: "Pasar Domestik & B2B / Kemitraan DUDI",
+      desc: "Format formal & persuasif untuk inovasi teknologi terapan, riset kampus, alat mesin, dan produk herbal. Menekankan legalitas, efisiensi kerja, dan keunggulan teknis faktual.",
+    },
+    {
+      id: "WHY YOU'LL LOVE IT",
+      title: "WHY YOU'LL LOVE IT",
+      lang: "Bahasa Inggris",
+      badge: "Modern Lifestyle, F&B & Ekspor",
+      desc: "Format modern & ramah konsumen (consumer-centric) untuk produk ritel, F&B, fashion, skincare, dan suvenir. Menekankan kenikmatan rasa, estetika desain, dan kepuasan harian.",
+    },
+  ];
+
+  const DEFAULT_AI_PROMPT = "Pencahayaan studio komersial lembut, resolusi Ultra HD 8K super tajam (razor-sharp focus), format portrait 3:4 (960x1280), sudut 3/4 komersial memperlihatkan sisi depan dan sisi samping kanan produk, clean minimalis, bebas blur, pertahankan keaslian warna, logo, dan identitas visual konsisten di seluruh foto.";
 
   const getCleanPrompt = (val?: string) => {
     if (!val || val.includes("1280x720") || val.includes("landscape") || val.includes("16:9")) {
@@ -91,6 +130,10 @@ export default function CreateProdiItem() {
     "Detail Material",
     "Finishing Rapi",
     "Desain Presisi",
+  ]);
+  const [aiSelectedAngles, setAiSelectedAngles] = useState<string[]>([
+    "Sisi Depan / Hero (Front View)",
+    "Sisi Samping Kanan (3/4 Perspective)",
   ]);
   const [aiBenefitHeadline, setAiBenefitHeadline] = useState<string>("KENAPA PRODUK INI LAYAK DIPILIH?");
   const [aiPrompt, setAiPrompt] = useState<string>(
@@ -123,6 +166,18 @@ export default function CreateProdiItem() {
       } else {
         toast.info("Maksimal 5 Tag", "Maksimal 5 tag detail agar infografis tetap fokus.");
       }
+    }
+  };
+
+  const handleToggleAngle = (angleLabel: string) => {
+    if (aiSelectedAngles.includes(angleLabel)) {
+      if (aiSelectedAngles.length > 1) {
+        setAiSelectedAngles(aiSelectedAngles.filter((a) => a !== angleLabel));
+      } else {
+        toast.error("Minimal 1 Sudut", "Pilih minimal satu sudut pemotretan produk.");
+      }
+    } else {
+      setAiSelectedAngles([...aiSelectedAngles, angleLabel]);
     }
   };
 
@@ -354,6 +409,7 @@ export default function CreateProdiItem() {
           kategori: aiKategori,
           detailLabels: aiDetailLabels,
           benefitHeadline: aiBenefitHeadline,
+          selectedAngles: aiSelectedAngles,
           rawImageBase64: rawImg,
           customPrompt: aiPrompt,
         };
@@ -907,42 +963,111 @@ export default function CreateProdiItem() {
                       </div>
                     </div>
 
-                    {/* 4. Headline Infografis Keunggulan (Foto 3 - Benefit Infographic) */}
+                    {/* 4. Sudut Pemotretan & Orientasi Produk (Sisi Depan, Samping & Belakang) */}
                     <div>
-                      <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block mb-1.5">
-                        4. Headline Infografis Keunggulan (Foto 3 Infografis):
-                      </label>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                        {AI_BENEFIT_HEADLINES.map((hl) => {
-                          const isSelected = aiBenefitHeadline === hl;
+                      <div className="flex items-center justify-between mb-1.5">
+                        <label className="text-xs font-bold text-slate-700 dark:text-slate-300">
+                          4. Sudut Pemotretan & Perspektif Produk:
+                        </label>
+                        <span className="text-[10px] text-slate-400">
+                          Pilih sudut untuk foto studio
+                        </span>
+                      </div>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                        {AI_ANGLE_OPTIONS.map((ang) => {
+                          const isSelected = aiSelectedAngles.includes(ang.label);
                           return (
                             <button
-                              key={hl}
+                              key={ang.id}
                               type="button"
-                              onClick={() => setAiBenefitHeadline(hl)}
-                              style={{ borderRadius: "14px" }}
-                              className={`p-2.5 text-xs font-bold transition border flex items-center gap-2 cursor-pointer text-left ${
+                              onClick={() => handleToggleAngle(ang.label)}
+                              style={{ borderRadius: "16px" }}
+                              className={`p-3 text-xs transition border flex items-start gap-2.5 cursor-pointer text-left ${
                                 isSelected
-                                  ? "bg-[#0F4C81] text-white border-[#0F4C81] shadow-xs ring-2 ring-[#0F4C81]/30"
-                                  : "bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700"
+                                  ? "bg-blue-50/80 dark:bg-blue-950/40 border-[#0F4C81] dark:border-sky-500/60 shadow-xs ring-2 ring-[#0F4C81]/20"
+                                  : "bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700/80"
                               }`}
                             >
-                              <div className={`w-3.5 h-3.5 rounded-full border flex items-center justify-center shrink-0 ${
-                                isSelected ? "border-white bg-[#C5A059]" : "border-slate-400"
+                              <div className={`w-4 h-4 mt-0.5 rounded-full border flex items-center justify-center shrink-0 ${
+                                isSelected ? "border-[#0F4C81] dark:border-sky-400 bg-[#0F4C81] dark:bg-sky-500 text-white" : "border-slate-400"
                               }`}>
-                                {isSelected && <Check className="w-2.5 h-2.5 text-white" />}
+                                {isSelected && <Check className="w-2.5 h-2.5 text-white stroke-[3]" />}
                               </div>
-                              <span className="truncate">{hl}</span>
+                              <div className="space-y-0.5">
+                                <div className="flex items-center gap-2">
+                                  <span className="font-extrabold text-slate-900 dark:text-white text-xs">{ang.label}</span>
+                                  <span className="text-[9px] px-1.5 py-0.2 rounded-full bg-slate-200 dark:bg-slate-700 font-bold text-slate-600 dark:text-slate-300">
+                                    {ang.badge}
+                                  </span>
+                                </div>
+                                <p className="text-[11px] text-slate-500 dark:text-slate-400 leading-snug">
+                                  {ang.desc}
+                                </p>
+                              </div>
                             </button>
                           );
                         })}
                       </div>
                     </div>
 
-                    {/* 5. Detail Identitas Produk */}
+                    {/* 5. Headline Infografis Keunggulan (Foto 3 Infografis) */}
+                    <div>
+                      <div className="flex items-center justify-between mb-1.5">
+                        <label className="text-xs font-bold text-slate-700 dark:text-slate-300">
+                          5. Headline Infografis Keunggulan (Foto 3 Infografis):
+                        </label>
+                        <span className="text-[10px] text-slate-400">
+                          Pilih gaya komunikasi infografis
+                        </span>
+                      </div>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        {AI_BENEFIT_HEADLINES.map((hl) => {
+                          const isSelected = aiBenefitHeadline === hl.id;
+                          return (
+                            <button
+                              key={hl.id}
+                              type="button"
+                              onClick={() => setAiBenefitHeadline(hl.id)}
+                              style={{ borderRadius: "18px" }}
+                              className={`p-3.5 text-xs transition border flex flex-col justify-between gap-2.5 cursor-pointer text-left ${
+                                isSelected
+                                  ? "bg-amber-50/70 dark:bg-amber-950/30 border-amber-500 dark:border-amber-500 shadow-xs ring-2 ring-amber-500/30"
+                                  : "bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700/80"
+                              }`}
+                            >
+                              <div className="flex items-center justify-between w-full">
+                                <span className={`text-[11px] font-black tracking-wide ${isSelected ? "text-amber-800 dark:text-amber-300" : "text-slate-900 dark:text-white"}`}>
+                                  {hl.title}
+                                </span>
+                                <div className={`w-4 h-4 rounded-full border flex items-center justify-center shrink-0 ${
+                                  isSelected ? "border-amber-600 bg-amber-500 text-white" : "border-slate-400"
+                                }`}>
+                                  {isSelected && <Check className="w-2.5 h-2.5 text-white stroke-[3]" />}
+                                </div>
+                              </div>
+
+                              <div className="space-y-1">
+                                <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full inline-block ${
+                                  hl.lang === "Bahasa Indonesia"
+                                    ? "bg-blue-100 dark:bg-blue-950 text-[#0F4C81] dark:text-sky-300"
+                                    : "bg-purple-100 dark:bg-purple-950 text-purple-700 dark:text-purple-300"
+                                }`}>
+                                  {hl.badge}
+                                </span>
+                                <p className="text-[11px] text-slate-600 dark:text-slate-300 leading-relaxed">
+                                  {hl.desc}
+                                </p>
+                              </div>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+
+                    {/* 6. Detail Identitas Produk */}
                     <div className="p-3 rounded-xl bg-slate-100/70 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/60 space-y-2">
                       <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider block">
-                        5. Identitas Produk Terkoneksi:
+                        6. Identitas Produk Terkoneksi:
                       </span>
                       <div className="text-xs text-slate-800 dark:text-slate-200 space-y-1">
                         <div>
@@ -958,10 +1083,10 @@ export default function CreateProdiItem() {
                       </div>
                     </div>
 
-                    {/* 6. Prompt Dinamis (Editable) */}
+                    {/* 7. Prompt Dinamis (Editable) */}
                     <div>
                       <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block mb-1">
-                        6. Catatan Prompt Dinamis & Permintaan Khusus:
+                        7. Catatan Prompt Dinamis & Permintaan Khusus:
                       </label>
                       <textarea
                         rows={2}
@@ -1222,30 +1347,19 @@ export default function CreateProdiItem() {
         {/* Fullscreen Lightbox Modal untuk Review Foto Marketplace */}
         {fullscreenPhoto && (
           <div
-            className="fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-6 bg-slate-950/90 backdrop-blur-md animate-in fade-in duration-200"
+            className="fixed inset-0 z-[100] flex items-center justify-center p-3 sm:p-6 pt-14 sm:pt-20 pb-6 sm:pb-8 bg-slate-950/85 backdrop-blur-md animate-in fade-in duration-200"
             onClick={() => setFullscreenPhoto(null)}
           >
             <div
-              className="relative w-full max-w-4xl max-h-[92vh] bg-white dark:bg-[#07192C] border border-slate-200 dark:border-slate-800 rounded-3xl shadow-2xl overflow-hidden flex flex-col md:flex-row text-left"
+              className="relative w-full max-w-4xl max-h-[84vh] bg-white dark:bg-[#07192C] border border-slate-200 dark:border-slate-800 rounded-3xl shadow-2xl overflow-hidden flex flex-col md:flex-row text-left my-auto"
               onClick={(e) => e.stopPropagation()}
             >
-              {/* Close Button Top Right */}
-              <button
-                type="button"
-                onClick={() => setFullscreenPhoto(null)}
-                style={{ borderRadius: "9999px" }}
-                className="absolute top-4 right-4 z-20 p-2 rounded-full bg-slate-900/70 hover:bg-slate-900 text-white transition cursor-pointer shadow-md"
-                title="Tutup (Esc)"
-              >
-                <X className="w-5 h-5" />
-              </button>
-
               {/* Left Column: Big Image Display */}
-              <div className="relative w-full md:w-1/2 bg-slate-950 flex items-center justify-center p-4 min-h-[320px] md:min-h-[500px]">
+              <div className="relative w-full md:w-1/2 bg-slate-950/95 flex items-center justify-center p-4 min-h-[280px] md:min-h-[460px]">
                 <img
                   src={fullscreenPhoto.url}
                   alt={fullscreenPhoto.title}
-                  className="max-h-[75vh] w-auto max-w-full object-contain rounded-xl shadow-2xl"
+                  className="max-h-[66vh] w-auto max-w-full object-contain rounded-xl shadow-2xl"
                 />
                 <span className="absolute top-4 left-4 px-3 py-1 rounded-full bg-slate-950/80 backdrop-blur-md text-xs font-bold text-white border border-white/20">
                   {fullscreenPhoto.angle || fullscreenPhoto.badge}
@@ -1285,9 +1399,9 @@ export default function CreateProdiItem() {
               </div>
 
               {/* Right Column: Full Details & Actions */}
-              <div className="w-full md:w-1/2 p-6 sm:p-8 flex flex-col justify-between overflow-y-auto max-h-[50vh] md:max-h-[92vh] space-y-4">
-                <div className="space-y-4">
-                  <div className="space-y-1">
+              <div className="w-full md:w-1/2 p-5 sm:p-7 flex flex-col justify-between overflow-y-auto max-h-[50vh] md:max-h-[84vh] space-y-4">
+                <div className="space-y-3.5">
+                  <div className="flex items-center justify-between pb-2.5 border-b border-slate-100 dark:border-slate-800">
                     <div className="flex items-center gap-2">
                       <span className="px-2.5 py-0.5 rounded-full bg-amber-100 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 text-[11px] font-black border border-amber-300 dark:border-amber-800">
                         Format Portrait 3:4 (960x1280)
@@ -1296,12 +1410,25 @@ export default function CreateProdiItem() {
                         Foto {fullscreenIndex + 1} dari {aiPhotos.length}
                       </span>
                     </div>
-                    <h3 className="text-lg sm:text-xl font-extrabold text-slate-900 dark:text-white pt-1">
+
+                    <button
+                      type="button"
+                      onClick={() => setFullscreenPhoto(null)}
+                      style={{ borderRadius: "9999px" }}
+                      className="p-1.5 rounded-full bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 transition cursor-pointer shadow-xs"
+                      title="Tutup (Esc)"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  </div>
+
+                  <div>
+                    <h3 className="text-base sm:text-lg font-extrabold text-slate-900 dark:text-white">
                       {fullscreenPhoto.title}
                     </h3>
                   </div>
 
-                  <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-2">
+                  <div className="p-3.5 rounded-2xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 space-y-1.5">
                     <h4 className="text-xs font-bold text-slate-700 dark:text-slate-300 uppercase tracking-wider flex items-center gap-1.5">
                       <Info className="w-3.5 h-3.5 text-amber-500" />
                       <span>Detail & Karakter Visual:</span>
