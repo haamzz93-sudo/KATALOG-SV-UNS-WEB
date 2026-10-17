@@ -323,12 +323,13 @@ export default function CreateProdiItem() {
       return;
     }
 
-    // 1. Prioritaskan Backend Photoroom AI (Fotografi Produk AI Fotorealistik 3D)
-    if (rawImg) {
+    // 1. Prioritaskan Backend Photoroom AI → OpenAI DALL-E → Pollinations fallback
+    if (rawImg || forceAi) {
       try {
         const API_BASE = typeof window !== "undefined" ? "/api/v1" : (process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000/api/v1");
         const payload = {
           apiKey: settings.gemini_api_key,
+          openaiApiKey: settings.openai_api_key,
           photoroom_api_key: settings.photoroom_api_key || "sandbox_sk_pr_kataloguns_1dba88ad21d6609f8fd00ac6058273fae7de8253",
           namaItem: namaItem.trim() || "Produk Inovasi Vokasi UNS",
           tagline: tagline.trim() || undefined,
@@ -358,20 +359,23 @@ export default function CreateProdiItem() {
           if (data.success && (data.data?.photos || data.photos)) {
             const resultPhotos = data.data?.photos || data.photos;
             setAiPhotos(resultPhotos);
-            toast.success(
-              "4 Foto Marketplace Siap!",
-              data.data?.engine === "photoroom_ai"
-                ? "Foto produk marketplace fotorealistik berhasil dihasilkan dengan Photoroom AI!"
-                : "4 foto katalog standar marketplace profesional berhasil diproses!"
-            );
+            const engine = data.data?.engine || "";
+            const toastMsg =
+              engine === "photoroom_ai"
+                ? "Foto produk fotorealistik dihasilkan dengan Photoroom AI!"
+                : engine === "openai_dalle"
+                ? "4 foto marketplace HD dihasilkan dengan OpenAI DALL-E!"
+                : "4 foto katalog standar marketplace profesional berhasil diproses!";
+            toast.success("4 Foto Marketplace Siap!", toastMsg);
             setAiLoading(false);
             return;
           }
         }
       } catch (backendErr) {
-        console.warn("Backend Photoroom call error, falling back to local studio generator:", backendErr);
+        console.warn("Backend AI call error, falling back to local studio generator:", backendErr);
       }
     }
+
 
     // 2. Fallback Studio Komposisi Produk Asli Presisi (Local Canvas Generator)
     if (rawImg && !forceAi) {

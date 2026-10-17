@@ -84,6 +84,12 @@ function AdminDashboardContent() {
   const cleanPromptTemplate = (val?: string) => (!val || val.includes("1280x720") || val.includes("landscape") || val.includes("16:9")) ? DEFAULT_PORTRAIT_AI_PROMPT : val;
 
   const [aiApiKey, setAiApiKey] = useState(settings.gemini_api_key || process.env.NEXT_PUBLIC_GEMINI_API_KEY || "");
+  const [openaiApiKey, setOpenaiApiKey] = useState(
+    settings.openai_api_key || process.env.NEXT_PUBLIC_OPENAI_API_KEY || ""
+  );
+  const [isOpenaiTesting, setIsOpenaiTesting] = useState(false);
+  const [openaiTestResult, setOpenaiTestResult] = useState<{ success: boolean; message: string } | null>(null);
+
   const [aiDomain, setAiDomain] = useState(settings.ai_default_domain || "spsbu.unsmadiun.id");
   const [aiPromptTemplate, setAiPromptTemplate] = useState(
     cleanPromptTemplate(settings.ai_default_prompt)
@@ -102,6 +108,7 @@ function AdminDashboardContent() {
 
   useEffect(() => {
     if (settings.gemini_api_key) setAiApiKey(settings.gemini_api_key);
+    if (settings.openai_api_key) setOpenaiApiKey(settings.openai_api_key);
     if (settings.ai_default_domain) setAiDomain(settings.ai_default_domain);
     if (settings.ai_default_prompt) setAiPromptTemplate(cleanPromptTemplate(settings.ai_default_prompt));
     if (settings.ai_prompt_1_hero) setAiPromptHero(settings.ai_prompt_1_hero);
@@ -164,11 +171,55 @@ function AdminDashboardContent() {
     }
   };
 
+  const handleTestOpenaiKey = async () => {
+    setIsOpenaiTesting(true);
+    setOpenaiTestResult(null);
+    try {
+      const API_BASE = typeof window !== "undefined" ? "/api/v1" : (process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000/api/v1");
+      const payload = { apiKey: openaiApiKey };
+
+      let res = await fetch(`${API_BASE}/public/ai/test-openai-key`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Accept: "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      if (!res.ok) {
+        res = await fetch("/api/ai/test-openai-key", {
+          method: "POST",
+          headers: { "Content-Type": "application/json", Accept: "application/json" },
+          body: JSON.stringify(payload),
+        });
+      }
+
+      let data: any = {};
+      try {
+        data = await res.json();
+      } catch (jsonErr) {
+        throw new Error("Respon server bukan JSON yang valid.");
+      }
+
+      if (res.ok && data.success) {
+        setOpenaiTestResult({ success: true, message: data.message });
+        toast.success("Koneksi OpenAI Berhasil", data.message);
+      } else {
+        setOpenaiTestResult({ success: false, message: data.message || "Gagal menguji OpenAI API" });
+        toast.error("Gagal Koneksi OpenAI", data.message || "Gagal menguji OpenAI API");
+      }
+    } catch (e: any) {
+      setOpenaiTestResult({ success: false, message: e.message || "Kesalahan jaringan" });
+      toast.error("Error", e.message || "Kesalahan jaringan");
+    } finally {
+      setIsOpenaiTesting(false);
+    }
+  };
+
   const handleSaveAiSettings = async () => {
     setIsAiSaving(true);
     try {
       await updateSettings({
         gemini_api_key: aiApiKey.trim(),
+        openai_api_key: openaiApiKey.trim(),
         ai_default_domain: aiDomain.trim(),
         ai_default_prompt: aiPromptTemplate.trim(),
         ai_prompt_1_hero: aiPromptHero.trim(),
@@ -177,7 +228,7 @@ function AdminDashboardContent() {
         ai_prompt_4_lifestyle: aiPromptLifestyle.trim(),
         ai_prompt_consistency: aiPromptConsistency.trim(),
       });
-      toast.success("Pengaturan AI Disimpan", "Kunci API & 5 template prompt studio berhasil disimpan secara permanen ke sistem!");
+      toast.success("Pengaturan AI Disimpan", "Kunci API OpenAI/Gemini & 5 template prompt studio berhasil disimpan secara permanen ke sistem!");
     } catch (e: any) {
       toast.error("Gagal Menyimpan", e.message);
     } finally {
@@ -5814,7 +5865,7 @@ function AdminDashboardContent() {
         </div>
       )}
 
-      {/* 8. SETTING PROMPT AI STUDIO (GEMINI API) */}
+      {/* 8. SETTING PROMPT AI STUDIO (OPENAI & GEMINI API) */}
       {activeTab === "ai_prompt" && (
         <div className="space-y-6 text-left">
           {/* Header Card */}
@@ -5822,13 +5873,13 @@ function AdminDashboardContent() {
             <div>
               <span className="text-xs font-bold uppercase tracking-wider text-amber-500 flex items-center gap-1.5">
                 <Camera className="w-4 h-4 text-amber-500" />
-                <span>Google Gemini 2.5 Flash Studio Visual</span>
+                <span>Studio Visual AI (OpenAI ChatGPT & Google Gemini)</span>
               </span>
               <h3 className="font-extrabold text-xl text-slate-900 dark:text-white mt-0.5">
                 Setting Prompt & Visual Studio Foto Katalog
               </h3>
               <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1">
-                Kelola API Key Google Gemini, domain display marketplace hilirisasi, serta konfigurasi paten 4 foto katalog marketplace (Hero Product, Detail & Craftsmanship, Infografis Keunggulan, dan Konteks Lifestyle).
+                Kelola API Key OpenAI ChatGPT (DALL-E), Google Gemini 2.5 Flash, domain display marketplace hilirisasi, serta konfigurasi paten 4 foto katalog marketplace (Hero Product, Detail & Craftsmanship, Infografis Keunggulan, dan Konteks Lifestyle).
               </p>
             </div>
 
@@ -5860,14 +5911,70 @@ function AdminDashboardContent() {
           {/* Setting Form Grid */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <div className="lg:col-span-2 space-y-6">
-              {/* API Key Card */}
+              {/* 1. OpenAI ChatGPT / DALL-E Card */}
+              <div className="p-6 rounded-3xl bg-white dark:bg-[#07192C] border border-slate-200 dark:border-slate-800 shadow-sm space-y-4">
+                <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
+                  <h4 className="font-bold text-sm sm:text-base text-slate-900 dark:text-white flex items-center gap-2">
+                    <Key className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                    <span>1. OpenAI API Key (ChatGPT / DALL-E)</span>
+                  </h4>
+                  <span className="text-xs font-mono px-2.5 py-1 rounded-full bg-emerald-100 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-300 font-bold border border-emerald-200 dark:border-emerald-800">
+                    Model: DALL-E 3 / GPT-Image-1
+                  </span>
+                </div>
+
+                <div>
+                  <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block mb-1.5">
+                    Kunci Akses API OpenAI (platform.openai.com)
+                  </label>
+                  <div className="flex flex-col sm:flex-row items-stretch gap-2.5">
+                    <input
+                      type="text"
+                      value={openaiApiKey}
+                      onChange={(e) => setOpenaiApiKey(e.target.value)}
+                      placeholder="sk-proj-..."
+                      className="flex-1 px-4 py-2.5 text-xs sm:text-sm font-mono rounded-xl sm:rounded-full border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-white focus:outline-none focus:border-[#C5A059]"
+                    />
+                    <button
+                      type="button"
+                      onClick={handleTestOpenaiKey}
+                      disabled={isOpenaiTesting || !openaiApiKey.trim()}
+                      style={{ borderRadius: "9999px" }}
+                      className="px-5 py-2.5 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold shadow-xs transition flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-50 shrink-0"
+                    >
+                      <RefreshCw className={`w-3.5 h-3.5 ${isOpenaiTesting ? "animate-spin" : ""}`} />
+                      <span>{isOpenaiTesting ? "Menguji..." : "Uji Koneksi"}</span>
+                    </button>
+                  </div>
+                  <p className="text-[11px] text-slate-400 mt-1.5">
+                    Akun prodi: <code>licensetifpsdku@gmail.com</code>. Digunakan untuk perenderan visual 4 foto produk marketplace komersial.
+                  </p>
+                </div>
+
+                {openaiTestResult && (
+                  <div className={`p-3.5 rounded-2xl text-xs font-medium flex items-center gap-2.5 border ${
+                    openaiTestResult.success
+                      ? "bg-emerald-50 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-200 border-emerald-200 dark:border-emerald-800"
+                      : "bg-rose-50 dark:bg-rose-950/60 text-rose-800 dark:text-rose-200 border-rose-200 dark:border-rose-800"
+                  }`}>
+                    {openaiTestResult.success ? (
+                      <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
+                    ) : (
+                      <ShieldAlert className="w-4 h-4 text-rose-600 shrink-0" />
+                    )}
+                    <span>{openaiTestResult.message}</span>
+                  </div>
+                )}
+              </div>
+
+              {/* 2. Google Gemini API Key Card */}
               <div className="p-6 rounded-3xl bg-white dark:bg-[#07192C] border border-slate-200 dark:border-slate-800 shadow-sm space-y-4">
                 <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
                   <h4 className="font-bold text-sm sm:text-base text-slate-900 dark:text-white flex items-center gap-2">
                     <Key className="w-4 h-4 text-[#0F4C81] dark:text-sky-400" />
-                    <span>1. Google Gemini API Key</span>
+                    <span>2. Google Gemini API Key</span>
                   </h4>
-                  <span className="text-xs font-mono px-2.5 py-1 rounded-full bg-emerald-100 dark:bg-emerald-950/80 text-emerald-700 dark:text-emerald-300 font-bold border border-emerald-200 dark:border-emerald-800">
+                  <span className="text-xs font-mono px-2.5 py-1 rounded-full bg-blue-100 dark:bg-blue-950/80 text-[#0F4C81] dark:text-sky-300 font-bold border border-blue-200 dark:border-blue-800">
                     Model: gemini-2.5-flash
                   </span>
                 </div>
@@ -5913,12 +6020,12 @@ function AdminDashboardContent() {
                 )}
               </div>
 
-              {/* Target Domain & Global Prompt */}
+              {/* 3. Target Domain & Global Prompt */}
               <div className="p-6 rounded-3xl bg-white dark:bg-[#07192C] border border-slate-200 dark:border-slate-800 shadow-sm space-y-4">
                 <div className="border-b border-slate-100 dark:border-slate-800 pb-3">
                   <h4 className="font-bold text-sm sm:text-base text-slate-900 dark:text-white flex items-center gap-2">
                     <Globe className="w-4 h-4 text-[#C5A059]" />
-                    <span>2. Domain Marketplace & Catatan Tambahan</span>
+                    <span>3. Domain Marketplace & Catatan Tambahan</span>
                   </h4>
                 </div>
 

@@ -277,6 +277,9 @@ export interface SiteSettings {
   ai_prompt_4_lifestyle?: string;
   ai_prompt_consistency?: string;
 
+  // OpenAI / ChatGPT API Key (DALL-E image generation)
+  openai_api_key?: string;
+
   [key: string]: any;
 }
 
@@ -442,6 +445,7 @@ export const DEFAULT_SITE_SETTINGS: SiteSettings = {
 
   // Setting Prompt AI Studio & Gemini API
   gemini_api_key: process.env.NEXT_PUBLIC_GEMINI_API_KEY || "",
+  openai_api_key: process.env.NEXT_PUBLIC_OPENAI_API_KEY || "",
   ai_default_domain: "spsbu.unsmadiun.id",
   ai_default_prompt: "Pencahayaan studio komersial lembut, resolusi HD 8k, format portrait 3:4 (960x1280), clean minimalis, pertahankan keaslian warna, logo, dan identitas visual konsisten di seluruh 4 foto.",
 

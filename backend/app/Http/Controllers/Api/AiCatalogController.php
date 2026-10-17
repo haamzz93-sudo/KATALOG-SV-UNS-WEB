@@ -305,7 +305,79 @@ class AiCatalogController extends Controller
                 'lifestyle' => $geminiEnhancedPrompt['lifestyle_prompt'] ?? "Authentic lifestyle product photography of {$baseSubject}, in natural real-world use environment for {$kategori}, warm ambient morning light, commercial catalog aesthetic, high quality depth of field, 8k",
             ];
 
-            // 3. Generate 4 Foto Dinamis HD Landscape (1280x720) via Proxy (Bypasses 402 Referer Paywall)
+            // 2c. Mesin Fotografi Produk AI OpenAI DALL-E (Jika OpenAI API Key tersedia)
+            $openaiApiKey = trim($request->input('openaiApiKey', ''))
+                ?: SiteSetting::get('openai_api_key')
+                ?: env('OPENAI_API_KEY', '');
+
+            if (!empty($openaiApiKey)) {
+                try {
+                    $openaiScenes = [
+                        'hero' => ['title' => '1. Foto Utama (Hero Marketplace)', 'angle' => 'Foto Utama', 'badge' => 'Hero Product', 'desc' => 'Fokus utama, background bersih (putih/ivory), pencahayaan studio lembut, identitas logo & warna presisi.', 'prompt' => $prompts['hero']],
+                        'detail' => ['title' => '2. Detail & Kualitas (Macro Shot)', 'angle' => 'Meyakinkan Kualitas', 'badge' => 'Detail & Quality', 'desc' => 'Macro shot tekstur, material, kerapian finishing & kemasan untuk meyakinkan calon pembeli/mitra.', 'prompt' => $prompts['detail']],
+                        'benefit' => ['title' => '3. Keunggulan & Fitur (Infografis)', 'angle' => 'Alasan Membeli', 'badge' => 'Key Features', 'desc' => 'Tampilan infografis modern menyajikan poin keunggulan dan alasan mengapa produk ini layak dipilih.', 'prompt' => $prompts['benefit']],
+                        'lifestyle' => ['title' => '4. Konteks Penggunaan (Lifestyle)', 'angle' => 'Konteks Real Use', 'badge' => 'Real Context', 'desc' => 'Fotografi kontekstual penggunaan nyata produk sesuai kategori.', 'prompt' => $prompts['lifestyle']],
+                    ];
+
+                    $openaiPhotos = [];
+                    foreach ($openaiScenes as $scKey => $scCfg) {
+                        try {
+                            $oRes = Http::timeout(45)
+                                ->withHeaders([
+                                    'Content-Type' => 'application/json',
+                                    'Authorization' => "Bearer {$openaiApiKey}",
+                                ])
+                                ->post('https://api.openai.com/v1/images/generations', [
+                                    'model' => 'dall-e-3',
+                                    'prompt' => substr($scCfg['prompt'], 0, 4000),
+                                    'n' => 1,
+                                    'size' => '1024x1792',
+                                    'quality' => 'standard',
+                                    'response_format' => 'b64_json',
+                                ]);
+
+                            if ($oRes->successful()) {
+                                $b64 = $oRes->json()['data'][0]['b64_json'] ?? null;
+                                if ($b64) {
+                                    $dataUrl = 'data:image/png;base64,' . $b64;
+                                    $openaiPhotos[] = [
+                                        'id' => $scKey,
+                                        'title' => $scCfg['title'],
+                                        'angle' => $scCfg['angle'],
+                                        'badge' => $scCfg['badge'],
+                                        'desc' => $scCfg['desc'],
+                                        'url' => $dataUrl,
+                                        'directUrl' => $dataUrl,
+                                        'prompt' => $scCfg['prompt'],
+                                    ];
+                                }
+                            }
+                        } catch (\Throwable $scErr) {
+                            Log::warning("OpenAI scene {$scKey} error: " . $scErr->getMessage());
+                        }
+                    }
+
+                    if (count($openaiPhotos) >= 3) {
+                        return response()->json([
+                            'success' => true,
+                            'message' => '4 foto marketplace berhasil dihasilkan dengan OpenAI DALL-E!',
+                            'data' => [
+                                'nama_item' => $namaItem,
+                                'tagline' => $tagline,
+                                'kategori' => $kategori,
+                                'detail_labels' => $detailLabels,
+                                'benefit_headline' => $benefitHeadline,
+                                'photos' => $openaiPhotos,
+                                'engine' => 'openai_dalle',
+                            ],
+                        ]);
+                    }
+                } catch (\Throwable $oaOuter) {
+                    Log::warning('OpenAI outer error: ' . $oaOuter->getMessage());
+                }
+            }
+
+            // 3. Generate 4 Foto Dinamis HD Portrait (960x1280) via Proxy (Bypasses 402 Referer Paywall)
             $seedBase = time();
             $photos = [
                 [
@@ -423,6 +495,83 @@ class AiCatalogController extends Controller
             return response()->json([
                 'success' => false,
                 'message' => 'Kesalahan koneksi: ' . $err->getMessage(),
+            ], 500);
+        }
+    }
+
+    /**
+     * Test connection to OpenAI API (ChatGPT / DALL-E)
+     */
+    public function testOpenAiKey(Request $request): JsonResponse
+    {
+        try {
+            $apiKey = trim($request->input('apiKey', ''));
+            if (empty($apiKey)) {
+                $apiKey = SiteSetting::get('openai_api_key') ?: env('OPENAI_API_KEY', '');
+            }
+
+            if (empty($apiKey)) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'API Key OpenAI belum diisi.',
+                ], 400);
+            }
+
+            // Test 1: Verify key against models endpoint
+            $modelsRes = Http::timeout(15)
+                ->withHeaders([
+                    'Authorization' => "Bearer {$apiKey}",
+                ])
+                ->get('https://api.openai.com/v1/models');
+
+            if (!$modelsRes->successful()) {
+                $err = $modelsRes->json();
+                $msg = $err['error']['message'] ?? 'Kunci API OpenAI tidak valid (HTTP ' . $modelsRes->status() . ').';
+                return response()->json([
+                    'success' => false,
+                    'message' => $msg,
+                ], 400);
+            }
+
+            // Test 2: Check quota with minimal chat ping
+            $chatRes = Http::timeout(15)
+                ->withHeaders([
+                    'Content-Type' => 'application/json',
+                    'Authorization' => "Bearer {$apiKey}",
+                ])
+                ->post('https://api.openai.com/v1/chat/completions', [
+                    'model' => 'gpt-4o-mini',
+                    'messages' => [['role' => 'user', 'content' => 'Ping']],
+                    'max_tokens' => 5,
+                ]);
+
+            if (!$chatRes->successful()) {
+                if ($chatRes->status() === 429) {
+                    return response()->json([
+                        'success' => true,
+                        'hasCredits' => false,
+                        'message' => 'Kunci API OpenAI Terverifikasi & Valid! Namun kuota/kredit akun saat ini $0 (habis). Harap isi saldo billing di platform.openai.com agar generate gambar aktif.',
+                        'model' => 'openai-api-connected',
+                    ]);
+                }
+                return response()->json([
+                    'success' => true,
+                    'hasCredits' => false,
+                    'message' => 'Kunci API OpenAI Terverifikasi Valid!',
+                    'model' => 'openai-api-connected',
+                ]);
+            }
+
+            return response()->json([
+                'success' => true,
+                'hasCredits' => true,
+                'message' => 'Koneksi OpenAI API Key Berhasil & Kuota Aktif! (Model DALL-E / ChatGPT Siap Digunakan)',
+                'model' => 'openai-gpt-dalle-ready',
+            ]);
+        } catch (\Throwable $err) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Kesalahan koneksi OpenAI: ' . $err->getMessage(),
             ], 500);
         }
     }
