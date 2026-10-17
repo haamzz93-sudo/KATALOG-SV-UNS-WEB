@@ -2580,7 +2580,7 @@ function AdminDashboardContent() {
         </div>
       )}
 
-      {/* 🎬 Showcase Video & Callouts Manager */}
+      {/* Showcase Video & Callouts Manager */}
       {activeTab === "showcase" && (
         <div className="space-y-6">
           {showcaseSaveNotice && (
@@ -6216,19 +6216,31 @@ function AdminDashboardContent() {
                 </h4>
                 <div className="space-y-2.5 text-xs text-slate-600 dark:text-slate-300">
                   <div className="p-3 rounded-2xl bg-white/70 dark:bg-slate-900/70 border border-amber-500/20">
-                    <strong className="block font-bold text-slate-900 dark:text-white mb-0.5">📸 1. Foto Utama (Hero Product)</strong>
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="w-5 h-5 rounded-full bg-amber-500/20 text-amber-700 dark:text-amber-300 font-black text-[10px] flex items-center justify-center shrink-0">1</span>
+                      <strong className="font-bold text-slate-900 dark:text-white">Foto Utama (Hero Product)</strong>
+                    </div>
                     <span>Fokus utama, background putih/ivory/grey, studio lighting lembut, logo & warna presisi.</span>
                   </div>
                   <div className="p-3 rounded-2xl bg-white/70 dark:bg-slate-900/70 border border-amber-500/20">
-                    <strong className="block font-bold text-slate-900 dark:text-white mb-0.5">📸 2. Detail & Kualitas (Macro Shot)</strong>
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="w-5 h-5 rounded-full bg-amber-500/20 text-amber-700 dark:text-amber-300 font-black text-[10px] flex items-center justify-center shrink-0">2</span>
+                      <strong className="font-bold text-slate-900 dark:text-white">Detail & Kualitas (Macro Shot)</strong>
+                    </div>
                     <span>Menampilkan tekstur material, jahitan/finishing rapi, dan detail kemasan untuk meyakinkan calon mitra.</span>
                   </div>
                   <div className="p-3 rounded-2xl bg-white/70 dark:bg-slate-900/70 border border-amber-500/20">
-                    <strong className="block font-bold text-slate-900 dark:text-white mb-0.5">📸 3. Keunggulan & Fitur (Infografis)</strong>
-                    <span>Infografis modern 'KENAPA PRODUK INI LAYAK DIPILIH?' menyajikan poin keunggulan faktual.</span>
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="w-5 h-5 rounded-full bg-amber-500/20 text-amber-700 dark:text-amber-300 font-black text-[10px] flex items-center justify-center shrink-0">3</span>
+                      <strong className="font-bold text-slate-900 dark:text-white">Keunggulan & Fitur (Infografis)</strong>
+                    </div>
+                    <span>Infografis modern &apos;KENAPA PRODUK INI LAYAK DIPILIH?&apos; menyajikan poin keunggulan faktual.</span>
                   </div>
                   <div className="p-3 rounded-2xl bg-white/70 dark:bg-slate-900/70 border border-amber-500/20">
-                    <strong className="block font-bold text-slate-900 dark:text-white mb-0.5">📸 4. Konteks Penggunaan (Lifestyle)</strong>
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="w-5 h-5 rounded-full bg-amber-500/20 text-amber-700 dark:text-amber-300 font-black text-[10px] flex items-center justify-center shrink-0">4</span>
+                      <strong className="font-bold text-slate-900 dark:text-white">Konteks Penggunaan (Lifestyle)</strong>
+                    </div>
                     <span>Fotografi kontekstual penggunaan nyata produk sesuai kategori (meja kerja, lab, konsumsi).</span>
                   </div>
                 </div>
