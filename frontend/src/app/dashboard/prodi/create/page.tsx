@@ -15,7 +15,14 @@ import { useSiteSettings } from "../../../../context/SiteSettingsContext";
 import { MediaUploader } from "../../../../components/ui/MediaUploader";
 import { SearchableProdiDropdown } from "../../../../components/ui/CustomCatalogSelect";
 import { Prodi } from "../../../../types/catalog";
-import { generateStudioMarketplacePhotos } from "../../../../lib/studioMarketplaceGenerator";
+import {
+  loadImage,
+  isolateProductForeground,
+  generateHeroPhoto,
+  generateDetailPhoto,
+  generateBenefitPhoto,
+  generateLifestylePhoto,
+} from "../../../../lib/studioMarketplaceGenerator";
 
 export default function CreateProdiItem() {
   const router = useRouter();
@@ -91,6 +98,8 @@ export default function CreateProdiItem() {
   const [aiRawPhoto, setAiRawPhoto] = useState<string>("");
   const [aiRawPhotoBase64, setAiRawPhotoBase64] = useState<string>("");
   const [aiLoading, setAiLoading] = useState(false);
+  const [generationStep, setGenerationStep] = useState<number>(0);
+  const [stepMessage, setStepMessage] = useState<string>("");
   const [aiPhotos, setAiPhotos] = useState<any[]>([]);
 
   // Clean dynamic specs (Bebas dari data dummy)
@@ -310,21 +319,27 @@ export default function CreateProdiItem() {
     setSpecs(updated);
   };
 
-  const handleGenerateAiPhotos = async (forceAi = false) => {
-    setAiLoading(true);
+  const handleGenerateAiPhotos = async () => {
     const rawImg = aiRawPhotoBase64 || aiRawPhoto || (thumbnailUrl && !thumbnailUrl.startsWith("blob:") ? thumbnailUrl : undefined);
 
-    if (!rawImg && !forceAi) {
+    if (!rawImg) {
       toast.info(
         "Unggah Foto Produk Terlebih Dahulu",
         "Silakan unggah foto produk mentah pada bagian 1 di atas agar 4 foto marketplace presisi dapat dihasilkan."
       );
-      setAiLoading(false);
       return;
     }
 
-    // 1. Prioritaskan Backend Photoroom AI → OpenAI DALL-E → Pollinations fallback
-    if (rawImg || forceAi) {
+    setAiLoading(true);
+    setAiPhotos([]);
+    setGenerationStep(1);
+    setStepMessage("Menganalisis objek produk dan mengisolasi latar belakang studio...");
+
+    const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
+    // Coba terlebih dahulu backend jika OpenAI atau Photoroom aktif
+    const hasPaidKey = !!(settings.openai_api_key && settings.openai_api_key.trim());
+    if (hasPaidKey) {
       try {
         const API_BASE = typeof window !== "undefined" ? "/api/v1" : (process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000/api/v1");
         const payload = {
@@ -357,52 +372,120 @@ export default function CreateProdiItem() {
         if (res.ok) {
           const data = await res.json();
           if (data.success && (data.data?.photos || data.photos)) {
-            const resultPhotos = data.data?.photos || data.photos;
-            setAiPhotos(resultPhotos);
-            const engine = data.data?.engine || "";
-            const toastMsg =
-              engine === "photoroom_ai"
-                ? "Foto produk fotorealistik dihasilkan dengan Photoroom AI!"
-                : engine === "openai_dalle"
-                ? "4 foto marketplace HD dihasilkan dengan OpenAI DALL-E!"
-                : "4 foto katalog standar marketplace profesional berhasil diproses!";
-            toast.success("4 Foto Marketplace Siap!", toastMsg);
+            const rawPhotos = data.data?.photos || data.photos;
+            // Animasi satu persatu memunculkan foto dari backend
+            const accumulated: any[] = [];
+            for (let i = 0; i < rawPhotos.length; i++) {
+              setGenerationStep(i + 1);
+              setStepMessage(`Langkah ${i + 1}/4: Merender ${rawPhotos[i].title}...`);
+              accumulated.push(rawPhotos[i]);
+              setAiPhotos([...accumulated]);
+              await delay(600);
+            }
+            setGenerationStep(5);
+            setStepMessage("Selesai! 4 Foto Marketplace Komersial Berhasil Dihasilkan.");
+            toast.success("4 Foto Marketplace Siap!", "4 foto katalog berhasil dihasilkan sesuai setting prompt paten.");
             setAiLoading(false);
             return;
           }
         }
       } catch (backendErr) {
-        console.warn("Backend AI call error, falling back to local studio generator:", backendErr);
+        console.warn("Backend AI call, proceeding to sequential studio engine:", backendErr);
       }
     }
 
+    // Engine Studio Visual Presisi Sekuensial (Foto 1 -> 2 -> 3 -> 4)
+    try {
+      // 1. Muat & Isolasi Background
+      const img = await loadImage(rawImg);
+      const isolatedImg = isolateProductForeground(img);
+      await delay(450);
 
-    // 2. Fallback Studio Komposisi Produk Asli Presisi (Local Canvas Generator)
-    if (rawImg && !forceAi) {
-      try {
-        const studioPhotos = await generateStudioMarketplacePhotos({
-          imageSrc: rawImg,
-          namaItem: namaItem.trim() || "Produk Inovasi Vokasi UNS",
-          kategori: aiKategori,
-          detailTags: aiDetailLabels,
-          benefitHeadline: aiBenefitHeadline,
-        });
+      const sequentialPhotos: any[] = [];
 
-        setAiPhotos(studioPhotos);
-        toast.success(
-          "4 Foto Marketplace Siap!",
-          "Produk asli Anda berhasil dikomposisikan ke 4 standar marketplace HD (Hero, Macro Detail, Infografis, Lifestyle) secara presisi 100%!"
-        );
-      } catch (err: any) {
-        console.error("Studio generator error:", err);
-        toast.error(
-          "Gagal Komposisi Studio Foto",
-          err?.message || "Terjadi kendala saat memproses gambar produk mentah."
-        );
-      } finally {
-        setAiLoading(false);
-      }
-      return;
+      // Step 1: Foto Utama (Hero Marketplace)
+      setGenerationStep(1);
+      setStepMessage("Langkah 1/4: Merender Foto Utama (Hero Product Photography)...");
+      const heroUrl = generateHeroPhoto(isolatedImg, namaItem.trim() || "Produk Inovasi Vokasi UNS", aiKategori);
+      const heroPhoto = {
+        id: "hero",
+        title: "1. Foto Utama (Hero Marketplace)",
+        angle: "Foto Utama",
+        badge: "Hero Product",
+        desc: "Fokus utama produk asli di atas podium studio putih ivory bersih, pencahayaan lembut, proporsi portrait 3:4 rapi.",
+        url: heroUrl,
+        directUrl: heroUrl,
+      };
+      sequentialPhotos.push(heroPhoto);
+      setAiPhotos([...sequentialPhotos]);
+      await delay(700);
+
+      // Step 2: Detail & Kualitas (Macro Shot)
+      setGenerationStep(2);
+      setStepMessage("Langkah 2/4: Memproses Detail & Kualitas (Macro Craftsmanship Shot)...");
+      const detailUrl = generateDetailPhoto(isolatedImg, aiDetailLabels);
+      const detailPhoto = {
+        id: "detail",
+        title: "2. Detail & Kualitas (Macro Shot)",
+        angle: "Meyakinkan Kualitas",
+        badge: "Macro Shot 1.8x",
+        desc: "Macro zoom tajam pada tekstur material, finishing kemasan, dan badge karakter kualitas terlihat.",
+        url: detailUrl,
+        directUrl: detailUrl,
+      };
+      sequentialPhotos.push(detailPhoto);
+      setAiPhotos([...sequentialPhotos]);
+      await delay(700);
+
+      // Step 3: Keunggulan & Fitur Utama (Infografis)
+      setGenerationStep(3);
+      setStepMessage("Langkah 3/4: Menyusun Infografis Fitur & Alasan Membeli...");
+      const benefitUrl = generateBenefitPhoto(isolatedImg, aiBenefitHeadline, namaItem.trim() || "Produk Inovasi Vokasi UNS", aiKategori);
+      const benefitPhoto = {
+        id: "benefit",
+        title: "3. Keunggulan & Fitur (Infografis)",
+        angle: "Alasan Membeli",
+        badge: "Infografis Komersial",
+        desc: "Tata letak infografis portrait menyajikan headline dan 3 poin keunggulan utama produk inovasi.",
+        url: benefitUrl,
+        directUrl: benefitUrl,
+      };
+      sequentialPhotos.push(benefitPhoto);
+      setAiPhotos([...sequentialPhotos]);
+      await delay(700);
+
+      // Step 4: Konteks Penggunaan Nyata (Lifestyle)
+      setGenerationStep(4);
+      setStepMessage("Langkah 4/4: Membangun Konteks Penggunaan Nyata (Lifestyle Context)...");
+      const lifestyleUrl = generateLifestylePhoto(isolatedImg, aiKategori);
+      const lifestylePhoto = {
+        id: "lifestyle",
+        title: "4. Konteks Penggunaan (Lifestyle)",
+        angle: "Konteks Real Use",
+        badge: "Lifestyle Tabletop",
+        desc: "Fotografi kontekstual produk asli di atas meja kayu hangat dengan pencahayaan pagi estetik.",
+        url: lifestyleUrl,
+        directUrl: lifestyleUrl,
+      };
+      sequentialPhotos.push(lifestylePhoto);
+      setAiPhotos([...sequentialPhotos]);
+      await delay(500);
+
+      // Selesai
+      setGenerationStep(5);
+      setStepMessage("Selesai! 4 Foto Marketplace Komersial Berhasil Dihasilkan.");
+      toast.success(
+        "4 Foto Marketplace Siap!",
+        "4 foto marketplace (Hero, Macro Detail, Infografis, Lifestyle) berhasil dihasilkan berurutan secara presisi 100%!"
+      );
+    } catch (err: any) {
+      console.error("Studio generator error:", err);
+      toast.error(
+        "Gagal Komposisi Studio Foto",
+        err?.message || "Terjadi kendala saat memproses gambar produk mentah."
+      );
+    } finally {
+      setAiLoading(false);
     }
   };
 
@@ -886,31 +969,130 @@ export default function CreateProdiItem() {
                       />
                     </div>
 
-                    {/* 5. Tombol Generate */}
-                    <div className="flex flex-col sm:flex-row gap-2.5">
+                    {/* 5. Tombol Tunggal Generate Studio */}
+                    <div>
                       <button
                         type="button"
-                        onClick={() => handleGenerateAiPhotos(false)}
+                        onClick={handleGenerateAiPhotos}
                         disabled={aiLoading}
                         style={{ borderRadius: "9999px" }}
-                        className="flex-1 py-3 px-4 rounded-full bg-gradient-to-r from-amber-500 via-[#C5A059] to-[#0F4C81] hover:brightness-105 text-white font-black text-xs shadow-md transition flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+                        className="w-full py-3.5 px-6 rounded-full bg-gradient-to-r from-amber-500 via-[#C5A059] to-[#0F4C81] hover:brightness-105 text-white font-black text-xs sm:text-sm shadow-md transition flex items-center justify-center gap-2.5 cursor-pointer disabled:opacity-50"
                       >
-                        <RefreshCw className={`w-3.5 h-3.5 ${aiLoading ? "animate-spin" : ""}`} />
-                        <span>{aiLoading ? "Memproses 4 Foto Marketplace..." : "Hasilkan 4 Foto Marketplace (100% Produk Asli Presisi)"}</span>
-                      </button>
-
-                      <button
-                        type="button"
-                        onClick={() => handleGenerateAiPhotos(true)}
-                        disabled={aiLoading}
-                        style={{ borderRadius: "9999px" }}
-                        title="Hasilkan variasi visual alternatif menggunakan Google Gemini 2.5 Flash"
-                        className="py-3 px-4 rounded-full bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-200 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700 font-bold text-xs transition flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-50"
-                      >
-                        <Camera className="w-3.5 h-3.5 text-amber-500" />
-                        <span>Sintesis AI (Gemini)</span>
+                        <RefreshCw className={`w-4 h-4 ${aiLoading ? "animate-spin" : ""}`} />
+                        <span>
+                          {aiLoading
+                            ? `Memproses Studio Foto (${generationStep}/4)...`
+                            : "Hasilkan 4 Foto Marketplace Komersial"}
+                        </span>
                       </button>
                     </div>
+
+                    {/* Animasi Proses Bertahap Satu Persatu (Step-by-Step Live Progress) */}
+                    {aiLoading && (
+                      <div className="p-4 rounded-2xl bg-gradient-to-br from-amber-500/10 via-amber-500/5 to-blue-500/10 border border-amber-500/30 shadow-xs space-y-3 animate-in fade-in duration-300">
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs font-black text-slate-900 dark:text-white flex items-center gap-2">
+                            <span className="w-2.5 h-2.5 rounded-full bg-amber-500 animate-ping" />
+                            <span>Proses Studio Visual Sedang Berjalan</span>
+                          </span>
+                          <span className="text-xs font-mono font-black text-amber-600 dark:text-amber-400">
+                            {generationStep === 1 && "25%"}
+                            {generationStep === 2 && "50%"}
+                            {generationStep === 3 && "75%"}
+                            {generationStep === 4 && "95%"}
+                            {generationStep >= 5 && "100%"}
+                          </span>
+                        </div>
+
+                        {/* Progress Bar */}
+                        <div className="w-full h-2 rounded-full bg-slate-200 dark:bg-slate-700 overflow-hidden">
+                          <div
+                            className="h-full bg-gradient-to-r from-amber-500 via-[#C5A059] to-[#0F4C81] transition-all duration-500 ease-out"
+                            style={{
+                              width:
+                                generationStep === 1
+                                  ? "25%"
+                                  : generationStep === 2
+                                  ? "50%"
+                                  : generationStep === 3
+                                  ? "75%"
+                                  : generationStep === 4
+                                  ? "95%"
+                                  : generationStep >= 5
+                                  ? "100%"
+                                  : "10%",
+                            }}
+                          />
+                        </div>
+
+                        {/* 4 Tahap Visual */}
+                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-1 text-[11px]">
+                          <div
+                            className={`p-2 rounded-xl border flex items-center gap-1.5 transition ${
+                              generationStep > 1
+                                ? "bg-emerald-50 dark:bg-emerald-950/40 border-emerald-300 dark:border-emerald-800 text-emerald-700 dark:text-emerald-300 font-bold"
+                                : generationStep === 1
+                                ? "bg-amber-50 dark:bg-amber-950/50 border-amber-400 dark:border-amber-600 text-amber-800 dark:text-amber-200 font-black ring-2 ring-amber-400/30"
+                                : "bg-white/60 dark:bg-slate-800/60 border-slate-200 dark:border-slate-700 text-slate-400"
+                            }`}
+                          >
+                            <span className="w-4 h-4 rounded-full bg-slate-900/10 dark:bg-white/10 flex items-center justify-center font-black text-[9px] shrink-0">
+                              {generationStep > 1 ? "✓" : "1"}
+                            </span>
+                            <span className="truncate">1. Hero Product</span>
+                          </div>
+
+                          <div
+                            className={`p-2 rounded-xl border flex items-center gap-1.5 transition ${
+                              generationStep > 2
+                                ? "bg-emerald-50 dark:bg-emerald-950/40 border-emerald-300 dark:border-emerald-800 text-emerald-700 dark:text-emerald-300 font-bold"
+                                : generationStep === 2
+                                ? "bg-amber-50 dark:bg-amber-950/50 border-amber-400 dark:border-amber-600 text-amber-800 dark:text-amber-200 font-black ring-2 ring-amber-400/30"
+                                : "bg-white/60 dark:bg-slate-800/60 border-slate-200 dark:border-slate-700 text-slate-400"
+                            }`}
+                          >
+                            <span className="w-4 h-4 rounded-full bg-slate-900/10 dark:bg-white/10 flex items-center justify-center font-black text-[9px] shrink-0">
+                              {generationStep > 2 ? "✓" : "2"}
+                            </span>
+                            <span className="truncate">2. Detail Macro</span>
+                          </div>
+
+                          <div
+                            className={`p-2 rounded-xl border flex items-center gap-1.5 transition ${
+                              generationStep > 3
+                                ? "bg-emerald-50 dark:bg-emerald-950/40 border-emerald-300 dark:border-emerald-800 text-emerald-700 dark:text-emerald-300 font-bold"
+                                : generationStep === 3
+                                ? "bg-amber-50 dark:bg-amber-950/50 border-amber-400 dark:border-amber-600 text-amber-800 dark:text-amber-200 font-black ring-2 ring-amber-400/30"
+                                : "bg-white/60 dark:bg-slate-800/60 border-slate-200 dark:border-slate-700 text-slate-400"
+                            }`}
+                          >
+                            <span className="w-4 h-4 rounded-full bg-slate-900/10 dark:bg-white/10 flex items-center justify-center font-black text-[9px] shrink-0">
+                              {generationStep > 3 ? "✓" : "3"}
+                            </span>
+                            <span className="truncate">3. Infografis Fitur</span>
+                          </div>
+
+                          <div
+                            className={`p-2 rounded-xl border flex items-center gap-1.5 transition ${
+                              generationStep > 4
+                                ? "bg-emerald-50 dark:bg-emerald-950/40 border-emerald-300 dark:border-emerald-800 text-emerald-700 dark:text-emerald-300 font-bold"
+                                : generationStep === 4
+                                ? "bg-amber-50 dark:bg-amber-950/50 border-amber-400 dark:border-amber-600 text-amber-800 dark:text-amber-200 font-black ring-2 ring-amber-400/30"
+                                : "bg-white/60 dark:bg-slate-800/60 border-slate-200 dark:border-slate-700 text-slate-400"
+                            }`}
+                          >
+                            <span className="w-4 h-4 rounded-full bg-slate-900/10 dark:bg-white/10 flex items-center justify-center font-black text-[9px] shrink-0">
+                              {generationStep > 4 ? "✓" : "4"}
+                            </span>
+                            <span className="truncate">4. Lifestyle</span>
+                          </div>
+                        </div>
+
+                        <p className="text-xs text-slate-600 dark:text-slate-300 font-medium italic pt-0.5">
+                          {stepMessage}
+                        </p>
+                      </div>
+                    )}
 
                     {/* 6. Hasil 4 Foto Produk */}
                     {aiPhotos.length > 0 && (
@@ -929,7 +1111,7 @@ export default function CreateProdiItem() {
                             <div
                               key={photo.id}
                               style={{ borderRadius: "20px" }}
-                              className={`p-3 border transition-all duration-200 flex flex-col justify-between shadow-xs ${
+                              className={`p-3 border transition-all duration-300 flex flex-col justify-between shadow-xs animate-in fade-in zoom-in-95 duration-500 ${
                                 thumbnailUrl === photo.url
                                   ? "border-emerald-500 bg-emerald-50/60 dark:bg-emerald-950/40 ring-2 ring-emerald-500/40 shadow-sm"
                                   : "border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/90 hover:border-amber-400"
