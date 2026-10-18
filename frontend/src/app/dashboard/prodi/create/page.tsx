@@ -153,8 +153,35 @@ export default function CreateProdiItem() {
   const [generationStep, setGenerationStep] = useState<number>(0);
   const [stepMessage, setStepMessage] = useState<string>("");
   const [aiPhotos, setAiPhotos] = useState<any[]>([]);
+  const [hasGenerated, setHasGenerated] = useState<boolean>(false);
   const [fullscreenPhoto, setFullscreenPhoto] = useState<any | null>(null);
   const [fullscreenIndex, setFullscreenIndex] = useState<number>(0);
+
+  // Terapkan otomatis 4 foto studio: Foto 1 jadi Mockup Utama, Foto 2-4 masuk Galeri
+  const applyAllAiPhotos = (photosList: any[]) => {
+    if (!photosList || photosList.length === 0) return;
+
+    // Foto 1 Hero -> Mockup Utama
+    const hero = photosList[0];
+    if (hero?.url) {
+      setThumbnailUrl(hero.url);
+    }
+
+    // Foto 2, 3, 4 -> Galeri Foto Tambahan
+    const otherPhotos = photosList.slice(1);
+    const newGalleryItems: GalleryImage[] = otherPhotos.map((p, idx) => ({
+      id: `ai-gen-${Date.now()}-${idx}-${Math.random().toString(36).substr(2, 4)}`,
+      url: p.url,
+      caption: p.title || `Foto Studio #${idx + 2}`,
+    }));
+
+    setGalleryImages(newGalleryItems);
+    setHasGenerated(true);
+    toast.success(
+      "4 Foto Marketplace Terpasang!",
+      "Foto 1 Hero otomatis dijadikan Mockup Utama, dan Foto 2–4 masuk ke Galeri Produk."
+    );
+  };
 
   // Kunci scroll halaman saat modal lightbox aktif agar tidak tembus
   useEffect(() => {
@@ -469,8 +496,8 @@ export default function CreateProdiItem() {
               await delay(600);
             }
             setGenerationStep(5);
-            setStepMessage("Selesai! 4 Foto Marketplace Komersial Berhasil Dihasilkan.");
-            toast.success("4 Foto Marketplace Siap!", "4 foto katalog berhasil dihasilkan sesuai setting prompt paten.");
+            setStepMessage("Selesai! 4 Foto Marketplace Komersial Berhasil Dihasilkan & Diterapkan.");
+            applyAllAiPhotos(rawPhotos);
             setAiLoading(false);
             return;
           }
@@ -578,11 +605,8 @@ export default function CreateProdiItem() {
 
       // Selesai
       setGenerationStep(5);
-      setStepMessage("Selesai! 4 Foto Marketplace Komersial Berhasil Dihasilkan.");
-      toast.success(
-        "4 Foto Marketplace Siap!",
-        "4 foto marketplace (Hero, Macro Detail, Infografis, Lifestyle) berhasil dihasilkan berurutan secara presisi 100%!"
-      );
+      setStepMessage("Selesai! 4 Foto Marketplace Komersial Berhasil Dihasilkan & Diterapkan.");
+      applyAllAiPhotos(sequentialPhotos);
     } catch (err: any) {
       console.error("Studio generator error:", err);
       toast.error(
@@ -598,6 +622,37 @@ export default function CreateProdiItem() {
     e.preventDefault();
     setIsSubmitting(true);
     setErrorMsg("");
+
+    // 1. Validasi foto mockup produk wajib
+    if (!thumbnailUrl || thumbnailUrl.startsWith("blob:")) {
+      toast.error(
+        "Foto Produk Wajib Diisi!",
+        "Silakan unggah foto mentah produk dan proses melalui Studio Foto AI sebelum menyimpan."
+      );
+      setIsSubmitting(false);
+      setIsAiStudioOpen(true);
+      return;
+    }
+
+    // 2. Jika user mengunggah foto mentah tetapi belum pernah dipoles melalui Studio Foto AI
+    if (!hasGenerated && aiPhotos.length === 0 && (aiRawPhoto || aiRawPhotoBase64 || thumbnailUrl)) {
+      const confirmGen = confirm(
+        "PERHATIAN STUDIO FOTO VISUAL AI:\n\n" +
+        "Foto produk Anda belum dipoles melalui Studio Foto Visual AI.\n\n" +
+        "Katalog inovasi Sekolah Vokasi UNS mewajibkan standar 4 foto marketplace (Hero Utama, Sisi Samping 3/4, Infografis Keunggulan, dan Lifestyle) berformat portrait 3:4 yang seragam dan profesional.\n\n" +
+        "Apakah Anda ingin sistem men-generate otomatis 4 foto marketplace sekarang?\n\n" +
+        "• Klik [OK] untuk men-generate otomatis sekarang.\n" +
+        "• Klik [Batal] jika ingin tetap menyimpan foto mentah."
+      );
+
+      if (confirmGen) {
+        setIsSubmitting(false);
+        setIsAiStudioOpen(true);
+        toast.info("Memproses Studio Foto AI...", "Menghasilkan 4 foto marketplace komersial...");
+        await handleGenerateAiPhotos();
+        return;
+      }
+    }
 
     try {
       const payload = {
@@ -905,16 +960,28 @@ export default function CreateProdiItem() {
             <div className="space-y-3">
               <MediaUploader
                 label="Foto Mockup Produk (Drag & Drop) *"
-                description="Upload gambar resolusi tinggi (PNG, JPG, WEBP maks 5MB)"
+                description="Upload gambar mentah/mockup (PNG, JPG, WEBP maks 5MB) - Wajib dipoles melalui Studio AI"
                 acceptedType="image"
                 maxSizeMb={5}
                 currentUrl={thumbnailUrl}
                 onUploadSuccess={(url, info) => {
-                  if (url) setThumbnailUrl(url);
-                  if (info?.dataUrl) {
-                    setAiRawPhotoBase64(info.dataUrl);
-                    if (!aiRawPhoto) setAiRawPhoto(url);
+                  if (url) {
+                    setThumbnailUrl(url);
+                    setAiRawPhoto(url);
+                    if (info?.dataUrl) setAiRawPhotoBase64(info.dataUrl);
+                    setIsAiStudioOpen(true);
+                    setHasGenerated(false);
+                    toast.info(
+                      "Foto Produk Diunggah",
+                      "Foto mentah siap! Klik 'Generate 4 Foto Marketplace' di bawah agar format studio 3:4 otomatis diterapkan."
+                    );
                   }
+                }}
+                onDelete={() => {
+                  setThumbnailUrl("");
+                  setAiRawPhoto("");
+                  setAiRawPhotoBase64("");
+                  setHasGenerated(false);
                 }}
               />
             </div>
@@ -949,6 +1016,57 @@ export default function CreateProdiItem() {
               </div>
             </div>
           </div>
+
+          {/* Banner Status & Aksi Cepat Studio Foto Visual AI */}
+          {(thumbnailUrl || aiRawPhoto || aiRawPhotoBase64) && (
+            <div className={`p-4 rounded-2xl border transition-all flex flex-col sm:flex-row items-center justify-between gap-3 shadow-xs ${
+              hasGenerated 
+                ? "bg-emerald-50 dark:bg-emerald-950/40 border-emerald-400 dark:border-emerald-600 text-emerald-900 dark:text-emerald-100"
+                : "bg-gradient-to-r from-amber-500/15 via-[#C5A059]/15 to-[#0F4C81]/15 border-2 border-amber-400 dark:border-amber-500 text-slate-900 dark:text-white"
+            }`}>
+              <div className="flex items-center gap-3 w-full sm:w-auto">
+                <div className={`w-10 h-10 rounded-2xl flex items-center justify-center shrink-0 shadow-md ${
+                  hasGenerated 
+                    ? "bg-emerald-600 text-white" 
+                    : "bg-gradient-to-br from-amber-500 to-[#C5A059] text-white"
+                }`}>
+                  {hasGenerated ? <CheckCircle2 className="w-5 h-5" /> : <Camera className="w-5 h-5 animate-pulse" />}
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs sm:text-sm font-black uppercase tracking-wide">
+                      {hasGenerated ? "4 Foto Studio AI Telah Terpasang" : "Wajib Dipoles: Studio Foto AI (Portrait 3:4)"}
+                    </span>
+                    <span className={`px-2 py-0.5 rounded-full text-[10px] font-black ${
+                      hasGenerated ? "bg-emerald-600 text-white" : "bg-amber-500 text-white"
+                    }`}>
+                      {hasGenerated ? "✓ 4 Foto Aktif" : "Klik Generate"}
+                    </span>
+                  </div>
+                  <p className="text-[11px] opacity-90 mt-0.5">
+                    {hasGenerated 
+                      ? "Foto Mockup Utama (Hero) & Galeri Produk (Detail 3/4, Infografis, Lifestyle) sudah otomatis terpasang rapi."
+                      : "Foto mentah wajib dipoles ke 4 foto marketplace (Hero, Detail 3/4, Infografis, Lifestyle) agar standar katalog SV UNS terpenuhi."}
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2 w-full sm:w-auto shrink-0">
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (!isAiStudioOpen) setIsAiStudioOpen(true);
+                    handleGenerateAiPhotos();
+                  }}
+                  disabled={aiLoading}
+                  className="w-full sm:w-auto px-5 py-2.5 rounded-full bg-gradient-to-r from-amber-500 via-[#C5A059] to-[#0F4C81] hover:brightness-110 text-white font-black text-xs shadow-md transition flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+                >
+                  <RefreshCw className={`w-3.5 h-3.5 ${aiLoading ? "animate-spin" : ""}`} />
+                  <span>{aiLoading ? "Sedang Merender..." : hasGenerated ? "Generate Ulang Foto" : "✨ Generate 4 Foto Sekarang"}</span>
+                </button>
+              </div>
+            </div>
+          )}
 
           {/* Galeri Foto Produk Tambahan (Multi-Image / Screenshots / Angles) */}
           <div className="pt-4 border-t border-slate-100 dark:border-slate-800 space-y-3">
@@ -1090,14 +1208,27 @@ export default function CreateProdiItem() {
                     {/* 1. Tambah Foto Mentah (Raw Photo) */}
                     <div>
                       <MediaUploader
-                        label="1. Unggah Foto Mentah Produk (Opsional / Rekomendasi)"
-                        description="Upload foto produk asli/mentah dari lab atau handphone untuk dianalisis oleh AI Studio"
+                        label="1. Unggah Foto Mentah Produk (Wajib / Rekomendasi)"
+                        description="Upload foto produk asli/mentah dari lab atau handphone untuk dipoles otomatis oleh Studio AI"
                         acceptedType="image"
                         maxSizeMb={5}
                         currentUrl={aiRawPhoto}
                         onUploadSuccess={(url, info) => {
-                          if (url) setAiRawPhoto(url);
-                          if (info?.dataUrl) setAiRawPhotoBase64(info.dataUrl);
+                          if (url) {
+                            setAiRawPhoto(url);
+                            if (!thumbnailUrl) setThumbnailUrl(url);
+                            if (info?.dataUrl) setAiRawPhotoBase64(info.dataUrl);
+                            setHasGenerated(false);
+                            toast.info(
+                              "Foto Mentah Siap",
+                              "Silakan pilih jenis produk dan klik 'Hasilkan 4 Foto Marketplace Komersial' di bawah."
+                            );
+                          }
+                        }}
+                        onDelete={() => {
+                          setAiRawPhoto("");
+                          setAiRawPhotoBase64("");
+                          setHasGenerated(false);
                         }}
                       />
                     </div>
@@ -1433,13 +1564,26 @@ export default function CreateProdiItem() {
                     {/* 6. Hasil 4 Foto Produk */}
                     {aiPhotos.length > 0 && (
                       <div className="pt-2 space-y-3">
-                        <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-1.5">
-                          <span className="text-xs font-black text-slate-900 dark:text-white">
-                            4 Foto Marketplace Siap Digunakan (Klik untuk Memilih Mockup Utama):
-                          </span>
-                          <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-bold">
-                            ✓ Format Marketplace Portrait (3:4)
-                          </span>
+                        <div className="flex flex-wrap items-center justify-between gap-2 p-3 rounded-2xl bg-gradient-to-r from-emerald-500/15 via-teal-500/10 to-blue-500/10 border border-emerald-400/40 dark:border-emerald-500/30">
+                          <div className="flex items-center gap-2">
+                            <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
+                            <div>
+                              <span className="text-xs font-black text-slate-900 dark:text-white">
+                                4 Foto Standar Marketplace Komersial (Portrait 3:4)
+                              </span>
+                              <p className="text-[10px] text-slate-500 dark:text-slate-400">
+                                Foto 1 Hero terpasang sebagai Mockup Utama, dan Foto 2–4 otomatis masuk ke Galeri Produk.
+                              </p>
+                            </div>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => applyAllAiPhotos(aiPhotos)}
+                            className="px-3.5 py-1.5 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white text-[11px] font-black transition flex items-center gap-1.5 shadow-xs cursor-pointer"
+                          >
+                            <Check className="w-3 h-3" />
+                            <span>Terapkan Ulang Semua Foto</span>
+                          </button>
                         </div>
 
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">

@@ -8,6 +8,7 @@ interface MediaUploaderProps {
   description?: string;
   currentUrl?: string;
   onUploadSuccess: (url: string, fileInfo?: { type: "image" | "video"; duration?: number; sizeMb: number; dataUrl?: string }) => void;
+  onDelete?: () => void;
   acceptedType?: "image" | "video" | "both";
   maxSizeMb?: number;
   maxDurationSeconds?: number;
@@ -19,6 +20,7 @@ export const MediaUploader: React.FC<MediaUploaderProps> = ({
   description,
   currentUrl,
   onUploadSuccess,
+  onDelete,
   acceptedType = "both",
   maxSizeMb = 10,
   maxDurationSeconds,
@@ -258,6 +260,7 @@ export const MediaUploader: React.FC<MediaUploaderProps> = ({
       fileInputRef.current.value = "";
     }
     onUploadSuccess("");
+    if (onDelete) onDelete();
   };
 
   return (

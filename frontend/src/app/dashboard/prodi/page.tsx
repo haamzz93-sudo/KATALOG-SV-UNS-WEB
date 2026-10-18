@@ -80,13 +80,17 @@ export default function ProdiDashboard() {
             style={{ borderRadius: "9999px" }}
             className="text-xs font-extrabold px-3 py-1 rounded-full bg-emerald-100 dark:bg-emerald-950/80 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 uppercase tracking-widest inline-block"
           >
-            Portal Administrator Prodi
+            {currentUser?.role === "super_admin" || (currentUser?.role as any)?.name === "super_admin" ? "Otoritas Super Admin" : "Portal Administrator Prodi"}
           </span>
           <h1 className="text-xl sm:text-2xl md:text-3xl font-black text-slate-900 dark:text-white tracking-tight mt-1.5">
-            Katalog Inovasi Prodi {currentUser?.prodi?.nama || "D3 Teknik Informatika"}
+            {currentUser?.role === "super_admin" || (currentUser?.role as any)?.name === "super_admin"
+              ? "Katalog Inovasi Seluruh Program Studi (Super Admin)" 
+              : `Katalog Inovasi Prodi ${currentUser?.prodi?.nama || (currentUser?.prodi as any)?.nama_prodi || "D3 Teknik Informatika"}`}
           </h1>
           <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 mt-1 font-medium">
-            Kelola seluruh produk teknologi, alat mekatronika/IoT, dan paket jasa software house milik prodi.
+            {currentUser?.role === "super_admin" || (currentUser?.role as any)?.name === "super_admin"
+              ? "Moderasi dan kelola seluruh produk inovasi, alat IoT, dan jasa dari seluruh prodi Sekolah Vokasi UNS."
+              : "Kelola seluruh produk teknologi, alat mekatronika/IoT, dan paket jasa software house milik prodi."}
           </p>
         </div>
 
