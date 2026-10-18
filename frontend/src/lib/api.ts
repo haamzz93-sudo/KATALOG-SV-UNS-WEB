@@ -720,6 +720,27 @@ export const api = {
     }
   },
 
+  async clearAllItems(): Promise<{ success: boolean; message: string }> {
+    if (typeof window !== "undefined") {
+      localStorage.removeItem("custom_catalog_items");
+    }
+    const token = getToken();
+    try {
+      const res = await fetch(`${API_BASE_URL}/admin/clear-catalog-items`, {
+        method: "POST",
+        headers: {
+          "Accept": "application/json",
+          "Content-Type": "application/json",
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+      });
+      const json = await res.json();
+      return { success: res.ok, message: json.message || "Seluruh item katalog lama berhasil dihapus." };
+    } catch {
+      return { success: false, message: "Koneksi ke server gagal saat menghapus produk." };
+    }
+  },
+
   // Pimpinan SV & Dashboard Realtime Telemetry
   async getPimpinanStats(): Promise<any> {
     const token = getToken();

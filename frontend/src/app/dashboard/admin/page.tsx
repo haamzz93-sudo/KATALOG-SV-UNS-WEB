@@ -2266,15 +2266,44 @@ function AdminDashboardContent() {
                 </p>
               </div>
 
-              <button
-                type="button"
-                onClick={handleOpenAddItem}
-                style={{ borderRadius: "9999px" }}
-                className="w-full sm:w-auto px-5 sm:px-6 py-2.5 rounded-full bg-gradient-to-r from-[#0F4C81] to-[#0A2540] hover:brightness-110 text-white font-extrabold text-xs sm:text-sm shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer shrink-0"
-              >
-                <Plus className="w-4 h-4" />
-                <span>Tambah Inovasi Baru</span>
-              </button>
+              <div className="flex flex-wrap items-center gap-2.5 w-full sm:w-auto">
+                {items.length > 0 && (
+                  <button
+                    type="button"
+                    onClick={async () => {
+                      if (confirm(`PERINGATAN SUPER ADMIN:\nApakah Anda yakin ingin MENGHAPUS SEMUA (${items.length}) produk inovasi katalog lawas dari sistem?\n\nKatalog akan dikosongkan agar bersih dan siap diinput ulang dengan format foto studio dan prompt terkini.`)) {
+                        try {
+                          const res = await api.clearAllItems();
+                          if (res.success) {
+                            toast.success("Katalog Dibersihkan", res.message);
+                            loadData();
+                          } else {
+                            toast.error("Gagal", res.message);
+                          }
+                        } catch {
+                          toast.error("Gagal", "Terjadi kesalahan saat menghapus data.");
+                        }
+                      }
+                    }}
+                    style={{ borderRadius: "9999px" }}
+                    className="px-4 py-2.5 rounded-full bg-rose-50 hover:bg-rose-100 text-rose-600 dark:bg-rose-950/40 dark:hover:bg-rose-900/40 dark:text-rose-300 font-bold text-xs sm:text-sm border border-rose-200 dark:border-rose-800 transition flex items-center justify-center gap-1.5 cursor-pointer shadow-xs"
+                    title="Hapus seluruh produk katalog lama"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                    <span>Hapus Semua Produk Lawas</span>
+                  </button>
+                )}
+
+                <button
+                  type="button"
+                  onClick={handleOpenAddItem}
+                  style={{ borderRadius: "9999px" }}
+                  className="w-full sm:w-auto px-5 sm:px-6 py-2.5 rounded-full bg-gradient-to-r from-[#0F4C81] to-[#0A2540] hover:brightness-110 text-white font-extrabold text-xs sm:text-sm shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer shrink-0"
+                >
+                  <Plus className="w-4 h-4" />
+                  <span>Tambah Inovasi Baru</span>
+                </button>
+              </div>
             </div>
 
             {/* Filter & Search Bar */}
@@ -7589,15 +7618,15 @@ function AdminDashboardContent() {
                 </div>
                 <div>
                   <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block mb-1">
-                    Nominal Tarif (Rp) *
+                    {itemForm.harga_tipe === "contact_us" ? "Nominal Tarif (Opsional / Hubungi PIC)" : "Nominal Tarif (Rp) *"}
                   </label>
                   <input
                     type="number"
                     min={0}
-                    step={500000}
-                    value={itemForm.harga_nominal}
-                    onChange={(e) => setItemForm({ ...itemForm, harga_nominal: Number(e.target.value) })}
-                    placeholder="5000000"
+                    step={10000}
+                    value={itemForm.harga_nominal === 0 && itemForm.harga_tipe === "contact_us" ? "" : (itemForm.harga_nominal || "")}
+                    onChange={(e) => setItemForm({ ...itemForm, harga_nominal: e.target.value === "" ? 0 : Number(e.target.value) })}
+                    placeholder={itemForm.harga_tipe === "contact_us" ? "0 (Bisa Negosiasi)" : "5000000"}
                     className="w-full px-4 py-2.5 text-xs rounded-full border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-white font-mono font-bold"
                   />
                 </div>

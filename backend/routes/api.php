@@ -46,6 +46,8 @@ $registerRoutes = function () {
             Route::post('/items', [ProdiCatalogController::class, 'store']);
             Route::put('/items/{id}', [ProdiCatalogController::class, 'update']);
             Route::delete('/items/{id}', [ProdiCatalogController::class, 'destroy']);
+            Route::delete('/clear-all', [ProdiCatalogController::class, 'clearAll']);
+            Route::post('/clear-all', [ProdiCatalogController::class, 'clearAll']);
         });
 
         // Pimpinan SV (Executive View-Only Analytics & Reports)
@@ -67,6 +69,8 @@ $registerRoutes = function () {
             Route::post('/prodis', [AdminController::class, 'storeProdi']);
             Route::put('/prodis/{id}', [AdminController::class, 'updateProdi']);
             Route::delete('/prodis/{id}', [AdminController::class, 'deleteProdi']);
+            Route::delete('/clear-catalog-items', [ProdiCatalogController::class, 'clearAll']);
+            Route::post('/clear-catalog-items', [ProdiCatalogController::class, 'clearAll']);
         });
     });
 
@@ -75,6 +79,8 @@ $registerRoutes = function () {
     Route::post('/admin/prodis', [AdminController::class, 'storeProdi']);
     Route::put('/admin/prodis/{id}', [AdminController::class, 'updateProdi']);
     Route::delete('/admin/prodis/{id}', [AdminController::class, 'deleteProdi']);
+    Route::post('/admin/clear-catalog-items', [ProdiCatalogController::class, 'clearAll']);
+    Route::delete('/admin/clear-catalog-items', [ProdiCatalogController::class, 'clearAll']);
     Route::post('/ai/catalog-photo', [AiCatalogController::class, 'generatePhotos']);
     Route::post('/ai/test-key', [AiCatalogController::class, 'testKey']);
     Route::get('/ai/image-proxy', [AiCatalogController::class, 'proxyImage']);

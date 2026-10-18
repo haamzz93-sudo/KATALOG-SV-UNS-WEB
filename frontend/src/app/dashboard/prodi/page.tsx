@@ -43,8 +43,27 @@ export default function ProdiDashboard() {
     }
   };
 
-  const formatRupiah = (val: number) => {
-    if (val === 0) return "Hubungi Kami";
+  const handleClearAll = async () => {
+    if (confirm("PERINGATAN PRODI:\nApakah Anda yakin ingin MENGHAPUS SEMUA produk inovasi katalog lama milik prodi ini?\n\nKatalog akan dikosongkan agar bersih dan siap diinput ulang dengan format foto studio dan prompt terkini.")) {
+      try {
+        setIsLoading(true);
+        const res = await api.clearAllItems();
+        if (res.success) {
+          toast.success("Katalog Dibersihkan", res.message);
+          setItems([]);
+        } else {
+          toast.error("Gagal Menghapus", res.message);
+        }
+      } catch {
+        toast.error("Gagal", "Terjadi kesalahan saat mengosongkan katalog.");
+      } finally {
+        setIsLoading(false);
+      }
+    }
+  };
+
+  const formatRupiah = (val: number, tipe?: string) => {
+    if (tipe === "contact_us" || val === 0) return "Hubungi PIC (RFQ)";
     return new Intl.NumberFormat("id-ID", {
       style: "currency",
       currency: "IDR",
@@ -71,14 +90,29 @@ export default function ProdiDashboard() {
           </p>
         </div>
 
-        <Link
-          href="/dashboard/prodi/create"
-          style={{ borderRadius: "9999px" }}
-          className="w-full sm:w-auto px-5 sm:px-6 py-2.5 rounded-full bg-[#0F4C81] hover:bg-[#135996] text-white font-extrabold text-xs sm:text-sm shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer shrink-0"
-        >
-          <PlusCircle className="w-4 h-4" />
-          <span>Tambah Inovasi Baru</span>
-        </Link>
+        <div className="flex flex-wrap items-center gap-2.5 w-full sm:w-auto">
+          {items.length > 0 && (
+            <button
+              type="button"
+              onClick={handleClearAll}
+              style={{ borderRadius: "9999px" }}
+              className="px-4 py-2.5 rounded-full bg-rose-50 hover:bg-rose-100 text-rose-600 dark:bg-rose-950/40 dark:hover:bg-rose-900/40 dark:text-rose-300 font-bold text-xs sm:text-sm border border-rose-200 dark:border-rose-800 transition flex items-center justify-center gap-1.5 cursor-pointer shadow-xs"
+              title="Hapus seluruh produk inovasi lama agar bersih"
+            >
+              <Trash2 className="w-4 h-4" />
+              <span>Hapus Semua Produk Lawas</span>
+            </button>
+          )}
+
+          <Link
+            href="/dashboard/prodi/create"
+            style={{ borderRadius: "9999px" }}
+            className="w-full sm:w-auto px-5 sm:px-6 py-2.5 rounded-full bg-[#0F4C81] hover:bg-[#135996] text-white font-extrabold text-xs sm:text-sm shadow-md hover:shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer shrink-0"
+          >
+            <PlusCircle className="w-4 h-4" />
+            <span>Tambah Inovasi Baru</span>
+          </Link>
+        </div>
       </div>
 
       {/* Items List Table */}
@@ -144,10 +178,10 @@ export default function ProdiDashboard() {
                       </td>
                       <td className="py-4">
                         <span className="font-black text-sm text-[#0A2540] dark:text-[#C5A059] block">
-                          {formatRupiah(item.harga_nominal)}
+                          {formatRupiah(item.harga_nominal, item.harga_tipe)}
                         </span>
                         <span className="text-xs text-slate-400 font-bold uppercase mt-0.5 block">
-                          {item.harga_tipe}
+                          {item.harga_tipe === "contact_us" ? "Kustom / RFQ" : item.harga_tipe}
                         </span>
                       </td>
                       <td className="py-4 text-center">
@@ -232,7 +266,7 @@ export default function ProdiDashboard() {
                         {item.category?.nama} • PIC: {item.pic_nama}
                       </span>
                       <span className="font-black text-xs text-[#0A2540] dark:text-[#C5A059] block mt-1">
-                        {formatRupiah(item.harga_nominal)} ({item.harga_tipe})
+                        {formatRupiah(item.harga_nominal, item.harga_tipe)}
                       </span>
                     </div>
                   </div>

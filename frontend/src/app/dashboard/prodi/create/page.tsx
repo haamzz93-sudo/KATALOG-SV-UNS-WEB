@@ -7,7 +7,7 @@ import {
   ArrowLeft, Plus, Trash2, CheckCircle2, 
   Laptop, Cpu, Wrench, Save, GraduationCap,
   Camera, SlidersHorizontal, RefreshCw, Eye, Download, Check, UploadCloud, ChevronDown,
-  Maximize2, X, ChevronLeft, ChevronRight, Info
+  Maximize2, X, ChevronLeft, ChevronRight, Info, Images
 } from "lucide-react";
 import { api } from "../../../../lib/api";
 import { useToast } from "../../../../context/ToastContext";
@@ -26,6 +26,12 @@ import {
   generateBackViewPhoto,
 } from "../../../../lib/studioMarketplaceGenerator";
 
+export interface GalleryImage {
+  id: string;
+  url: string;
+  caption?: string;
+}
+
 export default function CreateProdiItem() {
   const router = useRouter();
   const toast = useToast();
@@ -42,6 +48,7 @@ export default function CreateProdiItem() {
   const [liveDemoUrl, setLiveDemoUrl] = useState("");
   const [model3dUrl, setModel3dUrl] = useState("");
   const [thumbnailUrl, setThumbnailUrl] = useState("");
+  const [galleryImages, setGalleryImages] = useState<GalleryImage[]>([]);
   const [statusPublikasi, setStatusPublikasi] = useState<"draft" | "published">("published");
   const [hargaTipe, setHargaTipe] = useState<"starting_at" | "fixed" | "contact_us">("starting_at");
   const [hargaNominal, setHargaNominal] = useState<number>(0);
@@ -225,6 +232,8 @@ export default function CreateProdiItem() {
         if (d.liveDemoUrl !== undefined) setLiveDemoUrl(d.liveDemoUrl);
         if (d.model3dUrl !== undefined) setModel3dUrl(d.model3dUrl);
         if (d.thumbnailUrl !== undefined) setThumbnailUrl(d.thumbnailUrl);
+        if (d.thumbnailUrl !== undefined) setThumbnailUrl(d.thumbnailUrl);
+        if (d.galleryImages && Array.isArray(d.galleryImages)) setGalleryImages(d.galleryImages);
         if (d.statusPublikasi !== undefined) setStatusPublikasi(d.statusPublikasi);
         if (d.hargaTipe !== undefined) setHargaTipe(d.hargaTipe);
         if (d.hargaNominal !== undefined) setHargaNominal(d.hargaNominal);
@@ -260,6 +269,7 @@ export default function CreateProdiItem() {
       deskripsiSingkat.trim() ||
       deskripsiLengkap.trim() ||
       thumbnailUrl ||
+      (galleryImages && galleryImages.length > 0) ||
       aiRawPhoto ||
       (aiPhotos && aiPhotos.length > 0) ||
       liveDemoUrl.trim() ||
@@ -280,6 +290,7 @@ export default function CreateProdiItem() {
           liveDemoUrl,
           model3dUrl,
           thumbnailUrl,
+          galleryImages,
           statusPublikasi,
           hargaTipe,
           hargaNominal,
@@ -328,6 +339,7 @@ export default function CreateProdiItem() {
     liveDemoUrl,
     model3dUrl,
     thumbnailUrl,
+    galleryImages,
     statusPublikasi,
     hargaTipe,
     hargaNominal,
@@ -357,6 +369,7 @@ export default function CreateProdiItem() {
       setLiveDemoUrl("");
       setModel3dUrl("");
       setThumbnailUrl("");
+      setGalleryImages([]);
       setStatusPublikasi("published");
       setHargaTipe("starting_at");
       setHargaNominal(0);
@@ -599,11 +612,25 @@ export default function CreateProdiItem() {
         thumbnail_url: thumbnailUrl && !thumbnailUrl.startsWith("blob:") ? thumbnailUrl : "/images/brand/slogan-poster-vokasi.jpg",
         status_publikasi: statusPublikasi,
         harga_tipe: hargaTipe,
-        harga_nominal: hargaNominal,
+        harga_nominal: hargaTipe === "contact_us" ? (hargaNominal || 0) : (hargaNominal || 0),
         pic_nama: picNama,
         pic_kontak: picKontak,
         pic_laboratorium: picLaboratorium,
         specs: specs.filter((s) => s.spec_key.trim() !== ""),
+        media: [
+          ...(thumbnailUrl && !thumbnailUrl.startsWith("blob:") ? [{
+            file_url: thumbnailUrl,
+            media_type: "image",
+            is_primary: true,
+            caption: namaItem || "Foto Mockup Utama",
+          }] : []),
+          ...galleryImages.filter(g => g.url && !g.url.startsWith("blob:")).map((g, idx) => ({
+            file_url: g.url,
+            media_type: "image",
+            is_primary: false,
+            caption: g.caption || `Foto Tambahan #${idx + 2}`,
+          })),
+        ],
       };
 
       const res = await api.createItem(payload);
@@ -920,6 +947,111 @@ export default function CreateProdiItem() {
                   Tautan web interaktif (iframe Sandbox) atau link embed Spline 3D.
                 </p>
               </div>
+            </div>
+          </div>
+
+          {/* Galeri Foto Produk Tambahan (Multi-Image / Screenshots / Angles) */}
+          <div className="pt-4 border-t border-slate-100 dark:border-slate-800 space-y-3">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <div>
+                <label className="text-xs sm:text-sm font-bold text-slate-800 dark:text-slate-200 flex items-center gap-2">
+                  <Images className="w-4 h-4 text-[#0F4C81] dark:text-[#C5A059]" />
+                  <span>Galeri Foto Produk Tambahan (Opsional / Multi-Image)</span>
+                </label>
+                <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
+                  Unggah screenshot aplikasi, tampak samping, belakang, kemasan, atau detail lainnya untuk melengkapi galeri produk.
+                </p>
+              </div>
+              <span className="text-xs font-bold px-2.5 py-1 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300">
+                {galleryImages.length} Foto Tambahan
+              </span>
+            </div>
+
+            {/* Grid Preview Foto Galeri */}
+            {galleryImages.length > 0 && (
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2">
+                {galleryImages.map((img, idx) => (
+                  <div
+                    key={img.id || idx}
+                    className="group relative rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/60 p-2.5 flex flex-col justify-between space-y-2 shadow-xs"
+                  >
+                    <div className="relative aspect-[4/3] w-full rounded-xl overflow-hidden bg-slate-200 dark:bg-slate-800 border border-slate-200 dark:border-slate-700">
+                      <img
+                        src={img.url}
+                        alt={img.caption || `Foto #${idx + 2}`}
+                        className="w-full h-full object-cover"
+                      />
+                      <span className="absolute top-1.5 left-1.5 px-2 py-0.5 rounded-full bg-slate-900/80 backdrop-blur-xs text-[9px] font-bold text-white">
+                        #{idx + 2}
+                      </span>
+                    </div>
+
+                    <input
+                      type="text"
+                      placeholder="Caption foto (opsional)..."
+                      value={img.caption || ""}
+                      onChange={(e) => {
+                        const updated = [...galleryImages];
+                        updated[idx].caption = e.target.value;
+                        setGalleryImages(updated);
+                      }}
+                      className="w-full px-2.5 py-1 text-[11px] rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 focus:outline-none"
+                    />
+
+                    <div className="flex items-center gap-1.5 pt-1">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const oldThumb = thumbnailUrl;
+                          setThumbnailUrl(img.url);
+                          const updated = [...galleryImages];
+                          if (oldThumb) {
+                            updated[idx] = { ...img, url: oldThumb };
+                          } else {
+                            updated.splice(idx, 1);
+                          }
+                          setGalleryImages(updated);
+                          toast.success("Foto Utama Ditukar", "Foto galeri dijadikan sebagai foto mockup utama.");
+                        }}
+                        className="flex-1 py-1 px-2 rounded-lg bg-blue-50 hover:bg-blue-100 dark:bg-blue-950/40 dark:hover:bg-blue-900/40 text-[#0F4C81] dark:text-sky-300 text-[10px] font-bold transition text-center cursor-pointer"
+                        title="Tukar menjadi Mockup Utama"
+                      >
+                        Jadikan Utama
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setGalleryImages(galleryImages.filter((_, i) => i !== idx));
+                          toast.info("Foto Dihapus", "Foto dihapus dari galeri.");
+                        }}
+                        className="p-1.5 rounded-lg bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 transition cursor-pointer"
+                        title="Hapus foto"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Uploader Foto Galeri Tambahan */}
+            <div className="pt-2">
+              <MediaUploader
+                label="+ Tambah Foto ke Galeri Produk (Bisa Banyak)"
+                description="Upload foto screenshot atau variasi angle tambahan (PNG, JPG, WEBP maks 5MB)"
+                acceptedType="image"
+                maxSizeMb={5}
+                onUploadSuccess={(url) => {
+                  if (url) {
+                    setGalleryImages((prev) => [
+                      ...prev,
+                      { id: `gal-${Date.now()}-${Math.random().toString(36).substr(2, 4)}`, url, caption: "" }
+                    ]);
+                    toast.success("Foto Ditambahkan!", "Foto baru berhasil dimasukkan ke galeri produk.");
+                  }
+                }}
+              />
             </div>
           </div>
 
@@ -1381,7 +1513,7 @@ export default function CreateProdiItem() {
                                 </button>
                               </div>
 
-                              <div className="flex items-center gap-2 pt-2 border-t border-slate-100 dark:border-slate-700/60 mt-auto">
+                              <div className="flex items-center gap-1.5 pt-2 border-t border-slate-100 dark:border-slate-700/60 mt-auto">
                                 <button
                                   type="button"
                                   onClick={() => {
@@ -1389,14 +1521,35 @@ export default function CreateProdiItem() {
                                     toast.success("Foto Dipilih", `Foto "${photo.title}" dijadikan sebagai mockup produk.`);
                                   }}
                                   style={{ borderRadius: "9999px" }}
-                                  className={`flex-1 py-2 px-3 rounded-full text-xs font-bold transition flex items-center justify-center gap-1.5 cursor-pointer shadow-xs ${
+                                  className={`flex-1 py-1.5 px-2.5 rounded-full text-[11px] font-bold transition flex items-center justify-center gap-1 cursor-pointer shadow-xs ${
                                     thumbnailUrl === photo.url
                                       ? "bg-emerald-600 text-white hover:bg-emerald-700"
                                       : "bg-[#0F4C81] text-white hover:bg-[#135996]"
                                   }`}
                                 >
-                                  <Check className="w-3.5 h-3.5" />
+                                  <Check className="w-3 h-3" />
                                   <span>{thumbnailUrl === photo.url ? "Terpilih" : "Gunakan"}</span>
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    const isAlreadyInGallery = galleryImages.some((g) => g.url === photo.url);
+                                    if (isAlreadyInGallery) {
+                                      toast.info("Sudah di Galeri", "Foto ini sudah ada di galeri tambahan.");
+                                    } else {
+                                      setGalleryImages((prev) => [
+                                        ...prev,
+                                        { id: `gal-${Date.now()}-${Math.random().toString(36).substr(2, 4)}`, url: photo.url, caption: photo.title }
+                                      ]);
+                                      toast.success("Masuk Galeri!", `Foto "${photo.title}" ditambahkan ke galeri produk.`);
+                                    }
+                                  }}
+                                  style={{ borderRadius: "9999px" }}
+                                  className="py-1.5 px-2.5 rounded-full text-[11px] font-bold transition flex items-center justify-center gap-1 cursor-pointer bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-200 shadow-xs"
+                                  title="Tambahkan ke Galeri Produk Tambahan"
+                                >
+                                  <Plus className="w-3 h-3 text-amber-500" />
+                                  <span>+ Galeri</span>
                                 </button>
                                 <a
                                   href={photo.url}
@@ -1404,10 +1557,10 @@ export default function CreateProdiItem() {
                                   rel="noreferrer noopener"
                                   download
                                   style={{ borderRadius: "9999px" }}
-                                  className="p-2 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:text-amber-500 hover:bg-amber-50 dark:hover:bg-amber-950/40 transition cursor-pointer"
+                                  className="p-1.5 rounded-full bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:text-amber-500 hover:bg-amber-50 dark:hover:bg-amber-950/40 transition cursor-pointer"
                                   title="Unduh HD Portrait 3:4 (960x1280)"
                                 >
-                                  <Download className="w-4 h-4" />
+                                  <Download className="w-3.5 h-3.5" />
                                 </a>
                               </div>
                             </div>
@@ -1546,6 +1699,27 @@ export default function CreateProdiItem() {
                     <span>{thumbnailUrl === fullscreenPhoto.url ? "Sudah Terpilih Sebagai Mockup" : "Gunakan Sebagai Mockup Produk Utama"}</span>
                   </button>
 
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const isAlreadyInGallery = galleryImages.some((g) => g.url === fullscreenPhoto.url);
+                      if (isAlreadyInGallery) {
+                        toast.info("Sudah di Galeri", "Foto ini sudah ada di galeri tambahan.");
+                      } else {
+                        setGalleryImages((prev) => [
+                          ...prev,
+                          { id: `gal-${Date.now()}-${Math.random().toString(36).substr(2, 4)}`, url: fullscreenPhoto.url, caption: fullscreenPhoto.title }
+                        ]);
+                        toast.success("Masuk Galeri!", `Foto "${fullscreenPhoto.title}" berhasil dimasukkan ke galeri produk.`);
+                      }
+                    }}
+                    style={{ borderRadius: "9999px" }}
+                    className="w-full py-2.5 px-4 rounded-full font-bold text-xs sm:text-sm transition flex items-center justify-center gap-2 cursor-pointer bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 border border-slate-200 dark:border-slate-700"
+                  >
+                    <Plus className="w-4 h-4 text-amber-500" />
+                    <span>Tambahkan Foto Ini ke Galeri Produk</span>
+                  </button>
+
                   <div className="flex items-center gap-2">
                     <a
                       href={fullscreenPhoto.url}
@@ -1637,27 +1811,33 @@ export default function CreateProdiItem() {
                 value={hargaTipe}
                 onChange={(e) => setHargaTipe(e.target.value as any)}
                 style={{ borderRadius: "9999px" }}
-                className="w-full px-4 py-2.5 text-sm rounded-full border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-white"
+                className="w-full px-4 py-2.5 text-sm rounded-full border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-white font-bold"
               >
                 <option value="starting_at">Mulai Dari (Starting At)</option>
                 <option value="fixed">Harga Tetap (Fixed Unit)</option>
-                <option value="contact_us">Penawaran Kustom (RFQ)</option>
+                <option value="contact_us">Penawaran Kustom / Hubungi PIC (RFQ)</option>
               </select>
             </div>
 
             <div>
               <label className="text-sm font-bold text-slate-700 dark:text-slate-300 block mb-1.5">
-                Nominal Harga (Rupiah) *
+                {hargaTipe === "contact_us" ? "Nominal Harga (Opsional / Hubungi PIC)" : "Nominal Harga (Rupiah) *"}
               </label>
               <input
                 type="number"
-                required
+                required={hargaTipe !== "contact_us"}
                 min={0}
-                value={hargaNominal}
-                onChange={(e) => setHargaNominal(Number(e.target.value))}
+                value={hargaNominal === 0 && hargaTipe === "contact_us" ? "" : (hargaNominal || "")}
+                onChange={(e) => setHargaNominal(e.target.value === "" ? 0 : Number(e.target.value))}
+                placeholder={hargaTipe === "contact_us" ? "0 (Bisa Negosiasi / Konsultasi)" : "Contoh: 50000"}
                 style={{ borderRadius: "9999px" }}
                 className="w-full px-4 py-2.5 text-sm rounded-full border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-white"
               />
+              {hargaTipe === "contact_us" && (
+                <p className="text-[11px] text-amber-600 dark:text-amber-400 mt-1 font-medium">
+                  * Produk ini akan tampil dengan label &quot;Hubungi PIC / Penawaran Kustom&quot; di katalog.
+                </p>
+              )}
             </div>
 
             <div>
