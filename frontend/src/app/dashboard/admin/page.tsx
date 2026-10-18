@@ -2684,9 +2684,9 @@ function AdminDashboardContent() {
                   className="px-3.5 py-2 text-xs rounded-full border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-200 font-bold cursor-pointer"
                 >
                   <option value="all">Semua Kategori</option>
-                  <option value="1">{settings.service_1_title || "1. Teknologi & Digital"}</option>
-                  <option value="2">{settings.service_2_title || "2. Produk Inovasi & Riset"}</option>
-                  <option value="3">{settings.service_3_title || "3. Jasa & Layanan Keahlian"}</option>
+                  <option value="1">{settings.service_1_title || "Inovasi"}</option>
+                  <option value="2">{settings.service_2_title || "Produk Siap Terap"}</option>
+                  <option value="3">{settings.service_3_title || "Jasa Konsultan"}</option>
                 </select>
 
                 <select

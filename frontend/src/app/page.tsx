@@ -89,7 +89,21 @@ export default function HomePage() {
     }
 
     if (selectedProdi) {
-      list = list.filter((i) => i.prodi?.kode_prodi === selectedProdi);
+      list = list.filter((i) => {
+        const itemKode = i.prodi?.kode_prodi;
+        if (!itemKode) return false;
+        if (itemKode === selectedProdi) return true;
+        // Dukung pencocokan rumpun kampus Madiun & Pusat (D3-TIF & D3-TIF-MDN)
+        if (
+          (selectedProdi === "D3-TIF" && (itemKode === "D3-TIF-MDN" || itemKode === "D3-TIF")) ||
+          (selectedProdi === "D3-TIF-MDN" && (itemKode === "D3-TIF" || itemKode === "D3-TIF-MDN"))
+        ) return true;
+        if (
+          (selectedProdi === "D3-AKT" && (itemKode === "D3-AKT-MDN" || itemKode === "D3-AKT")) ||
+          (selectedProdi === "D3-AKT-MDN" && (itemKode === "D3-AKT" || itemKode === "D3-AKT-MDN"))
+        ) return true;
+        return false;
+      });
     }
 
     if (searchKeyword.trim()) {
@@ -171,37 +185,49 @@ export default function HomePage() {
       "Engineered by expert faculty and talented vocational students to meet industry standards"
     ),
     service1Badge: getLocalizedSetting("service_1_badge", settings, currentLang, "Layanan 1", "Service 1"),
-    service1Title: getLocalizedSetting("service_1_title", settings, currentLang, "1. Teknologi & SaaS", "1. Technology & SaaS"),
+    service1Title: (() => {
+      const val = getLocalizedSetting("service_1_title", settings, currentLang, "Inovasi", "Innovations");
+      if (val === "1. Teknologi & SaaS" || val === "Teknologi" || val === "1. Inovasi Teknologi") return isEn ? "Innovations" : "Inovasi";
+      return val;
+    })(),
     service1Desc: getLocalizedSetting(
       "service_1_desc",
       settings,
       currentLang,
-      "Platform web, modul AI, dan perangkat lunak siap terap hasil riset dan project based learning yang sudah melewati pengujian.",
-      "Web platforms, AI models, and turnkey software verified through applied project-based learning."
+      "Inovasi siap terap hasil riset terapan dan projek base learning yang sudah melewati pengujian.",
+      "Ready-to-deploy innovations from applied research and project-based learning verified through testing."
     ),
     service1Btn: getLocalizedSetting("service_1_btn", settings, currentLang, "Buka Demo Sandbox", "Open Sandbox Demo"),
 
-    service2Badge: getLocalizedSetting("service_2_badge", settings, currentLang, "Layanan 2 (Unggulan)", "Service 2 (Featured)"),
-    service2Title: getLocalizedSetting("service_2_title", settings, currentLang, "2. Produk Fisik & IoT", "2. Hardware & IoT"),
+    service2Badge: getLocalizedSetting("service_2_badge", settings, currentLang, "Layanan 2", "Service 2"),
+    service2Title: (() => {
+      const val = getLocalizedSetting("service_2_title", settings, currentLang, "Produk Siap Terap", "Ready-to-Deploy Products");
+      if (val === "2. Produk Fisik & IoT" || val === "2. Produk Siap Terap") return isEn ? "Ready-to-Deploy Products" : "Produk Siap Terap";
+      return val;
+    })(),
     service2Desc: getLocalizedSetting(
       "service_2_desc",
       settings,
       currentLang,
-      "Produk unggulan siap edar, alat mekatronika presisi, robot patroli otonom, dan perangkat embedded cerdas berstandar manufaktur.",
-      "Production-ready physical products, precision mechatronics, autonomous robots, and intelligent embedded hardware."
+      "Produk unggulan siap edar hasil riset terapan dan sudah dilakukan pengujian mendalam.",
+      "Flagship marketable products resulting from applied research and in-depth testing."
     ),
-    service2Btn: getLocalizedSetting("service_2_btn", settings, currentLang, "Putar Objek 3D", "Rotate 3D Model"),
+    service2Btn: getLocalizedSetting("service_2_btn", settings, currentLang, "Jelajahi Produk", "Explore Products"),
 
     service3Badge: getLocalizedSetting("service_3_badge", settings, currentLang, "Layanan 3", "Service 3"),
-    service3Title: getLocalizedSetting("service_3_title", settings, currentLang, "3. Jasa Software House", "3. Software House Services"),
+    service3Title: (() => {
+      const val = getLocalizedSetting("service_3_title", settings, currentLang, "Jasa Konsultan", "Consulting Services");
+      if (val === "3. Jasa Software House" || val === "3. Jasa & Layanan Keahlian") return isEn ? "Consulting Services" : "Jasa Konsultan";
+      return val;
+    })(),
     service3Desc: getLocalizedSetting(
       "service_3_desc",
       settings,
       currentLang,
-      "Jasa layanan rancang bangun sistem kustom, konsultasi tenaga ahli, sprint agile, dan garansi pemeliharaan sistem teruji.",
-      "Custom software engineering, faculty expert consulting, agile sprint delivery, and proven system warranty."
+      "Jasa layanan pengembangan dan konsultasi tenaga ahli.",
+      "Development services and expert professional consulting."
     ),
-    service3Btn: getLocalizedSetting("service_3_btn", settings, currentLang, "Konsultasi Proyek", "Consult Project"),
+    service3Btn: getLocalizedSetting("service_3_btn", settings, currentLang, "Konsultasi Layanan", "Consult Service"),
 
     catalogBadge: isEn ? "Applied Research & Engineering Marketplace" : "Marketplace Riset & Rekayasa Terapan",
     catalogTitle: isEn ? "Vocational Products & Innovations Catalog" : "Katalog Produk & Inovasi Vokasi",
@@ -646,22 +672,28 @@ export default function HomePage() {
               {[
                 { 
                   key: "", 
-                  label: isEn ? (settings.catalog_tab_all_en || "All Categories") : (settings.catalog_tab_all_id || "Semua Inovasi"), 
+                  label: isEn ? (settings.catalog_tab_all_en || "All Categories") : (settings.catalog_tab_all_id || "Semua"), 
                   icon: Layers 
                 },
                 { 
                   key: "teknologi", 
-                  label: isEn ? (settings.catalog_tab_teknologi_en || "Technology & Digital") : (settings.catalog_tab_teknologi_id || "Teknologi & Digital"), 
+                  label: isEn 
+                    ? (settings.catalog_tab_teknologi_en || "Innovation") 
+                    : (!settings.catalog_tab_teknologi_id || settings.catalog_tab_teknologi_id === "Teknologi" || settings.catalog_tab_teknologi_id === "Teknologi & Digital" ? "Inovasi" : settings.catalog_tab_teknologi_id), 
                   icon: Laptop 
                 },
                 { 
                   key: "produk", 
-                  label: isEn ? (settings.catalog_tab_produk_en || "Applied Products") : (settings.catalog_tab_produk_id || "Produk Inovasi"), 
+                  label: isEn 
+                    ? (settings.catalog_tab_produk_en || "Ready-to-Deploy Products") 
+                    : (settings.catalog_tab_produk_id || "Produk Siap Terap"), 
                   icon: Package 
                 },
                 { 
                   key: "jasa", 
-                  label: isEn ? (settings.catalog_tab_jasa_en || "Expert Services") : (settings.catalog_tab_jasa_id || "Layanan & Jasa"), 
+                  label: isEn 
+                    ? (settings.catalog_tab_jasa_en || "Services") 
+                    : (!settings.catalog_tab_jasa_id || settings.catalog_tab_jasa_id === "Layanan & Jasa" || settings.catalog_tab_jasa_id === "Jasa & Layanan" ? "Jasa" : settings.catalog_tab_jasa_id), 
                   icon: Briefcase 
                 },
               ].map((tab) => {

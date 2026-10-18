@@ -1,15 +1,15 @@
 [
   {
-    "nama_item": "Rabuk Apps - Sistem Presisi Pemupukan & Pertanian Cerdas",
+    "nama_item": "Rabuk Apps",
     "slug": "rabuk-apps-pertanian-cerdas",
     "prodi_code": "D3-TIF-MDN",
     "category_id": 1,
-    "tagline": "Aplikasi Pertanian Presisi Berbasis Analisis Hara Tanah & Prediksi Iklim",
+    "tagline": "Aplikasi Pertanian Cerdas Berbasis Analisis Hara Tanah & Prediksi Iklim",
     "deskripsi_singkat": "Aplikasi pertanian cerdas yang dirancang untuk mendukung keberlanjutan sektor pemupukan melalui pendekatan presisi berbasis IoT dan analisis hara tanah.",
     "deskripsi_lengkap": "Rabuk Apps adalah aplikasi pertanian cerdas yang dirancang untuk mendukung keberlanjutan sektor pemupukan melalui pendekatan presisi. Berbasis analisis unsur hara tanah dan prediksi anomali iklim, sistem ini membantu petani mengoptimalkan dosis pupuk secara akurat, menjaga efisiensi biaya, serta mendorong kesadaran petani yang selama ini belum melakukan pemupukan secara teratur.\n\nSebagai bentuk dukungan konkret bagi komoditas lokal, aplikasi ini difokuskan untuk meningkatkan produktivitas dan kualitas panen salak Magelang. Dengan hasil panen yang konsisten dan memenuhi standar mutu internasional, Rabuk Apps siap memperkuat daya saing dan potensi ekspor salak Magelang ke pasar global.",
-    "thumbnail_url": "/images/catalog/studio/rabuk-apps-pertanian-cerdas-1-hero.jpg",
+    "thumbnail_url": "/images/catalog/rabuk-apps.png",
     "gallery": [
-      "/images/catalog/studio/rabuk-apps-pertanian-cerdas-1-hero.jpg",
+      "/images/catalog/rabuk-apps.png",
       "/images/catalog/studio/rabuk-apps-pertanian-cerdas-2-detail.jpg",
       "/images/catalog/studio/rabuk-apps-pertanian-cerdas-3-infografis.jpg"
     ],
@@ -50,9 +50,9 @@
     "tagline": "Permesinan Industri Kokoh & Berdaya Tahan Tinggi untuk Manufaktur Skala Presisi",
     "deskripsi_singkat": "Solusi permesinan industri berdaya tahan tinggi berstruktur gantry dua kolom kaku untuk manufaktur presisi skala menengah hingga besar.",
     "deskripsi_lengkap": "Mesin Double Column CNC Milling 3-Axis merupakan solusi permesinan industri berdaya tahan tinggi yang dirancang untuk kebutuhan manufaktur presisi skala menengah hingga besar. Dengan struktur dua kolom (gantry) yang sangat kokoh dan kaku, mesin ini memberikan kestabilan optimal serta mampu meredam getaran (vibration resistant) secara efektif selama proses pemotongan intensif.\n\nDilengkapi dengan spindle torsi tinggi dan sistem kontrol otomatis presisi, mesin ini mampu melakukan pemesinan berbagai material logam keras, cetakan mold & die, serta komponen struktural presisi dengan toleransi mikron.",
-    "thumbnail_url": "/images/catalog/studio/mesin-double-column-cnc-milling-3-axis-1-hero.jpg",
+    "thumbnail_url": "/images/catalog/mesin-cnc-milling.png",
     "gallery": [
-      "/images/catalog/studio/mesin-double-column-cnc-milling-3-axis-1-hero.jpg",
+      "/images/catalog/mesin-cnc-milling.png",
       "/images/catalog/studio/mesin-double-column-cnc-milling-3-axis-2-detail.jpg",
       "/images/catalog/studio/mesin-double-column-cnc-milling-3-axis-3-infografis.jpg"
     ],
@@ -86,16 +86,16 @@
     ]
   },
   {
-    "nama_item": "Mesin CNC Turning (Mesin Bubut Otomatis Presisi)",
+    "nama_item": "Inovasi Mesin CNC Turning Presisi",
     "slug": "mesin-cnc-turning-presisi",
     "prodi_code": "D4-TRM",
     "category_id": 1,
     "tagline": "Solusi Pembubutan Silindris Otomatis Skala Industri dengan Akurasi Repetisi Tinggi",
-    "deskripsi_singkat": "Mesin bubut otomatis presisi untuk membentuk benda kerja silindris dengan repetisi tinggi dan toleransi mikro.",
-    "deskripsi_lengkap": "Inovasi Mesin CNC Turning merupakan solusi presisi untuk mengoptimalkan efisiensi proses manufaktur modern. Mesin ini dirancang khusus untuk membentuk benda kerja silindris melalui proses pembubutan otomatis dengan akurasi dan repetisi yang sangat tinggi.\n\nBerkat sistem kontrol otomatis yang stabil, mesin ini sangat ideal untuk memproduksi berbagai komponen rumit secara konsisten dan efisien dalam skala produksi massal industri otomotif, permesinan presisi, dan komponen medis.",
-    "thumbnail_url": "/images/catalog/studio/mesin-cnc-turning-presisi-1-hero.jpg",
+    "deskripsi_singkat": "Solusi presisi untuk mengoptimalkan efisiensi proses manufaktur modern melalui pembubutan otomatis akurasi tinggi.",
+    "deskripsi_lengkap": "Inovasi Mesin CNC Turning merupakan solusi presisi untuk mengoptimalkan efisiensi proses manufaktur modern. Mesin ini dirancang khusus untuk membentuk benda kerja silindris melalui proses pembubutan otomatis dengan akurasi dan repetisi yang sangat tinggi. Berkat sistem kontrol otomatis yang stabil, mesin ini sangat ideal untuk memproduksi berbagai komponen rumit secara konsisten dan efisien dalam skala produksi massal.",
+    "thumbnail_url": "/images/catalog/mesin-cnc-turning.png",
     "gallery": [
-      "/images/catalog/studio/mesin-cnc-turning-presisi-1-hero.jpg",
+      "/images/catalog/mesin-cnc-turning.png",
       "/images/catalog/studio/mesin-cnc-turning-presisi-2-detail.jpg",
       "/images/catalog/studio/mesin-cnc-turning-presisi-3-infografis.jpg"
     ],

@@ -808,10 +808,10 @@ export default function CreateProdiItem() {
                   )}
                 </div>
                 <h4 className="font-bold text-sm sm:text-base leading-snug">
-                  {settings.service_1_title || "1. Teknologi & Digital"}
+                  {settings.service_1_title || "Inovasi"}
                 </h4>
                 <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 line-clamp-2">
-                  {settings.service_1_desc || "Aplikasi, AI, SaaS & Web"}
+                  {settings.service_1_desc || "Inovasi siap terap hasil riset terapan dan projek base learning yang sudah melewati pengujian."}
                 </p>
               </div>
             </button>
@@ -836,10 +836,10 @@ export default function CreateProdiItem() {
                   )}
                 </div>
                 <h4 className="font-bold text-sm sm:text-base leading-snug">
-                  {settings.service_2_title || "2. Produk Inovasi & Riset"}
+                  {settings.service_2_title || "Produk Siap Terap"}
                 </h4>
                 <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 line-clamp-2">
-                  {settings.service_2_desc || "Pangan, Herbal, Mesin & Fisik"}
+                  {settings.service_2_desc || "Produk unggulan siap edar hasil riset terapan dan sudah dilakukan pengujian mendalam."}
                 </p>
               </div>
             </button>
@@ -864,10 +864,10 @@ export default function CreateProdiItem() {
                   )}
                 </div>
                 <h4 className="font-bold text-sm sm:text-base leading-snug">
-                  {settings.service_3_title || "3. Jasa & Layanan Keahlian"}
+                  {settings.service_3_title || "Jasa Konsultan"}
                 </h4>
                 <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 line-clamp-2">
-                  {settings.service_3_desc || "Konsultasi, Uji Lab & Pelatihan"}
+                  {settings.service_3_desc || "Jasa layanan pengembangan dan konsultasi tenaga ahli."}
                 </p>
               </div>
             </button>

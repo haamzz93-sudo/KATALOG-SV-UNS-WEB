@@ -19,22 +19,22 @@ const rawProducts = JSON.parse(fs.readFileSync(PRODUCTS_JSON_PATH, 'utf8'));
 
 // Metadata khusus terstandarisasi 3 Lini Layanan (1_inovasi: 3 item, 2_produk: 19 item, 3_jasa: 9 item)
 const productMeta = {
-  // === LINI 1: INOVASI TEKNOLOGI (category_id: 1, total 3 item) ===
+  // === LINI 1: INOVASI (category_id: 1, total 3 item) ===
   "rabuk-apps-pertanian-cerdas": {
     lini: "teknologi",
-    kategoriBadge: "INOVASI TEKNOLOGI",
+    kategoriBadge: "INOVASI",
     headline: "KENAPA INOVASI INI LAYAK DITERAPKAN?",
     tags: ["Sensor Presisi Tanah", "Prediksi Cuaca AI", "Hemat Dosis Pupuk", "Dashboard Terintegrasi"]
   },
   "mesin-double-column-cnc-milling-3-axis": {
     lini: "teknologi",
-    kategoriBadge: "INOVASI TEKNOLOGI",
+    kategoriBadge: "INOVASI",
     headline: "KENAPA MESIN INI LAYAK DIPILIH?",
     tags: ["Gantry Dua Kolom Kaku", "Spindle Torsi Tinggi", "Peredam Getaran Optimal", "Toleransi Presisi Mikron"]
   },
   "mesin-cnc-turning-presisi": {
     lini: "teknologi",
-    kategoriBadge: "INOVASI TEKNOLOGI",
+    kategoriBadge: "INOVASI",
     headline: "KENAPA MESIN INI LAYAK DIPILIH?",
     tags: ["Bubut Silindris Presisi", "Struktur Besi Cor Kokoh", "Sistem Kontrol Otomatis", "Efisiensi Siklus Produksi"]
   },

@@ -26,17 +26,54 @@ class OfficialCatalogPdfSeeder extends Seeder
 
         // 1B. Update Nama Kategori Resmi Sesuai 3 Lini Layanan (1_inovasi, 2_produk, 3_jasa)
         DB::table('categories')->where('slug', 'teknologi')->update([
-            'nama' => 'Inovasi Teknologi',
-            'deskripsi' => 'Alat teknologi rekayasa, mesin perkakas CNC/IoT, aplikasi riset mutakhir, dan invensi kampus.',
+            'nama' => 'Inovasi',
+            'deskripsi' => 'Inovasi siap terap hasil riset terapan dan projek base learning yang sudah melewati pengujian.',
         ]);
         DB::table('categories')->where('slug', 'produk')->update([
             'nama' => 'Produk Siap Terap',
-            'deskripsi' => 'Platform software siap pakai, sistem informasi UMKM & publik, pangan olahan, formulasi herbal, dan multimedia.',
+            'deskripsi' => 'Produk unggulan siap edar hasil riset terapan dan sudah dilakukan pengujian mendalam.',
         ]);
         DB::table('categories')->where('slug', 'jasa')->update([
-            'nama' => 'Jasa & Layanan Keahlian',
-            'deskripsi' => 'Pengujian lab terakreditasi, sertifikasi kompetensi, pelatihan industri, konsultasi bisnis/pajak, dan alih teknologi.',
+            'nama' => 'Jasa Konsultan',
+            'deskripsi' => 'Jasa layanan pengembangan dan konsultasi tenaga ahli.',
         ]);
+
+        // 1C. Sinkronkan Pengaturan Site Settings untuk 3 Lini Layanan & Tab Kategori
+        $settingsToUpsert = [
+            'service_1_badge' => 'Layanan 1',
+            'service_1_title' => 'Inovasi',
+            'service_1_desc' => 'Inovasi siap terap hasil riset terapan dan projek base learning yang sudah melewati pengujian.',
+            'service_1_btn' => 'Buka Demo Sandbox',
+            'service_1_link' => '/katalog?kategori=teknologi',
+
+            'service_2_badge' => 'Layanan 2',
+            'service_2_title' => 'Produk Siap Terap',
+            'service_2_desc' => 'Produk unggulan siap edar hasil riset terapan dan sudah dilakukan pengujian mendalam.',
+            'service_2_btn' => 'Jelajahi Produk',
+            'service_2_link' => '/katalog?kategori=produk',
+
+            'service_3_badge' => 'Layanan 3',
+            'service_3_title' => 'Jasa Konsultan',
+            'service_3_desc' => 'Jasa layanan pengembangan dan konsultasi tenaga ahli.',
+            'service_3_btn' => 'Konsultasi Layanan',
+            'service_3_link' => '/katalog?kategori=jasa',
+
+            'catalog_tab_all_id' => 'Semua',
+            'catalog_tab_all_en' => 'All',
+            'catalog_tab_teknologi_id' => 'Inovasi',
+            'catalog_tab_teknologi_en' => 'Innovation',
+            'catalog_tab_produk_id' => 'Produk Siap Terap',
+            'catalog_tab_produk_en' => 'Ready-to-Deploy Products',
+            'catalog_tab_jasa_id' => 'Jasa',
+            'catalog_tab_jasa_en' => 'Services',
+        ];
+
+        foreach ($settingsToUpsert as $k => $v) {
+            DB::table('site_settings')->updateOrInsert(
+                ['key' => $k],
+                ['value' => $v, 'group' => 'services', 'updated_at' => now(), 'created_at' => now()]
+            );
+        }
 
         // 2. Daftar Lengkap Program Studi Sekolah Vokasi UNS (Pusat & Madiun + PDF Resmi)
         $prodisList = [
