@@ -171,16 +171,16 @@ export const ProductCard: React.FC<ProductCardProps> = ({
 
       {/* Top Image & Badge */}
       <div>
-        <div className="relative aspect-[16/10] w-full overflow-hidden bg-slate-100 dark:bg-slate-900 rounded-t-[32px]">
+        <div className="relative aspect-[3/4] w-full overflow-hidden bg-gradient-to-b from-slate-100 to-slate-200 dark:from-slate-900 dark:to-slate-950 rounded-t-[32px]">
           <img
             src={item.thumbnail_url && !item.thumbnail_url.startsWith("blob:") ? item.thumbnail_url : "/images/brand/slogan-poster-vokasi.jpg"}
             alt={item.nama_item}
-            className="w-full h-full object-cover object-center group-hover:scale-106 transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)]"
+            className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)]"
             onError={(e) => {
               (e.currentTarget as HTMLImageElement).src = "/images/brand/slogan-poster-vokasi.jpg";
             }}
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/65 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
 
           {/* Badges on top of image */}
           <div className="absolute top-3 inset-x-3 flex items-center justify-between pointer-events-none z-20">

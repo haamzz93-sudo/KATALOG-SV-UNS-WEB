@@ -2690,7 +2690,7 @@ function AdminDashboardContent() {
                               <img
                                 src={item.thumbnail_url && !item.thumbnail_url.startsWith("blob:") ? item.thumbnail_url : "/images/brand/slogan-poster-vokasi.jpg"}
                                 alt={item.nama_item}
-                                className="w-12 h-10 rounded-xl object-cover bg-slate-100 dark:bg-slate-800 shrink-0 border border-slate-200 dark:border-slate-700 shadow-xs"
+                                className="w-11 h-14 aspect-[3/4] rounded-xl object-cover bg-slate-100 dark:bg-slate-800 shrink-0 border border-slate-200 dark:border-slate-700 shadow-xs"
                                 onError={(e) => {
                                   (e.currentTarget as HTMLImageElement).src = "/images/brand/slogan-poster-vokasi.jpg";
                                 }}
@@ -2813,7 +2813,7 @@ function AdminDashboardContent() {
                         <img
                           src={item.thumbnail_url && !item.thumbnail_url.startsWith("blob:") ? item.thumbnail_url : "/images/brand/slogan-poster-vokasi.jpg"}
                           alt={item.nama_item}
-                          className="w-16 h-14 rounded-xl object-cover bg-slate-100 dark:bg-slate-800 shrink-0 border border-slate-200 dark:border-slate-700"
+                          className="w-14 h-18 aspect-[3/4] rounded-xl object-cover bg-slate-100 dark:bg-slate-800 shrink-0 border border-slate-200 dark:border-slate-700"
                           onError={(e) => {
                             (e.currentTarget as HTMLImageElement).src = "/images/brand/slogan-poster-vokasi.jpg";
                           }}
