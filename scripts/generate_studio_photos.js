@@ -17,76 +17,76 @@ if (!fs.existsSync(STUDIO_OUTPUT_DIR)) {
 // 1. Baca data 31 produk
 const rawProducts = JSON.parse(fs.readFileSync(PRODUCTS_JSON_PATH, 'utf8'));
 
-// Metadata khusus terstandarisasi 3 Lini Layanan
+// Metadata khusus terstandarisasi 3 Lini Layanan (1_inovasi: 3 item, 2_produk: 19 item, 3_jasa: 9 item)
 const productMeta = {
-  // === LINI 1: TEKNOLOGI & DIGITAL (category_id: 1) ===
+  // === LINI 1: INOVASI TEKNOLOGI (category_id: 1, total 3 item) ===
   "rabuk-apps-pertanian-cerdas": {
     lini: "teknologi",
-    kategoriBadge: "TEKNOLOGI & DIGITAL",
-    headline: "KENAPA TEKNOLOGI INI LAYAK DITERAPKAN?",
+    kategoriBadge: "INOVASI TEKNOLOGI",
+    headline: "KENAPA INOVASI INI LAYAK DITERAPKAN?",
     tags: ["Sensor Presisi Tanah", "Prediksi Cuaca AI", "Hemat Dosis Pupuk", "Dashboard Terintegrasi"]
   },
-  "mofin-umkm-akuntansi-keuangan-web": {
-    lini: "teknologi",
-    kategoriBadge: "TEKNOLOGI & DIGITAL",
-    headline: "KENAPA TEKNOLOGI INI LAYAK DITERAPKAN?",
-    tags: ["Standar SAK EMKM", "Laporan Otomatis Real-time", "Multi-User & Hak Akses", "Keamanan Cloud Terjamin"]
-  },
-  "rintisku-id-software-erp-cloud": {
-    lini: "teknologi",
-    kategoriBadge: "TEKNOLOGI & DIGITAL",
-    headline: "KENAPA TEKNOLOGI INI LAYAK DITERAPKAN?",
-    tags: ["Manajemen Multi-Cabang", "Otomasi Arus Kas", "Monitoring Inventori POS", "Analitik Bisnis Cerdas"]
-  },
-  "e-marketplace-umkm-kelurahan": {
-    lini: "teknologi",
-    kategoriBadge: "TEKNOLOGI & DIGITAL",
-    headline: "KENAPA TEKNOLOGI INI LAYAK DITERAPKAN?",
-    tags: ["Katalog Produk Lokal", "Sistem Transaksi Cepat", "Integrasi Kurir Lokal", "Dashboard Pengelola Kelurahan"]
-  },
-  "sistem-tiket-museum-tahir-foundation": {
-    lini: "teknologi",
-    kategoriBadge: "TEKNOLOGI & DIGITAL",
-    headline: "KENAPA TEKNOLOGI INI LAYAK DITERAPKAN?",
-    tags: ["Validasi QR Code Cepat", "Monitoring Kuota Pengunjung", "Pembayaran Digital QRIS", "Rekap Data Presisi"]
-  },
-  "sim-bank-sampah-untuk-rakyat": {
-    lini: "teknologi",
-    kategoriBadge: "TEKNOLOGI & DIGITAL",
-    headline: "KENAPA TEKNOLOGI INI LAYAK DITERAPKAN?",
-    tags: ["Pencatatan Timbangan Real-time", "Tabungan Digital Nasabah", "Konversi Poin Rupiah", "Laporan Rekap Otomatis"]
-  },
-  "sistem-digitalisasi-adminduk-pencatatan-sipil": {
-    lini: "teknologi",
-    kategoriBadge: "TEKNOLOGI & DIGITAL",
-    headline: "KENAPA TEKNOLOGI INI LAYAK DITERAPKAN?",
-    tags: ["Pengarsipan Digital Cepat", "Validasi NIK Aman", "Pencarian Dokumen Kilat", "Standar Enkripsi Aman"]
-  },
-  "sistem-otomasi-data-survei-rule-based": {
-    lini: "teknologi",
-    kategoriBadge: "TEKNOLOGI & DIGITAL",
-    headline: "KENAPA TEKNOLOGI INI LAYAK DITERAPKAN?",
-    tags: ["Filtering Anomali Cepat", "Rule Engine Kustom", "Visualisasi Grafik Otomatis", "Ekspor Multi-Format"]
-  },
-  "smart-pest-control-iot-pertanian": {
-    lini: "teknologi",
-    kategoriBadge: "TEKNOLOGI & DIGITAL",
-    headline: "KENAPA TEKNOLOGI INI LAYAK DITERAPKAN?",
-    tags: ["Perangkap Tenaga Surya", "Sensor Spektrum Cahaya", "Konektivitas IoT LoRa/WiFi", "Ramah Ekosistem Sawah"]
-  },
-
-  // === LINI 2: PRODUK SIAP TERAP / INOVASI & RISET (category_id: 2) ===
   "mesin-double-column-cnc-milling-3-axis": {
-    lini: "produk",
-    kategoriBadge: "PRODUK SIAP TERAP",
-    headline: "KENAPA PRODUK INI LAYAK DIPILIH?",
+    lini: "teknologi",
+    kategoriBadge: "INOVASI TEKNOLOGI",
+    headline: "KENAPA MESIN INI LAYAK DIPILIH?",
     tags: ["Gantry Dua Kolom Kaku", "Spindle Torsi Tinggi", "Peredam Getaran Optimal", "Toleransi Presisi Mikron"]
   },
   "mesin-cnc-turning-presisi": {
+    lini: "teknologi",
+    kategoriBadge: "INOVASI TEKNOLOGI",
+    headline: "KENAPA MESIN INI LAYAK DIPILIH?",
+    tags: ["Bubut Silindris Presisi", "Struktur Besi Cor Kokoh", "Sistem Kontrol Otomatis", "Efisiensi Siklus Produksi"]
+  },
+
+  // === LINI 2: PRODUK SIAP TERAP (category_id: 2, total 19 item) ===
+  "mofin-umkm-akuntansi-keuangan-web": {
     lini: "produk",
     kategoriBadge: "PRODUK SIAP TERAP",
-    headline: "KENAPA PRODUK INI LAYAK DIPILIH?",
-    tags: ["Bubut Silindris Presisi", "Struktur Besi Cor Kokoh", "Sistem Kontrol Otomatis", "Efisiensi Siklus Produksi"]
+    headline: "KENAPA SOFTWARE INI LAYAK DITERAPKAN?",
+    tags: ["Standar SAK EMKM", "Laporan Otomatis Real-time", "Multi-User & Hak Akses", "Keamanan Cloud Terjamin"]
+  },
+  "rintisku-id-software-erp-cloud": {
+    lini: "produk",
+    kategoriBadge: "PRODUK SIAP TERAP",
+    headline: "KENAPA PLATFORM INI LAYAK DITERAPKAN?",
+    tags: ["Manajemen Multi-Cabang", "Otomasi Arus Kas", "Monitoring Inventori POS", "Analitik Bisnis Cerdas"]
+  },
+  "e-marketplace-umkm-kelurahan": {
+    lini: "produk",
+    kategoriBadge: "PRODUK SIAP TERAP",
+    headline: "KENAPA SISTEM INI LAYAK DITERAPKAN?",
+    tags: ["Katalog Produk Lokal", "Sistem Transaksi Cepat", "Integrasi Kurir Lokal", "Dashboard Pengelola Kelurahan"]
+  },
+  "sistem-tiket-museum-tahir-foundation": {
+    lini: "produk",
+    kategoriBadge: "PRODUK SIAP TERAP",
+    headline: "KENAPA SISTEM INI LAYAK DITERAPKAN?",
+    tags: ["Validasi QR Code Cepat", "Monitoring Kuota Pengunjung", "Pembayaran Digital QRIS", "Rekap Data Presisi"]
+  },
+  "sim-bank-sampah-untuk-rakyat": {
+    lini: "produk",
+    kategoriBadge: "PRODUK SIAP TERAP",
+    headline: "KENAPA SISTEM INI LAYAK DITERAPKAN?",
+    tags: ["Pencatatan Timbangan Real-time", "Tabungan Digital Nasabah", "Konversi Poin Rupiah", "Laporan Rekap Otomatis"]
+  },
+  "sistem-digitalisasi-adminduk-pencatatan-sipil": {
+    lini: "produk",
+    kategoriBadge: "PRODUK SIAP TERAP",
+    headline: "KENAPA SISTEM INI LAYAK DITERAPKAN?",
+    tags: ["Pengarsipan Digital Cepat", "Validasi NIK Aman", "Pencarian Dokumen Kilat", "Standar Enkripsi Aman"]
+  },
+  "sistem-otomasi-data-survei-rule-based": {
+    lini: "produk",
+    kategoriBadge: "PRODUK SIAP TERAP",
+    headline: "KENAPA SISTEM INI LAYAK DITERAPKAN?",
+    tags: ["Filtering Anomali Cepat", "Rule Engine Kustom", "Visualisasi Grafik Otomatis", "Ekspor Multi-Format"]
+  },
+  "smart-pest-control-iot-pertanian": {
+    lini: "produk",
+    kategoriBadge: "PRODUK SIAP TERAP",
+    headline: "KENAPA ALAT INI LAYAK DITERAPKAN?",
+    tags: ["Perangkap Tenaga Surya", "Sensor Spektrum Cahaya", "Konektivitas IoT LoRa/WiFi", "Ramah Ekosistem Sawah"]
   },
   "pico-natural-magic-oil-blue-spirulina": {
     lini: "produk",
@@ -155,7 +155,7 @@ const productMeta = {
     tags: ["Kandungan Nikel Terstandarisasi", "Proses Ekstraksi Presisi", "Kemurnian Bubuk Tinggi", "Bahan Baku Baterai Bersih"]
   },
 
-  // === LINI 3: JASA KONSULTAN & LAYANAN KEAHLIAN (category_id: 3) ===
+  // === LINI 3: JASA KONSULTAN & LAYANAN KEAHLIAN (category_id: 3, total 9 item) ===
   "gatc-bim-5d-konstruksi-pelatihan": {
     lini: "jasa",
     kategoriBadge: "JASA & LAYANAN KEAHLIAN",

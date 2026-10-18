@@ -24,18 +24,18 @@ class OfficialCatalogPdfSeeder extends Seeder
             $prodiRoleId = $prodiRole->id;
         }
 
-        // 1B. Update Nama Kategori Resmi agar Universal & Relevan untuk Seluruh 45 Prodi
+        // 1B. Update Nama Kategori Resmi Sesuai 3 Lini Layanan (1_inovasi, 2_produk, 3_jasa)
         DB::table('categories')->where('slug', 'teknologi')->update([
-            'nama' => 'Teknologi & Digital',
-            'deskripsi' => 'Aplikasi web, sistem cerdas, platform SaaS, dan transformasi digital kampus.',
+            'nama' => 'Inovasi Teknologi',
+            'deskripsi' => 'Alat teknologi rekayasa, mesin perkakas CNC/IoT, aplikasi riset mutakhir, dan invensi kampus.',
         ]);
         DB::table('categories')->where('slug', 'produk')->update([
-            'nama' => 'Produk Inovasi & Riset',
-            'deskripsi' => 'Produk pangan, formulasi herbal, mesin perkakas, dan inovasi riset terapan.',
+            'nama' => 'Produk Siap Terap',
+            'deskripsi' => 'Platform software siap pakai, sistem informasi UMKM & publik, pangan olahan, formulasi herbal, dan multimedia.',
         ]);
         DB::table('categories')->where('slug', 'jasa')->update([
             'nama' => 'Jasa & Layanan Keahlian',
-            'deskripsi' => 'Pengujian lab terakreditasi, sertifikasi kompetensi, konsultasi bisnis/pajak, dan alih teknologi.',
+            'deskripsi' => 'Pengujian lab terakreditasi, sertifikasi kompetensi, pelatihan industri, konsultasi bisnis/pajak, dan alih teknologi.',
         ]);
 
         // 2. Daftar Lengkap Program Studi Sekolah Vokasi UNS (Pusat & Madiun + PDF Resmi)

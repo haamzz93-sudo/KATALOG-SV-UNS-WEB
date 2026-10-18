@@ -53,6 +53,28 @@ export const drawRoundRect = (
 };
 
 /**
+ * Menghitung ukuran fit proporsional tanpa pernah keluar bounding box (Zero-Crop Guarantee)
+ */
+export const calculateFit = (
+  imgW: number,
+  imgH: number,
+  maxW: number,
+  maxH: number
+): { w: number; h: number } => {
+  const imgRatio = imgW / imgH;
+  const boxRatio = maxW / maxH;
+  let w: number, h: number;
+  if (imgRatio > boxRatio) {
+    w = maxW;
+    h = maxW / imgRatio;
+  } else {
+    h = maxH;
+    w = maxH * imgRatio;
+  }
+  return { w: Math.round(w), h: Math.round(h) };
+};
+
+/**
  * Memuat gambar ke elemen Image HTML dengan konversi aman ke Blob/DataURL
  * agar tidak pernah terkena CORS error dan kanvas tidak pernah 'tainted'.
  */
@@ -162,6 +184,12 @@ export const isolateProductForeground = (
   if (!ctx) return canvas;
 
   ctx.drawImage(sourceImg, 0, 0);
+
+  // Jika gambar berformat landscape lebar (seperti screenshot web, aplikasi UI, diagram, poster),
+  // jangan lakukan flood-fill background removal agar konten teks/header/antarmuka tidak terhapus.
+  if (w / h > 1.15) {
+    return canvas;
+  }
 
   try {
     const imgData = ctx.getImageData(0, 0, w, h);
@@ -344,17 +372,15 @@ export const generateHeroPhoto = (
   ctx.lineWidth = 2;
   ctx.stroke();
 
-  // 3. Product Contact Shadow on Podium
-  const prodTargetH = 740;
-  const prodRatio = img.width / img.height;
-  const prodW = prodTargetH * prodRatio;
-  const prodX = 480 - prodW / 2;
-  const prodY = podY - prodTargetH + 18;
+  // 3. Product Contact Shadow on Podium (Zero-Crop Fit)
+  const fit = calculateFit(img.width, img.height, 800, 650);
+  const prodX = 480 - fit.w / 2;
+  const prodY = podY - fit.h + 15;
 
-  drawContactShadow(ctx, 480, podY + 5, prodW * 0.46, 22, 0.38);
+  drawContactShadow(ctx, 480, podY + 5, fit.w * 0.46, 20, 0.35);
 
-  // 4. Gambar Produk Asli
-  ctx.drawImage(img, prodX, prodY, prodW, prodTargetH);
+  // 4. Gambar Produk Asli Utuh (Anti-Crop)
+  ctx.drawImage(img, prodX, prodY, fit.w, fit.h);
 
   // 5. Header Branding Badge
   ctx.fillStyle = "rgba(15, 76, 129, 0.92)";
@@ -426,10 +452,11 @@ export const generateDetailPhoto = (
   ctx.restore();
 
   // 2. 3D Perspective Transform untuk Sisi Samping Produk (3/4 Commercial Angle)
-  const macroH = 820;
-  const macroW = (macroH * img.width) / img.height;
+  const fit = calculateFit(img.width, img.height, 800, 750);
+  const macroW = fit.w;
+  const macroH = fit.h;
   const macroX = 480 - macroW / 2;
-  const macroY = 220;
+  const macroY = 220 + (750 - macroH) / 2;
 
   // Efek Kedalaman 3D Samping (Extrusion & Contact Shadow)
   ctx.save();
@@ -543,11 +570,12 @@ export const generateBackViewPhoto = (
   ctx.font = "bold 14px system-ui, -apple-system, sans-serif";
   ctx.fillText("SISI BELAKANG PRODUK • BACK VIEW INSPECTION", 58, 67);
 
-  // 3. Display Produk Utama (Slightly Scaled)
-  const prodH = 560;
-  const prodW = (prodH * img.width) / img.height;
+  // 3. Display Produk Utama (Zero-Crop Fit)
+  const fit = calculateFit(img.width, img.height, 780, 520);
+  const prodW = fit.w;
+  const prodH = fit.h;
   const prodX = 480 - prodW / 2;
-  const prodY = 120;
+  const prodY = 120 + (520 - prodH) / 2;
 
   drawContactShadow(ctx, 480, prodY + prodH + 5, prodW * 0.45, 22, 0.32);
   ctx.drawImage(img, prodX, prodY, prodW, prodH);
@@ -650,11 +678,12 @@ export const generateBenefitPhoto = (
   ctx.font = "14px system-ui, -apple-system, sans-serif";
   ctx.fillText("3 Alasan Utama Mengapa Produk Inovasi Ini Memiliki Nilai Jual & Mutu Tinggi:", 50, 126);
 
-  // 3. Product Display in Showcase Frame (y = 150 to 650)
-  const prodH = 460;
-  const prodW = (prodH * img.width) / img.height;
+  // 3. Product Display in Showcase Frame (Zero-Crop Fit)
+  const fit = calculateFit(img.width, img.height, 760, 440);
+  const prodW = fit.w;
+  const prodH = fit.h;
   const prodX = 480 - prodW / 2;
-  const prodY = 160;
+  const prodY = 160 + (440 - prodH) / 2;
 
   // Podium Ellipse
   ctx.save();
@@ -813,10 +842,10 @@ export const generateLifestylePhoto = (
   ctx.fillStyle = edgeShadow;
   ctx.fillRect(0, 700, 960, 25);
 
-  // 3. Product Placement on Table (x = 480, y = 720)
-  const prodH = 680;
-  const prodRatio = img.width / img.height;
-  const prodW = prodH * prodRatio;
+  // 3. Product Placement on Table (Zero-Crop Fit)
+  const fit = calculateFit(img.width, img.height, 780, 580);
+  const prodW = fit.w;
+  const prodH = fit.h;
   const prodX = 480 - prodW / 2;
   const prodY = 720 - prodH + 20;
 
