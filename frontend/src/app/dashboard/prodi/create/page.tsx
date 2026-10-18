@@ -167,8 +167,8 @@ export default function CreateProdiItem() {
       setThumbnailUrl(hero.url);
     }
 
-    // Foto 2, 3, 4 -> Galeri Foto Tambahan
-    const otherPhotos = photosList.slice(1);
+    // Standar Resmi Katalog: Maksimal 3 Foto (Foto 1 Hero Mockup + Foto 2-3 Galeri Tambahan)
+    const otherPhotos = photosList.slice(1, 3);
     const newGalleryItems: GalleryImage[] = otherPhotos.map((p, idx) => ({
       id: `ai-gen-${Date.now()}-${idx}-${Math.random().toString(36).substr(2, 4)}`,
       url: p.url,
@@ -178,8 +178,8 @@ export default function CreateProdiItem() {
     setGalleryImages(newGalleryItems);
     setHasGenerated(true);
     toast.success(
-      "4 Foto Marketplace Terpasang!",
-      "Foto 1 Hero otomatis dijadikan Mockup Utama, dan Foto 2–4 masuk ke Galeri Produk."
+      "3 Foto Studio Resmi Terpasang!",
+      "Foto 1 Hero otomatis dijadikan Mockup Utama, dan Foto 2–3 masuk ke Galeri Produk (total tepat 3 foto)."
     );
   };
 
@@ -1074,14 +1074,14 @@ export default function CreateProdiItem() {
               <div>
                 <label className="text-xs sm:text-sm font-bold text-slate-800 dark:text-slate-200 flex items-center gap-2">
                   <Images className="w-4 h-4 text-[#0F4C81] dark:text-[#C5A059]" />
-                  <span>Galeri Foto Produk Tambahan (Opsional / Multi-Image)</span>
+                  <span>Galeri Foto Produk Tambahan (Maksimal 2 Foto Tambahan)</span>
                 </label>
                 <p className="text-[11px] text-slate-500 dark:text-slate-400 mt-0.5">
-                  Unggah screenshot aplikasi, tampak samping, belakang, kemasan, atau detail lainnya untuk melengkapi galeri produk.
+                  Standar resmi katalog: Maksimal 3 foto per produk (1 Mockup Utama + 2 Galeri Tambahan).
                 </p>
               </div>
               <span className="text-xs font-bold px-2.5 py-1 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300">
-                {galleryImages.length} Foto Tambahan
+                {galleryImages.length}/2 Foto Tambahan
               </span>
             </div>
 
@@ -1155,21 +1155,28 @@ export default function CreateProdiItem() {
 
             {/* Uploader Foto Galeri Tambahan */}
             <div className="pt-2">
-              <MediaUploader
-                label="+ Tambah Foto ke Galeri Produk (Bisa Banyak)"
-                description="Upload foto screenshot atau variasi angle tambahan (PNG, JPG, WEBP maks 5MB)"
-                acceptedType="image"
-                maxSizeMb={5}
-                onUploadSuccess={(url) => {
-                  if (url) {
-                    setGalleryImages((prev) => [
-                      ...prev,
-                      { id: `gal-${Date.now()}-${Math.random().toString(36).substr(2, 4)}`, url, caption: "" }
-                    ]);
-                    toast.success("Foto Ditambahkan!", "Foto baru berhasil dimasukkan ke galeri produk.");
-                  }
-                }}
-              />
+              {galleryImages.length >= 2 ? (
+                <div className="p-3.5 rounded-2xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/50 flex items-center gap-2.5 text-xs text-emerald-800 dark:text-emerald-300">
+                  <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-600 dark:text-emerald-400" />
+                  <span>Batas maksimal 3 foto telah terpenuhi (1 Mockup Utama + 2 Galeri Tambahan). Hapus salah satu foto galeri jika ingin mengunggah foto pengganti.</span>
+                </div>
+              ) : (
+                <MediaUploader
+                  label={`+ Tambah Foto ke Galeri Produk (${galleryImages.length}/2 Foto Tambahan)`}
+                  description="Upload foto screenshot atau variasi angle tambahan (PNG, JPG, WEBP maks 5MB)"
+                  acceptedType="image"
+                  maxSizeMb={5}
+                  onUploadSuccess={(url) => {
+                    if (url) {
+                      setGalleryImages((prev) => [
+                        ...prev,
+                        { id: `gal-${Date.now()}-${Math.random().toString(36).substr(2, 4)}`, url, caption: "" }
+                      ]);
+                      toast.success("Foto Ditambahkan!", "Foto baru berhasil dimasukkan ke galeri produk.");
+                    }
+                  }}
+                />
+              )}
             </div>
           </div>
 
@@ -1680,6 +1687,8 @@ export default function CreateProdiItem() {
                                     const isAlreadyInGallery = galleryImages.some((g) => g.url === photo.url);
                                     if (isAlreadyInGallery) {
                                       toast.info("Sudah di Galeri", "Foto ini sudah ada di galeri tambahan.");
+                                    } else if (galleryImages.length >= 2) {
+                                      toast.error("Batas Maksimal 3 Foto", "Galeri sudah terisi 2 foto (total 3 foto produk). Hapus salah satu foto galeri jika ingin mengganti.");
                                     } else {
                                       setGalleryImages((prev) => [
                                         ...prev,
@@ -1849,6 +1858,8 @@ export default function CreateProdiItem() {
                       const isAlreadyInGallery = galleryImages.some((g) => g.url === fullscreenPhoto.url);
                       if (isAlreadyInGallery) {
                         toast.info("Sudah di Galeri", "Foto ini sudah ada di galeri tambahan.");
+                      } else if (galleryImages.length >= 2) {
+                        toast.error("Batas Maksimal 3 Foto", "Galeri sudah terisi 2 foto (total 3 foto produk). Hapus salah satu foto galeri jika ingin mengganti.");
                       } else {
                         setGalleryImages((prev) => [
                           ...prev,

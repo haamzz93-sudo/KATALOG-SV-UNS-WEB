@@ -6,7 +6,8 @@ import Link from "next/link";
 import { 
   Laptop, Cpu, Wrench, Play, Eye, MessageSquare, 
   ArrowLeft, Building2, User, Phone, Mail, 
-  CheckCircle2, Layers, ShieldCheck, Download
+  CheckCircle2, Layers, ShieldCheck, Download,
+  Maximize2, ZoomIn, ZoomOut, ChevronLeft, ChevronRight, X
 } from "lucide-react";
 import { DynamicIslandHeader } from "../../../components/navigation/DynamicIslandHeader";
 import { LiveDemoModal } from "../../../components/catalog/LiveDemoModal";
@@ -29,6 +30,8 @@ export default function DetailProdukPage() {
   const [isDemoOpen, setIsDemoOpen] = useState(false);
   const [isVideoOpen, setIsVideoOpen] = useState(false);
   const [isInquiryOpen, setIsInquiryOpen] = useState(false);
+  const [isLightboxOpen, setIsLightboxOpen] = useState(false);
+  const [zoomLevel, setZoomLevel] = useState(1);
 
   useEffect(() => {
     async function loadItem() {
@@ -114,18 +117,24 @@ export default function DetailProdukPage() {
           {/* Left Column: Visual Media & Demo Triggers (5 cols - Portrait 3:4 Marketplace) */}
           <div className="lg:col-span-5 space-y-4">
             {/* Primary Media Display (Portrait 3:4 Standard & Zero-Crop Guarantee) */}
-            <div className="relative aspect-[3/4] max-h-[580px] w-full max-w-[480px] mx-auto rounded-2xl sm:rounded-[32px] overflow-hidden bg-gradient-to-b from-slate-50 via-slate-100 to-slate-200 dark:from-slate-900 dark:via-slate-900/90 dark:to-slate-950 border border-slate-200 dark:border-slate-800 shadow-xl flex items-center justify-center p-2.5">
+            <div 
+              onClick={() => {
+                setIsLightboxOpen(true);
+                setZoomLevel(1);
+              }}
+              className="relative aspect-[3/4] max-h-[580px] w-full max-w-[480px] mx-auto rounded-2xl sm:rounded-[32px] overflow-hidden bg-gradient-to-b from-slate-50 via-slate-100 to-slate-200 dark:from-slate-900 dark:via-slate-900/90 dark:to-slate-950 border border-slate-200 dark:border-slate-800 shadow-xl flex items-center justify-center p-2.5 cursor-zoom-in group"
+            >
               <img
                 src={mediaList[activeMediaIndex]?.file_url || safeThumbnail}
                 alt={item.nama_item}
-                className="max-h-full max-w-full w-auto h-auto object-contain rounded-xl sm:rounded-2xl transition-all duration-300 drop-shadow-md"
+                className="max-h-full max-w-full w-auto h-auto object-contain rounded-xl sm:rounded-2xl transition-all duration-300 drop-shadow-md group-hover:scale-102"
                 onError={(e) => {
                   (e.currentTarget as HTMLImageElement).src = "/images/brand/slogan-poster-vokasi.jpg";
                 }}
               />
 
               {/* Badges on top */}
-              <div className="absolute top-4 left-4 flex gap-2 z-10">
+              <div className="absolute top-4 left-4 flex gap-2 z-10 pointer-events-none">
                 <span className="px-3 py-1 rounded-full text-xs font-extrabold bg-[#0A2540]/85 backdrop-blur-md text-[#C5A059] border border-[#C5A059]/40 shadow-sm">
                   {item.category?.nama}
                 </span>
@@ -133,6 +142,21 @@ export default function DetailProdukPage() {
                   {item.prodi?.kode_prodi}
                 </span>
               </div>
+
+              {/* Button Lihat Detail Gambar HD */}
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setIsLightboxOpen(true);
+                  setZoomLevel(1);
+                }}
+                className="absolute bottom-4 right-4 z-20 px-3.5 py-1.5 rounded-full bg-slate-900/85 hover:bg-slate-900 text-white backdrop-blur-md border border-white/20 shadow-lg text-xs font-bold flex items-center gap-1.5 transition-all duration-200 hover:scale-105 cursor-pointer"
+                title="Klik untuk melihat foto dalam resolusi tinggi & perbesar detail"
+              >
+                <Maximize2 className="w-3.5 h-3.5 text-[#C5A059]" />
+                <span>Lihat Detail HD</span>
+              </button>
             </div>
 
             {/* Media Thumbnails Carousel (Portrait 3:4 Aspect) */}
@@ -344,6 +368,140 @@ export default function DetailProdukPage() {
           onClose={() => setIsInquiryOpen(false)}
           item={item}
         />
+      )}
+
+      {/* Fullscreen Lightbox Modal HD untuk melihat gambar secara detail per gambar */}
+      {isLightboxOpen && (
+        <div 
+          onClick={() => {
+            setIsLightboxOpen(false);
+            setZoomLevel(1);
+          }}
+          className="fixed inset-0 z-50 bg-black/95 backdrop-blur-md flex flex-col items-center justify-between p-4 sm:p-6 animate-in fade-in duration-200 select-none"
+        >
+          {/* Top Bar */}
+          <div 
+            onClick={(e) => e.stopPropagation()} 
+            className="w-full flex items-center justify-between text-white max-w-6xl z-20 pb-2 border-b border-white/10"
+          >
+            <div className="flex items-center gap-3">
+              <span className="px-3 py-1 rounded-full text-xs font-bold bg-[#C5A059] text-slate-900 shadow-sm">
+                Foto {activeMediaIndex + 1} dari {mediaList.length}
+              </span>
+              <span className="text-sm font-bold truncate max-w-md hidden sm:inline text-slate-200">
+                {mediaList[activeMediaIndex]?.caption || item.nama_item}
+              </span>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <span className="text-xs text-slate-400 font-mono hidden md:inline mr-2">
+                Zoom: {Math.round(zoomLevel * 100)}%
+              </span>
+              <button
+                type="button"
+                onClick={() => setZoomLevel((z) => Math.min(z + 0.25, 2.5))}
+                className="p-2 rounded-full bg-white/10 hover:bg-white/20 text-white transition cursor-pointer"
+                title="Perbesar (Zoom In)"
+              >
+                <ZoomIn className="w-4 h-4" />
+              </button>
+              <button
+                type="button"
+                onClick={() => setZoomLevel((z) => Math.max(z - 0.25, 0.75))}
+                className="p-2 rounded-full bg-white/10 hover:bg-white/20 text-white transition cursor-pointer"
+                title="Perkecil (Zoom Out)"
+              >
+                <ZoomOut className="w-4 h-4" />
+              </button>
+              <button
+                type="button"
+                onClick={() => setZoomLevel(1)}
+                className="px-2.5 py-1 rounded-full bg-white/10 hover:bg-white/20 text-xs text-white transition cursor-pointer hidden sm:inline"
+                title="Reset Zoom"
+              >
+                100%
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  setIsLightboxOpen(false);
+                  setZoomLevel(1);
+                }}
+                className="p-2 rounded-full bg-white/10 hover:bg-rose-500 text-white transition ml-2 cursor-pointer"
+                title="Tutup (ESC)"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+          </div>
+
+          {/* Center Image with Zoom & Navigation */}
+          <div 
+            onClick={(e) => e.stopPropagation()}
+            className="relative flex-1 w-full flex items-center justify-center overflow-hidden p-2 my-2"
+          >
+            {mediaList.length > 1 && (
+              <button
+                type="button"
+                onClick={() => {
+                  setActiveMediaIndex((idx) => (idx > 0 ? idx - 1 : mediaList.length - 1));
+                  setZoomLevel(1);
+                }}
+                className="absolute left-2 sm:left-6 top-1/2 -translate-y-1/2 z-30 p-3 rounded-full bg-black/60 hover:bg-black/90 text-white border border-white/20 shadow-xl transition cursor-pointer"
+                title="Foto Sebelumnya"
+              >
+                <ChevronLeft className="w-6 h-6" />
+              </button>
+            )}
+
+            <div className="max-h-[80vh] max-w-[90vw] overflow-auto flex items-center justify-center">
+              <img
+                src={mediaList[activeMediaIndex]?.file_url || safeThumbnail}
+                alt={item.nama_item}
+                style={{ transform: `scale(${zoomLevel})` }}
+                className="max-h-[75vh] max-w-[85vw] object-contain transition-transform duration-200 rounded-2xl shadow-2xl"
+              />
+            </div>
+
+            {mediaList.length > 1 && (
+              <button
+                type="button"
+                onClick={() => {
+                  setActiveMediaIndex((idx) => (idx < mediaList.length - 1 ? idx + 1 : 0));
+                  setZoomLevel(1);
+                }}
+                className="absolute right-2 sm:right-6 top-1/2 -translate-y-1/2 z-30 p-3 rounded-full bg-black/60 hover:bg-black/90 text-white border border-white/20 shadow-xl transition cursor-pointer"
+                title="Foto Berikutnya"
+              >
+                <ChevronRight className="w-6 h-6" />
+              </button>
+            )}
+          </div>
+
+          {/* Bottom Thumbnails Navigation */}
+          <div 
+            onClick={(e) => e.stopPropagation()}
+            className="flex gap-2.5 overflow-x-auto pb-1 max-w-xl z-20 pt-2 border-t border-white/10"
+          >
+            {mediaList.map((m, idx) => (
+              <button
+                key={m.id || idx}
+                type="button"
+                onClick={() => {
+                  setActiveMediaIndex(idx);
+                  setZoomLevel(1);
+                }}
+                className={`relative w-14 h-18 aspect-[3/4] rounded-xl overflow-hidden border-2 transition shrink-0 cursor-pointer ${
+                  activeMediaIndex === idx
+                    ? "border-[#C5A059] ring-2 ring-[#C5A059]/60 scale-105"
+                    : "border-white/20 opacity-50 hover:opacity-100"
+                }`}
+              >
+                <img src={m.file_url} alt="thumb" className="w-full h-full object-contain bg-slate-900" />
+              </button>
+            ))}
+          </div>
+        </div>
       )}
     </div>
   );

@@ -10,7 +10,8 @@ import {
   Globe, Palette, Settings2, UploadCloud, Key, Search, Lock, Award, Laptop,
   Briefcase, Handshake, ExternalLink, ExternalLink as ExtLink, TrendingUp, Box, Cpu, Wrench, Building2, Package,
   GraduationCap, Navigation, X, LayoutGrid, SlidersHorizontal, AlignLeft, AlignRight,
-  Star, Quote, Camera, Image as ImageIcon, Images, ChevronDown, Maximize2
+  Star, Quote, Camera, Image as ImageIcon, Images, ChevronDown, Maximize2,
+  ChevronLeft, ChevronRight, ZoomIn, ZoomOut
 } from "lucide-react";
 import {
   loadImage,
@@ -319,6 +320,63 @@ function AdminDashboardContent() {
     ],
   });
   const [isItemSubmitting, setIsItemSubmitting] = useState(false);
+
+  // Detail HD Photo Preview Modal State (Zero-Crop HD Inspector)
+  const [previewPhotoItem, setPreviewPhotoItem] = useState<any | null>(null);
+  const [previewPhotoIndex, setPreviewPhotoIndex] = useState<number>(0);
+
+  const getCatalogItemPhotos = (item: any) => {
+    if (!item) return [];
+    const photos: { url: string; title: string; subtitle: string; badge: string }[] = [];
+    
+    if (item.thumbnail_url) {
+      photos.push({
+        url: item.thumbnail_url,
+        title: "Foto #1 — Mockup Utama (Hero Marketplace)",
+        subtitle: "Tampilan visual utama di katalog & etalase publik",
+        badge: "Hero Utama",
+      });
+    }
+
+    if (Array.isArray(item.media)) {
+      const additional = item.media.filter((m: any) => {
+        const u = m.file_url || m.url;
+        return u && u !== item.thumbnail_url;
+      });
+
+      additional.forEach((m: any, idx: number) => {
+        const u = m.file_url || m.url;
+        const defaultTitle = idx === 0 
+          ? "Foto #2 — Detail & Kualitas Macro 3/4" 
+          : idx === 1 
+            ? "Foto #3 — Infografis Fitur & Alasan Membeli" 
+            : `Foto #${idx + 2} — Galeri Tambahan`;
+        const defaultSub = idx === 0
+          ? "Close-up material, presisi rancang bangun, dan keandalan komponen"
+          : idx === 1
+            ? "Matriks keunggulan, standar sertifikasi, dan daya saing industri"
+            : "Dokumentasi visual pendukung";
+
+        photos.push({
+          url: u,
+          title: m.caption ? `${defaultTitle} (${m.caption})` : defaultTitle,
+          subtitle: defaultSub,
+          badge: idx === 0 ? "Detail Macro" : idx === 1 ? "Infografis Fitur" : `Foto #${idx + 2}`,
+        });
+      });
+    }
+
+    if (photos.length === 0) {
+      photos.push({
+        url: "/images/brand/slogan-poster-vokasi.jpg",
+        title: "Foto Mockup Standar",
+        subtitle: "Belum ada foto studio terunggah",
+        badge: "Standar",
+      });
+    }
+
+    return photos;
+  };
 
   // Studio AI State for Catalog Item Modal
   const [isAiStudioOpen, setIsAiStudioOpen] = useState(false);
@@ -1520,7 +1578,8 @@ function AdminDashboardContent() {
     const hero = photosList[0];
     const newThumb = hero?.url || itemForm.thumbnail_url;
 
-    const otherPhotos = photosList.slice(1);
+    // Standar Resmi Katalog: Maksimal 3 Foto (Foto 1 Hero Mockup + Foto 2-3 Galeri Tambahan)
+    const otherPhotos = photosList.slice(1, 3);
     const newGalleryItems = otherPhotos.map((p, idx) => ({
       id: `ai-gen-${Date.now()}-${idx}-${Math.random().toString(36).substr(2, 4)}`,
       url: p.url,
@@ -1534,8 +1593,8 @@ function AdminDashboardContent() {
     }));
     setHasGenerated(true);
     toast.success(
-      "4 Foto Studio Diterapkan!",
-      "Foto 1 Hero terpasang sebagai Mockup Utama, dan Foto 2–4 otomatis masuk ke Galeri Produk."
+      "3 Foto Studio Resmi Diterapkan!",
+      "Foto 1 Hero dijadikan Mockup Utama, dan Foto 2–3 masuk ke Galeri Produk (total tepat 3 foto)."
     );
   };
 
@@ -2775,6 +2834,21 @@ function AdminDashboardContent() {
                                 </button>
                               )}
 
+                              {/* Lihat Foto HD Preview Button */}
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  setPreviewPhotoItem(item);
+                                  setPreviewPhotoIndex(0);
+                                }}
+                                style={{ borderRadius: "9999px" }}
+                                className="px-2.5 py-1 rounded-full bg-amber-500/10 hover:bg-amber-500/20 text-amber-700 dark:text-amber-300 border border-amber-500/30 font-bold text-xs transition cursor-pointer flex items-center gap-1"
+                                title="Lihat Detail 3 Foto Studio HD"
+                              >
+                                <Images className="w-3.5 h-3.5" />
+                                <span>Lihat Foto</span>
+                              </button>
+
                               {/* Edit Button */}
                               <button
                                 type="button"
@@ -2882,6 +2956,19 @@ function AdminDashboardContent() {
                               <ExtLink className="w-3.5 h-3.5" />
                             </a>
                           )}
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setPreviewPhotoItem(item);
+                              setPreviewPhotoIndex(0);
+                            }}
+                            style={{ borderRadius: "9999px" }}
+                            className="px-2.5 py-1 rounded-full bg-amber-500/10 hover:bg-amber-500/20 text-amber-700 dark:text-amber-300 border border-amber-500/30 font-bold text-xs flex items-center gap-1 cursor-pointer"
+                            title="Lihat Detail 3 Foto Studio HD"
+                          >
+                            <Images className="w-3 h-3" />
+                            <span>Foto</span>
+                          </button>
                           <button
                             type="button"
                             onClick={() => handleOpenEditItem(item)}
@@ -8095,6 +8182,8 @@ function AdminDashboardContent() {
                                       const isAlready = itemForm.galleryImages.some((g) => g.url === photo.url);
                                       if (isAlready) {
                                         toast.info("Sudah Ada", "Foto ini sudah ada di galeri.");
+                                      } else if (itemForm.galleryImages.length >= 2) {
+                                        toast.error("Batas Maksimal 3 Foto", "Galeri sudah terisi 2 foto (total 3 foto produk). Hapus salah satu foto galeri jika ingin mengganti.");
                                       } else {
                                         setItemForm((prev) => ({
                                           ...prev,
@@ -8120,16 +8209,16 @@ function AdminDashboardContent() {
                   )}
                 </div>
 
-                {/* Galeri Foto Produk Tambahan (Multi-Image / Screenshots / Angles) */}
+                {/* Galeri Foto Produk Tambahan (Maksimal 2 Foto Tambahan) */}
                 <div className="pt-3 border-t border-slate-100 dark:border-slate-800 space-y-3">
                   <div className="flex items-center justify-between">
                     <div>
                       <label className="text-xs font-bold text-slate-800 dark:text-slate-200 flex items-center gap-1.5">
                         <Images className="w-3.5 h-3.5 text-[#0F4C81] dark:text-[#C5A059]" />
-                        <span>Galeri Foto Produk Tambahan ({itemForm.galleryImages.length} Foto)</span>
+                        <span>Galeri Foto Produk Tambahan ({itemForm.galleryImages.length}/2 Foto Tambahan)</span>
                       </label>
                       <p className="text-[10px] text-slate-500 dark:text-slate-400">
-                        Unggah foto screenshot, tampak samping, belakang, kemasan, atau detail lainnya (Bisa Tambah Banyak).
+                        Standar resmi katalog: Maksimal 3 foto per produk (1 Mockup Utama + 2 Galeri Tambahan).
                       </p>
                     </div>
                   </div>
@@ -8201,24 +8290,31 @@ function AdminDashboardContent() {
                   )}
 
                   {/* Uploader Tambah Foto ke Galeri */}
-                  <MediaUploader
-                    label="+ Tambah Foto ke Galeri Produk (Bisa Banyak)"
-                    description="Upload foto screenshot atau variasi angle tambahan (PNG, JPG, WEBP maks 5MB)"
-                    acceptedType="image"
-                    maxSizeMb={5}
-                    onUploadSuccess={(url) => {
-                      if (url) {
-                        setItemForm((prev) => ({
-                          ...prev,
-                          galleryImages: [
-                            ...prev.galleryImages,
-                            { id: `gal-${Date.now()}-${Math.random().toString(36).substr(2, 4)}`, url, caption: "" }
-                          ],
-                        }));
-                        toast.success("Foto Ditambahkan!", "Foto baru berhasil dimasukkan ke galeri produk.");
-                      }
-                    }}
-                  />
+                  {itemForm.galleryImages.length >= 2 ? (
+                    <div className="p-3 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/50 flex items-center gap-2.5 text-xs text-emerald-800 dark:text-emerald-300">
+                      <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-600 dark:text-emerald-400" />
+                      <span>Batas maksimal 3 foto telah terpenuhi (1 Mockup Utama + 2 Galeri Tambahan). Hapus salah satu foto galeri jika ingin mengunggah foto pengganti.</span>
+                    </div>
+                  ) : (
+                    <MediaUploader
+                      label={`+ Tambah Foto ke Galeri Produk (${itemForm.galleryImages.length}/2 Foto Tambahan)`}
+                      description="Upload foto screenshot atau variasi angle tambahan (PNG, JPG, WEBP maks 5MB)"
+                      acceptedType="image"
+                      maxSizeMb={5}
+                      onUploadSuccess={(url) => {
+                        if (url) {
+                          setItemForm((prev) => ({
+                            ...prev,
+                            galleryImages: [
+                              ...prev.galleryImages,
+                              { id: `gal-${Date.now()}-${Math.random().toString(36).substr(2, 4)}`, url, caption: "" }
+                            ],
+                          }));
+                          toast.success("Foto Ditambahkan!", "Foto baru berhasil dimasukkan ke galeri produk.");
+                        }
+                      }}
+                    />
+                  )}
                 </div>
               </div>
 
@@ -8475,6 +8571,186 @@ function AdminDashboardContent() {
           </div>
         </div>
       )}
+
+      {/* Detail HD Photo Preview Modal (3 Foto Studio Zero-Crop HD Inspector) */}
+      {previewPhotoItem && (() => {
+        const photos = getCatalogItemPhotos(previewPhotoItem);
+        const safeIdx = Math.min(previewPhotoIndex, Math.max(0, photos.length - 1));
+        const activePhoto = photos[safeIdx] || photos[0];
+
+        return (
+          <div 
+            className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 bg-slate-950/85 backdrop-blur-md animate-fadeIn"
+            onClick={() => setPreviewPhotoItem(null)}
+          >
+            <div 
+              className="relative w-full max-w-4xl bg-white dark:bg-[#07192C] border border-slate-200 dark:border-slate-800 rounded-3xl p-4 sm:p-6 shadow-2xl space-y-4 max-h-[95vh] flex flex-col"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Modal Header */}
+              <div className="flex items-center justify-between pb-3 border-b border-slate-100 dark:border-slate-800">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-2xl bg-amber-500/10 dark:bg-amber-500/20 flex items-center justify-center text-amber-600 dark:text-amber-400">
+                    <Images className="w-5 h-5" />
+                  </div>
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded-full bg-blue-100 dark:bg-blue-950 text-[#0F4C81] dark:text-sky-300 border border-blue-200 dark:border-blue-900/40">
+                        {previewPhotoItem.category?.nama || "Inovasi Vokasi"}
+                      </span>
+                      <span className="text-[10px] font-bold text-slate-400">
+                        Total {photos.length} Foto Studio HD
+                      </span>
+                    </div>
+                    <h3 className="font-extrabold text-sm sm:text-base text-slate-900 dark:text-white line-clamp-1 mt-0.5">
+                      {previewPhotoItem.nama_item}
+                    </h3>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setPreviewPhotoItem(null)}
+                  style={{ borderRadius: "9999px" }}
+                  className="w-9 h-9 rounded-full bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 flex items-center justify-center transition cursor-pointer"
+                  title="Tutup Preview"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+
+              {/* Modal Main Image Display with Anti-Crop */}
+              <div className="relative flex-1 min-h-[300px] max-h-[58vh] bg-slate-900/90 dark:bg-black/90 rounded-2xl overflow-hidden flex items-center justify-center p-3 border border-slate-800">
+                <img
+                  src={activePhoto.url}
+                  alt={activePhoto.title}
+                  className="w-full h-full object-contain max-h-[55vh] select-none rounded-lg drop-shadow-2xl"
+                />
+
+                {/* Badge Photo Info */}
+                <div className="absolute top-3 left-3 flex items-center gap-2">
+                  <span className="px-3 py-1 rounded-full bg-slate-950/80 backdrop-blur-md border border-white/10 text-white font-extrabold text-xs shadow-lg flex items-center gap-1.5">
+                    <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
+                    {activePhoto.badge} ({safeIdx + 1}/{photos.length})
+                  </span>
+                </div>
+
+                {/* Action Link to Full Raw */}
+                <div className="absolute top-3 right-3 flex items-center gap-2">
+                  <a
+                    href={activePhoto.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{ borderRadius: "9999px" }}
+                    className="px-3 py-1 rounded-full bg-slate-950/80 hover:bg-slate-900 backdrop-blur-md border border-white/10 text-white font-bold text-xs flex items-center gap-1.5 transition"
+                    title="Buka File Gambar Asli"
+                  >
+                    <Maximize2 className="w-3.5 h-3.5" />
+                    <span className="hidden sm:inline">Buka Resolusi Asli</span>
+                  </a>
+                </div>
+
+                {/* Prev/Next Navigation Arrows */}
+                {photos.length > 1 && (
+                  <>
+                    <button
+                      type="button"
+                      onClick={() => setPreviewPhotoIndex((prev) => (prev > 0 ? prev - 1 : photos.length - 1))}
+                      style={{ borderRadius: "9999px" }}
+                      className="absolute left-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-slate-950/80 hover:bg-slate-900 border border-white/15 text-white flex items-center justify-center shadow-xl transition cursor-pointer"
+                      title="Foto Sebelumnya"
+                    >
+                      <ChevronLeft className="w-5 h-5" />
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setPreviewPhotoIndex((prev) => (prev < photos.length - 1 ? prev + 1 : 0))}
+                      style={{ borderRadius: "9999px" }}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-slate-950/80 hover:bg-slate-900 border border-white/15 text-white flex items-center justify-center shadow-xl transition cursor-pointer"
+                      title="Foto Selanjutnya"
+                    >
+                      <ChevronRight className="w-5 h-5" />
+                    </button>
+                  </>
+                )}
+
+                {/* Bottom Overlay Label */}
+                <div className="absolute bottom-3 inset-x-3 text-center pointer-events-none">
+                  <div className="inline-block px-4 py-1.5 rounded-full bg-slate-950/85 backdrop-blur-md border border-white/10 text-white shadow-xl max-w-[90%]">
+                    <p className="text-xs font-bold truncate">{activePhoto.title}</p>
+                    {activePhoto.subtitle && (
+                      <p className="text-[10px] text-slate-300 truncate">{activePhoto.subtitle}</p>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* Thumbnail Selector Strip (3 Foto) */}
+              <div className="grid grid-cols-3 gap-2 sm:gap-3">
+                {photos.map((p, idx) => (
+                  <button
+                    key={idx}
+                    type="button"
+                    onClick={() => setPreviewPhotoIndex(idx)}
+                    className={`p-2 rounded-xl border text-left transition flex items-center gap-2.5 cursor-pointer ${
+                      safeIdx === idx
+                        ? "bg-amber-500/10 border-amber-500/60 dark:border-amber-400 ring-2 ring-amber-500/30"
+                        : "bg-slate-50 dark:bg-slate-900/60 border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700"
+                    }`}
+                  >
+                    <div className="w-10 h-13 rounded-lg overflow-hidden bg-slate-900 shrink-0 border border-slate-300 dark:border-slate-700 flex items-center justify-center">
+                      <img src={p.url} alt={p.title} className="w-full h-full object-contain" />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center justify-between">
+                        <span className={`text-[9px] font-extrabold uppercase px-1.5 py-0.2 rounded ${
+                          safeIdx === idx ? "bg-amber-500 text-slate-950" : "bg-slate-200 dark:bg-slate-800 text-slate-600 dark:text-slate-300"
+                        }`}>
+                          #{idx + 1}
+                        </span>
+                        {safeIdx === idx && (
+                          <span className="text-[9px] font-bold text-amber-600 dark:text-amber-400">Aktif</span>
+                        )}
+                      </div>
+                      <p className="text-[11px] font-bold text-slate-800 dark:text-slate-200 truncate mt-0.5">
+                        {p.badge}
+                      </p>
+                    </div>
+                  </button>
+                ))}
+              </div>
+
+              {/* Modal Footer Actions */}
+              <div className="flex items-center justify-between pt-2 border-t border-slate-100 dark:border-slate-800">
+                <div className="text-xs text-slate-500 dark:text-slate-400 hidden sm:block">
+                  PIC: <span className="font-semibold text-slate-700 dark:text-slate-300">{previewPhotoItem.pic_nama || "Tim Dosen & Mahasiswa"}</span>
+                </div>
+                <div className="flex items-center gap-2 w-full sm:w-auto justify-end">
+                  {previewPhotoItem.slug && (
+                    <a
+                      href={`/katalog/${previewPhotoItem.slug}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style={{ borderRadius: "9999px" }}
+                      className="px-4 py-2 rounded-full bg-[#0F4C81]/10 hover:bg-[#0F4C81]/20 text-[#0F4C81] dark:text-sky-300 font-bold text-xs flex items-center gap-1.5 transition"
+                    >
+                      <ExternalLink className="w-3.5 h-3.5" />
+                      <span>Halaman Detail Publik</span>
+                    </a>
+                  )}
+                  <button
+                    type="button"
+                    onClick={() => setPreviewPhotoItem(null)}
+                    style={{ borderRadius: "9999px" }}
+                    className="px-5 py-2 rounded-full bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold text-xs cursor-pointer transition"
+                  >
+                    Tutup
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        );
+      })()}
 
       {/* Header Navigation CRUD Modal */}
       {isHeaderNavModalOpen && (
