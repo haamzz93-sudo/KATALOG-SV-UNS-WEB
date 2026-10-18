@@ -4,7 +4,7 @@ import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { 
   PlusCircle, Trash2, Eye, ExternalLink, 
-  Play, Building2, CheckCircle2, Images, Maximize2, X, ChevronLeft, ChevronRight 
+  Play, Building2, CheckCircle2, Images, Maximize2, X, ChevronLeft, ChevronRight, ArrowLeft 
 } from "lucide-react";
 import { api } from "../../../lib/api";
 import { CatalogItem } from "../../../types/catalog";
@@ -133,13 +133,24 @@ export default function ProdiDashboard() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
-          <span 
-            style={{ borderRadius: "9999px" }}
-            className="text-xs font-extrabold px-3 py-1 rounded-full bg-emerald-100 dark:bg-emerald-950/80 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 uppercase tracking-widest inline-block"
-          >
-            {currentUser?.role === "super_admin" || (currentUser?.role as any)?.name === "super_admin" ? "Otoritas Super Admin" : "Portal Administrator Prodi"}
-          </span>
-          <h1 className="text-xl sm:text-2xl md:text-3xl font-black text-slate-900 dark:text-white tracking-tight mt-1.5">
+          <div className="flex items-center gap-2 mb-2">
+            <Link
+              href="/"
+              style={{ borderRadius: "9999px" }}
+              className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold text-xs transition border border-slate-200 dark:border-slate-700 shadow-2xs"
+              title="Kembali ke Beranda Utama"
+            >
+              <ArrowLeft className="w-3.5 h-3.5" />
+              <span>Kembali ke Beranda</span>
+            </Link>
+            <span 
+              style={{ borderRadius: "9999px" }}
+              className="text-xs font-extrabold px-3 py-1 rounded-full bg-emerald-100 dark:bg-emerald-950/80 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 uppercase tracking-widest inline-block"
+            >
+              {currentUser?.role === "super_admin" || (currentUser?.role as any)?.name === "super_admin" ? "Otoritas Super Admin" : "Portal Administrator Prodi"}
+            </span>
+          </div>
+          <h1 className="text-xl sm:text-2xl md:text-3xl font-black text-slate-900 dark:text-white tracking-tight">
             {currentUser?.role === "super_admin" || (currentUser?.role as any)?.name === "super_admin"
               ? "Katalog Inovasi Seluruh Program Studi (Super Admin)" 
               : `Katalog Inovasi Prodi ${currentUser?.prodi?.nama || (currentUser?.prodi as any)?.nama_prodi || "D3 Teknik Informatika"}`}
@@ -436,56 +447,46 @@ export default function ProdiDashboard() {
                     </h3>
                   </div>
                 </div>
-                <button
-                  type="button"
-                  onClick={() => setPreviewPhotoItem(null)}
-                  style={{ borderRadius: "9999px" }}
-                  className="w-9 h-9 rounded-full bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 flex items-center justify-center transition cursor-pointer"
-                  title="Tutup Preview"
-                >
-                  <X className="w-4 h-4" />
-                </button>
-              </div>
-
-              {/* Modal Main Image Display with Anti-Crop */}
-              <div className="relative flex-1 min-h-[300px] max-h-[58vh] bg-slate-900/90 dark:bg-black/90 rounded-2xl overflow-hidden flex items-center justify-center p-3 border border-slate-800">
-                <img
-                  src={activePhoto.url}
-                  alt={activePhoto.title}
-                  className="w-full h-full object-contain max-h-[55vh] select-none rounded-lg drop-shadow-2xl"
-                />
-
-                {/* Badge Photo Info */}
-                <div className="absolute top-3 left-3 flex items-center gap-2">
-                  <span className="px-3 py-1 rounded-full bg-slate-950/80 backdrop-blur-md border border-white/10 text-white font-extrabold text-xs shadow-lg flex items-center gap-1.5">
-                    <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
-                    {activePhoto.badge} ({safeIdx + 1}/{photos.length})
-                  </span>
-                </div>
-
-                {/* Action Link to Full Raw */}
-                <div className="absolute top-3 right-3 flex items-center gap-2">
+                <div className="flex items-center gap-2">
                   <a
                     href={activePhoto.url}
                     target="_blank"
                     rel="noopener noreferrer"
                     style={{ borderRadius: "9999px" }}
-                    className="px-3 py-1 rounded-full bg-slate-950/80 hover:bg-slate-900 backdrop-blur-md border border-white/10 text-white font-bold text-xs flex items-center gap-1.5 transition"
-                    title="Buka File Gambar Asli"
+                    className="px-3 py-1.5 rounded-full bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold text-xs flex items-center gap-1.5 transition border border-slate-200 dark:border-slate-700"
+                    title="Buka Resolusi Asli di Tab Baru"
                   >
                     <Maximize2 className="w-3.5 h-3.5" />
                     <span className="hidden sm:inline">Buka Resolusi Asli</span>
                   </a>
+                  <button
+                    type="button"
+                    onClick={() => setPreviewPhotoItem(null)}
+                    style={{ borderRadius: "9999px" }}
+                    className="w-9 h-9 rounded-full bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 flex items-center justify-center transition cursor-pointer"
+                    title="Tutup Preview"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
                 </div>
+              </div>
 
-                {/* Prev/Next Navigation Arrows */}
+              {/* Modal Main Image Display with Anti-Crop (100% Bebas Halangan / Zero-Obstruction) */}
+              <div className="relative flex-1 min-h-[300px] max-h-[56vh] bg-slate-900/95 dark:bg-black/95 rounded-2xl overflow-hidden flex items-center justify-center p-2.5 sm:p-4 border border-slate-800 shadow-inner">
+                <img
+                  src={activePhoto.url}
+                  alt={activePhoto.title}
+                  className="w-full h-full object-contain max-h-[52vh] select-none rounded-lg drop-shadow-2xl"
+                />
+
+                {/* Prev/Next Navigation Arrows (Di Tepi Sisi, Tidak Menghalangi Foto) */}
                 {photos.length > 1 && (
                   <>
                     <button
                       type="button"
                       onClick={() => setPreviewPhotoIndex((prev) => (prev > 0 ? prev - 1 : photos.length - 1))}
                       style={{ borderRadius: "9999px" }}
-                      className="absolute left-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-slate-950/80 hover:bg-slate-900 border border-white/15 text-white flex items-center justify-center shadow-xl transition cursor-pointer"
+                      className="absolute left-2.5 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-slate-950/80 hover:bg-slate-900 border border-white/20 text-white flex items-center justify-center shadow-xl transition cursor-pointer"
                       title="Foto Sebelumnya"
                     >
                       <ChevronLeft className="w-5 h-5" />
@@ -494,23 +495,35 @@ export default function ProdiDashboard() {
                       type="button"
                       onClick={() => setPreviewPhotoIndex((prev) => (prev < photos.length - 1 ? prev + 1 : 0))}
                       style={{ borderRadius: "9999px" }}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-slate-950/80 hover:bg-slate-900 border border-white/15 text-white flex items-center justify-center shadow-xl transition cursor-pointer"
+                      className="absolute right-2.5 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-slate-950/80 hover:bg-slate-900 border border-white/20 text-white flex items-center justify-center shadow-xl transition cursor-pointer"
                       title="Foto Selanjutnya"
                     >
                       <ChevronRight className="w-5 h-5" />
                     </button>
                   </>
                 )}
+              </div>
 
-                {/* Bottom Overlay Label */}
-                <div className="absolute bottom-3 inset-x-3 text-center pointer-events-none">
-                  <div className="inline-block px-4 py-1.5 rounded-full bg-slate-950/85 backdrop-blur-md border border-white/10 text-white shadow-xl max-w-[90%]">
-                    <p className="text-xs font-bold truncate">{activePhoto.title}</p>
-                    {activePhoto.subtitle && (
-                      <p className="text-[10px] text-slate-300 truncate">{activePhoto.subtitle}</p>
-                    )}
+              {/* Dedicated Clean Photo Caption Bar (Di Luar Gambar, Tidak Menghalangi Teks Produk) */}
+              <div className="py-2.5 px-4 rounded-2xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 text-left">
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] font-black uppercase px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-700 dark:text-amber-300 border border-amber-500/30 shrink-0">
+                      {activePhoto.badge} ({safeIdx + 1}/{photos.length})
+                    </span>
+                    <span className="font-extrabold text-xs sm:text-sm text-slate-900 dark:text-white truncate">
+                      {activePhoto.title}
+                    </span>
                   </div>
+                  {activePhoto.subtitle && (
+                    <p className="text-[11px] text-slate-500 dark:text-slate-400 truncate mt-0.5">
+                      {activePhoto.subtitle}
+                    </p>
+                  )}
                 </div>
+                <span className="text-[10px] font-mono text-slate-400 shrink-0">
+                  Resolusi Studio HD 3:4 (960x1280)
+                </span>
               </div>
 
               {/* Thumbnail Selector Strip (3 Foto) */}

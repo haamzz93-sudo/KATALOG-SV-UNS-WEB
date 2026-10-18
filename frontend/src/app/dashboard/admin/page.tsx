@@ -2,6 +2,7 @@
 
 import React, { useEffect, useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import Link from "next/link";
 import { 
   Users, UserPlus, Shield, ShieldCheck, ShieldAlert, 
   CheckCircle2, XCircle, Layers, Check, RefreshCw,
@@ -11,7 +12,7 @@ import {
   Briefcase, Handshake, ExternalLink, ExternalLink as ExtLink, TrendingUp, Box, Cpu, Wrench, Building2, Package,
   GraduationCap, Navigation, X, LayoutGrid, SlidersHorizontal, AlignLeft, AlignRight,
   Star, Quote, Camera, Image as ImageIcon, Images, ChevronDown, Maximize2,
-  ChevronLeft, ChevronRight, ZoomIn, ZoomOut
+  ChevronLeft, ChevronRight, ZoomIn, ZoomOut, ArrowLeft
 } from "lucide-react";
 import {
   loadImage,
@@ -1604,7 +1605,7 @@ function AdminDashboardContent() {
     if (!rawImg) {
       toast.info(
         "Unggah Foto Produk Terlebih Dahulu",
-        "Silakan unggah foto produk mentah agar 4 foto marketplace presisi dapat dihasilkan."
+        "Silakan unggah foto produk mentah agar 3 foto studio marketplace presisi dapat dihasilkan."
       );
       return;
     }
@@ -1653,10 +1654,11 @@ function AdminDashboardContent() {
           const data = await res.json();
           const rawPhotos = data.data?.photos || data.photos;
           if (rawPhotos && rawPhotos.length > 0) {
-            setGenerationStep(5);
-            setStepMessage("Selesai! 4 Foto Marketplace Komersial Berhasil Dihasilkan & Diterapkan.");
-            setAiPhotos(rawPhotos);
-            applyAllAiPhotosToItem(rawPhotos);
+            const finalThree = rawPhotos.slice(0, 3);
+            setGenerationStep(4);
+            setStepMessage("Selesai! 3 Foto Studio Marketplace Berhasil Dihasilkan & Diterapkan.");
+            setAiPhotos(finalThree);
+            applyAllAiPhotosToItem(finalThree);
             setAiLoading(false);
             return;
           }
@@ -1666,7 +1668,7 @@ function AdminDashboardContent() {
       }
     }
 
-    // Sequential Canvas Engine
+    // Sequential Canvas Engine (Standar Tepat 3 Foto Marketplace)
     try {
       const img = await loadImage(rawImg);
       const isolatedImg = isolateProductForeground(img);
@@ -1676,7 +1678,7 @@ function AdminDashboardContent() {
 
       // Step 1: Hero
       setGenerationStep(1);
-      setStepMessage("Langkah 1/4: Merender Foto Utama (Hero Product Photography)...");
+      setStepMessage("Langkah 1/3: Merender Foto Utama (Hero Product Photography)...");
       const heroUrl = generateHeroPhoto(isolatedImg, itemForm.nama_item.trim() || "Produk Inovasi Vokasi UNS", aiKategori);
       const heroPhoto = {
         id: "hero",
@@ -1691,9 +1693,9 @@ function AdminDashboardContent() {
       setAiPhotos([...sequentialPhotos]);
       await delay(600);
 
-      // Step 2: Detail Macro
+      // Step 2: Detail Macro 3/4
       setGenerationStep(2);
-      setStepMessage("Langkah 2/4: Memproses Sisi Samping Produk (3/4 Perspective) & Detail Finishing...");
+      setStepMessage("Langkah 2/3: Memproses Sisi Samping Produk (3/4 Perspective) & Detail Finishing...");
       const detailUrl = generateDetailPhoto(isolatedImg, aiDetailLabels);
       const detailPhoto = {
         id: "detail",
@@ -1710,7 +1712,7 @@ function AdminDashboardContent() {
 
       // Step 3: Infografis Keunggulan
       setGenerationStep(3);
-      setStepMessage("Langkah 3/4: Menyusun Infografis Fitur & Alasan Membeli...");
+      setStepMessage("Langkah 3/3: Menyusun Infografis Fitur & Alasan Membeli...");
       const benefitUrl = generateBenefitPhoto(isolatedImg, aiBenefitHeadline, itemForm.nama_item.trim() || "Produk Inovasi Vokasi UNS", aiKategori);
       const benefitPhoto = {
         id: "benefit",
@@ -1725,25 +1727,8 @@ function AdminDashboardContent() {
       setAiPhotos([...sequentialPhotos]);
       await delay(600);
 
-      // Step 4: Lifestyle
       setGenerationStep(4);
-      setStepMessage("Langkah 4/4: Membangun Konteks Penggunaan Nyata (Lifestyle Context)...");
-      const lifestyleUrl = generateLifestylePhoto(isolatedImg, aiKategori);
-      const lifestylePhoto = {
-        id: "lifestyle",
-        title: "4. Konteks Penggunaan (Lifestyle)",
-        angle: "Konteks Real Use",
-        badge: "Lifestyle Tabletop",
-        desc: "Fotografi kontekstual produk asli di atas meja kayu hangat dengan pencahayaan pagi estetik.",
-        url: lifestyleUrl,
-        directUrl: lifestyleUrl,
-      };
-      sequentialPhotos.push(lifestylePhoto);
-      setAiPhotos([...sequentialPhotos]);
-      await delay(400);
-
-      setGenerationStep(5);
-      setStepMessage("Selesai! 4 Foto Marketplace Komersial Berhasil Dihasilkan & Diterapkan.");
+      setStepMessage("Selesai! 3 Foto Studio Marketplace Berhasil Dihasilkan & Diterapkan.");
       applyAllAiPhotosToItem(sequentialPhotos);
     } catch (err: any) {
       console.error("Studio generator error:", err);
@@ -1997,13 +1982,24 @@ function AdminDashboardContent() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
-          <span 
-            style={{ borderRadius: "9999px" }}
-            className="text-xs font-extrabold px-3 py-1 rounded-full bg-blue-100 dark:bg-blue-950/80 text-[#0F4C81] dark:text-sky-300 border border-blue-200 dark:border-blue-800 uppercase tracking-wider inline-block"
-          >
-            Portal Otoritas Super Admin
-          </span>
-          <h1 className="text-xl sm:text-2xl md:text-3xl font-black text-slate-900 dark:text-white tracking-tight mt-1.5">
+          <div className="flex items-center gap-2 mb-2">
+            <Link
+              href="/"
+              style={{ borderRadius: "9999px" }}
+              className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold text-xs transition border border-slate-200 dark:border-slate-700 shadow-2xs"
+              title="Kembali ke Beranda Utama"
+            >
+              <ArrowLeft className="w-3.5 h-3.5" />
+              <span>Kembali ke Beranda</span>
+            </Link>
+            <span 
+              style={{ borderRadius: "9999px" }}
+              className="text-xs font-extrabold px-3 py-1 rounded-full bg-blue-100 dark:bg-blue-950/80 text-[#0F4C81] dark:text-sky-300 border border-blue-200 dark:border-blue-800 uppercase tracking-wider inline-block"
+            >
+              Portal Otoritas Super Admin
+            </span>
+          </div>
+          <h1 className="text-xl sm:text-2xl md:text-3xl font-black text-slate-900 dark:text-white tracking-tight">
             Manajemen Pengguna & Moderasi Inovasi
           </h1>
           <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 mt-1 font-medium">
@@ -6296,7 +6292,7 @@ function AdminDashboardContent() {
                 Setting Prompt & Visual Studio Foto Katalog
               </h3>
               <p className="text-xs sm:text-sm text-slate-500 dark:text-slate-400 mt-1">
-                Kelola API Key OpenAI ChatGPT (DALL-E), Google Gemini 2.5 Flash, domain display marketplace hilirisasi, serta konfigurasi paten 4 foto katalog marketplace (Hero Product, Detail & Craftsmanship, Infografis Keunggulan, dan Konteks Lifestyle).
+                Kelola API Key OpenAI ChatGPT (DALL-E), Google Gemini 2.5 Flash, domain display marketplace hilirisasi, serta konfigurasi paten 3 foto katalog marketplace (Hero Product, Detail & Craftsmanship, dan Infografis Keunggulan).
               </p>
             </div>
 
@@ -7969,18 +7965,18 @@ function AdminDashboardContent() {
                       <div>
                         <div className="flex items-center gap-1.5">
                           <span className="text-xs font-black uppercase tracking-wide">
-                            {hasGenerated ? "4 Foto Studio AI Telah Terpasang" : "Wajib Dipoles: Studio Foto AI (Portrait 3:4)"}
+                            {hasGenerated ? "3 Foto Studio AI Telah Terpasang" : "Wajib Dipoles: Studio Foto AI (Portrait 3:4)"}
                           </span>
                           <span className={`px-2 py-0.5 rounded-full text-[9px] font-black ${
                             hasGenerated ? "bg-emerald-600 text-white" : "bg-amber-500 text-white"
                           }`}>
-                            {hasGenerated ? "✓ 4 Foto Aktif" : "Klik Generate"}
+                            {hasGenerated ? "✓ 3 Foto Aktif" : "Klik Generate"}
                           </span>
                         </div>
                         <p className="text-[10px] opacity-90 mt-0.5">
                           {hasGenerated 
-                            ? "Foto Mockup Utama (Hero) & Galeri Produk (Detail 3/4, Infografis, Lifestyle) sudah otomatis terpasang."
-                            : "Poles foto mentah menjadi 4 foto marketplace (Hero, Detail 3/4, Infografis, Lifestyle) format portrait 3:4."}
+                            ? "Foto Mockup Utama (Hero) & Galeri Produk (Detail 3/4, Infografis) sudah otomatis terpasang (total tepat 3 foto)."
+                            : "Poles foto mentah menjadi 3 foto marketplace resmi (Hero, Detail 3/4, Infografis) format portrait 3:4."}
                         </p>
                       </div>
                     </div>
@@ -7995,7 +7991,7 @@ function AdminDashboardContent() {
                       className="w-full sm:w-auto px-4 py-2 rounded-full bg-gradient-to-r from-amber-500 via-[#C5A059] to-[#0F4C81] hover:brightness-110 text-white font-black text-xs shadow-md transition flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-50 shrink-0"
                     >
                       <RefreshCw className={`w-3.5 h-3.5 ${aiLoading ? "animate-spin" : ""}`} />
-                      <span>{aiLoading ? "Sedang Merender..." : hasGenerated ? "Generate Ulang Foto" : "✨ Generate 4 Foto Sekarang"}</span>
+                      <span>{aiLoading ? "Sedang Merender..." : hasGenerated ? "Generate Ulang 3 Foto" : "Hasilkan 3 Foto Studio"}</span>
                     </button>
                   </div>
                 )}
@@ -8017,7 +8013,7 @@ function AdminDashboardContent() {
                   {isAiStudioOpen && (
                     <div className="space-y-4 pt-2 border-t border-amber-300/40 dark:border-amber-700/40 text-left">
                       <div className="p-2.5 rounded-xl bg-amber-500/10 border border-amber-400/20 text-[11px] text-amber-800 dark:text-amber-300">
-                        <strong>Standar 4 Foto Marketplace:</strong> Menghasilkan 1 set komplit (1. Hero Product, 2. Detail & Kualitas Macro 3/4, 3. Infografis Fitur & Alasan Membeli, 4. Konteks Lifestyle) dengan identitas warna dan logo konsisten.
+                        <strong>Standar 3 Foto Marketplace:</strong> Menghasilkan 1 set komplit (1. Hero Product, 2. Detail & Kualitas Macro 3/4, 3. Infografis Fitur & Alasan Membeli) dengan identitas warna dan logo konsisten.
                       </div>
 
                       {/* 1. Pilih Kategori Produk AI */}
@@ -8116,7 +8112,7 @@ function AdminDashboardContent() {
                         className="w-full py-3 rounded-full bg-gradient-to-r from-amber-500 via-[#C5A059] to-[#0F4C81] hover:brightness-105 text-white font-black text-xs shadow-md transition flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
                       >
                         <RefreshCw className={`w-4 h-4 ${aiLoading ? "animate-spin" : ""}`} />
-                        <span>{aiLoading ? `Memproses Studio Foto (${generationStep}/4)...` : "Hasilkan 4 Foto Marketplace Komersial"}</span>
+                        <span>{aiLoading ? `Memproses Studio Foto (${Math.min(generationStep, 3)}/3)...` : "Hasilkan 3 Foto Studio Marketplace"}</span>
                       </button>
 
                       {/* Step Progress Animasi */}
@@ -8124,22 +8120,22 @@ function AdminDashboardContent() {
                         <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-400/30 space-y-2 animate-in fade-in">
                           <div className="flex items-center justify-between text-xs font-bold text-slate-800 dark:text-white">
                             <span>{stepMessage}</span>
-                            <span className="font-mono font-black text-amber-600">{generationStep * 25}%</span>
+                            <span className="font-mono font-black text-amber-600">{Math.min(Math.round(generationStep * 33.33), 100)}%</span>
                           </div>
                           <div className="w-full h-1.5 rounded-full bg-slate-200 dark:bg-slate-700 overflow-hidden">
                             <div
                               className="h-full bg-gradient-to-r from-amber-500 to-[#0F4C81] transition-all duration-300"
-                              style={{ width: `${Math.min(generationStep * 25, 100)}%` }}
+                              style={{ width: `${Math.min(Math.round(generationStep * 33.33), 100)}%` }}
                             />
                           </div>
                         </div>
                       )}
 
-                      {/* Grid 4 Foto Marketplace */}
+                      {/* Grid 3 Foto Marketplace */}
                       {aiPhotos.length > 0 && (
                         <div className="space-y-2 pt-2 border-t border-amber-300/40">
                           <div className="flex items-center justify-between">
-                            <span className="text-xs font-black text-slate-900 dark:text-white">Hasil 4 Foto Studio AI:</span>
+                            <span className="text-xs font-black text-slate-900 dark:text-white">Hasil 3 Foto Studio AI:</span>
                             <button
                               type="button"
                               onClick={() => applyAllAiPhotosToItem(aiPhotos)}
@@ -8148,7 +8144,7 @@ function AdminDashboardContent() {
                               Terapkan Semua ke Mockup & Galeri
                             </button>
                           </div>
-                          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                          <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
                             {aiPhotos.map((photo, idx) => (
                               <div
                                 key={photo.id || idx}
@@ -8607,56 +8603,47 @@ function AdminDashboardContent() {
                     </h3>
                   </div>
                 </div>
-                <button
-                  type="button"
-                  onClick={() => setPreviewPhotoItem(null)}
-                  style={{ borderRadius: "9999px" }}
-                  className="w-9 h-9 rounded-full bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 flex items-center justify-center transition cursor-pointer"
-                  title="Tutup Preview"
-                >
-                  <X className="w-4 h-4" />
-                </button>
-              </div>
 
-              {/* Modal Main Image Display with Anti-Crop */}
-              <div className="relative flex-1 min-h-[300px] max-h-[58vh] bg-slate-900/90 dark:bg-black/90 rounded-2xl overflow-hidden flex items-center justify-center p-3 border border-slate-800">
-                <img
-                  src={activePhoto.url}
-                  alt={activePhoto.title}
-                  className="w-full h-full object-contain max-h-[55vh] select-none rounded-lg drop-shadow-2xl"
-                />
-
-                {/* Badge Photo Info */}
-                <div className="absolute top-3 left-3 flex items-center gap-2">
-                  <span className="px-3 py-1 rounded-full bg-slate-950/80 backdrop-blur-md border border-white/10 text-white font-extrabold text-xs shadow-lg flex items-center gap-1.5">
-                    <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
-                    {activePhoto.badge} ({safeIdx + 1}/{photos.length})
-                  </span>
-                </div>
-
-                {/* Action Link to Full Raw */}
-                <div className="absolute top-3 right-3 flex items-center gap-2">
+                <div className="flex items-center gap-2">
                   <a
                     href={activePhoto.url}
                     target="_blank"
                     rel="noopener noreferrer"
                     style={{ borderRadius: "9999px" }}
-                    className="px-3 py-1 rounded-full bg-slate-950/80 hover:bg-slate-900 backdrop-blur-md border border-white/10 text-white font-bold text-xs flex items-center gap-1.5 transition"
-                    title="Buka File Gambar Asli"
+                    className="px-3 py-1.5 rounded-full bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 font-bold text-xs flex items-center gap-1.5 transition border border-slate-200 dark:border-slate-700"
+                    title="Buka Resolusi Asli di Tab Baru"
                   >
                     <Maximize2 className="w-3.5 h-3.5" />
                     <span className="hidden sm:inline">Buka Resolusi Asli</span>
                   </a>
+                  <button
+                    type="button"
+                    onClick={() => setPreviewPhotoItem(null)}
+                    style={{ borderRadius: "9999px" }}
+                    className="w-9 h-9 rounded-full bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 flex items-center justify-center transition cursor-pointer"
+                    title="Tutup Preview"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
                 </div>
+              </div>
 
-                {/* Prev/Next Navigation Arrows */}
+              {/* Modal Main Image Display with Anti-Crop (100% Bebas Halangan / Zero-Obstruction) */}
+              <div className="relative flex-1 min-h-[300px] max-h-[56vh] bg-slate-900/95 dark:bg-black/95 rounded-2xl overflow-hidden flex items-center justify-center p-2.5 sm:p-4 border border-slate-800 shadow-inner">
+                <img
+                  src={activePhoto.url}
+                  alt={activePhoto.title}
+                  className="w-full h-full object-contain max-h-[52vh] select-none rounded-lg drop-shadow-2xl"
+                />
+
+                {/* Prev/Next Navigation Arrows (Di Tepi Sisi, Tidak Menghalangi Foto) */}
                 {photos.length > 1 && (
                   <>
                     <button
                       type="button"
                       onClick={() => setPreviewPhotoIndex((prev) => (prev > 0 ? prev - 1 : photos.length - 1))}
                       style={{ borderRadius: "9999px" }}
-                      className="absolute left-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-slate-950/80 hover:bg-slate-900 border border-white/15 text-white flex items-center justify-center shadow-xl transition cursor-pointer"
+                      className="absolute left-2.5 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-slate-950/80 hover:bg-slate-900 border border-white/20 text-white flex items-center justify-center shadow-xl transition cursor-pointer"
                       title="Foto Sebelumnya"
                     >
                       <ChevronLeft className="w-5 h-5" />
@@ -8665,23 +8652,35 @@ function AdminDashboardContent() {
                       type="button"
                       onClick={() => setPreviewPhotoIndex((prev) => (prev < photos.length - 1 ? prev + 1 : 0))}
                       style={{ borderRadius: "9999px" }}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-slate-950/80 hover:bg-slate-900 border border-white/15 text-white flex items-center justify-center shadow-xl transition cursor-pointer"
+                      className="absolute right-2.5 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-slate-950/80 hover:bg-slate-900 border border-white/20 text-white flex items-center justify-center shadow-xl transition cursor-pointer"
                       title="Foto Selanjutnya"
                     >
                       <ChevronRight className="w-5 h-5" />
                     </button>
                   </>
                 )}
+              </div>
 
-                {/* Bottom Overlay Label */}
-                <div className="absolute bottom-3 inset-x-3 text-center pointer-events-none">
-                  <div className="inline-block px-4 py-1.5 rounded-full bg-slate-950/85 backdrop-blur-md border border-white/10 text-white shadow-xl max-w-[90%]">
-                    <p className="text-xs font-bold truncate">{activePhoto.title}</p>
-                    {activePhoto.subtitle && (
-                      <p className="text-[10px] text-slate-300 truncate">{activePhoto.subtitle}</p>
-                    )}
+              {/* Dedicated Clean Photo Caption Bar (Di Luar Gambar, Tidak Menghalangi Teks Produk) */}
+              <div className="py-2.5 px-4 rounded-2xl bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-1.5 text-left">
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] font-black uppercase px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-700 dark:text-amber-300 border border-amber-500/30 shrink-0">
+                      {activePhoto.badge} ({safeIdx + 1}/{photos.length})
+                    </span>
+                    <span className="font-extrabold text-xs sm:text-sm text-slate-900 dark:text-white truncate">
+                      {activePhoto.title}
+                    </span>
                   </div>
+                  {activePhoto.subtitle && (
+                    <p className="text-[11px] text-slate-500 dark:text-slate-400 truncate mt-0.5">
+                      {activePhoto.subtitle}
+                    </p>
+                  )}
                 </div>
+                <span className="text-[10px] font-mono text-slate-400 shrink-0">
+                  Resolusi Studio HD 3:4 (960x1280)
+                </span>
               </div>
 
               {/* Thumbnail Selector Strip (3 Foto) */}

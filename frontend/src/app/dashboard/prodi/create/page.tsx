@@ -437,7 +437,7 @@ export default function CreateProdiItem() {
     if (!rawImg) {
       toast.info(
         "Unggah Foto Produk Terlebih Dahulu",
-        "Silakan unggah foto produk mentah pada bagian 1 di atas agar 4 foto marketplace presisi dapat dihasilkan."
+        "Silakan unggah foto produk mentah pada bagian 1 di atas agar 3 foto studio marketplace presisi dapat dihasilkan."
       );
       return;
     }
@@ -485,18 +485,18 @@ export default function CreateProdiItem() {
         if (res.ok) {
           const data = await res.json();
           if (data.success && (data.data?.photos || data.photos)) {
-            const rawPhotos = data.data?.photos || data.photos;
+            const rawPhotos = (data.data?.photos || data.photos).slice(0, 3);
             // Animasi satu persatu memunculkan foto dari backend
             const accumulated: any[] = [];
             for (let i = 0; i < rawPhotos.length; i++) {
               setGenerationStep(i + 1);
-              setStepMessage(`Langkah ${i + 1}/4: Merender ${rawPhotos[i].title}...`);
+              setStepMessage(`Langkah ${i + 1}/${rawPhotos.length}: Merender ${rawPhotos[i].title}...`);
               accumulated.push(rawPhotos[i]);
               setAiPhotos([...accumulated]);
               await delay(600);
             }
-            setGenerationStep(5);
-            setStepMessage("Selesai! 4 Foto Marketplace Komersial Berhasil Dihasilkan & Diterapkan.");
+            setGenerationStep(4);
+            setStepMessage("Selesai! 3 Foto Studio Marketplace Berhasil Dihasilkan & Diterapkan.");
             applyAllAiPhotos(rawPhotos);
             setAiLoading(false);
             return;
@@ -558,7 +558,7 @@ export default function CreateProdiItem() {
       let benefitPhoto: any;
 
       if (isBackSelected) {
-        setStepMessage("Langkah 3/4: Membangun Foto Sisi Belakang (Back View & Inspeksi Legalitas)...");
+        setStepMessage("Langkah 3/3: Membangun Foto Sisi Belakang (Back View & Inspeksi Legalitas)...");
         benefitUrl = generateBackViewPhoto(isolatedImg, namaItem.trim() || "Produk Inovasi Vokasi UNS", aiKategori);
         benefitPhoto = {
           id: "back_view",
@@ -570,7 +570,7 @@ export default function CreateProdiItem() {
           directUrl: benefitUrl,
         };
       } else {
-        setStepMessage("Langkah 3/4: Menyusun Infografis Fitur & Alasan Membeli...");
+        setStepMessage("Langkah 3/3: Menyusun Infografis Fitur & Alasan Membeli...");
         benefitUrl = generateBenefitPhoto(isolatedImg, aiBenefitHeadline, namaItem.trim() || "Produk Inovasi Vokasi UNS", aiKategori);
         benefitPhoto = {
           id: "benefit",
@@ -584,28 +584,11 @@ export default function CreateProdiItem() {
       }
       sequentialPhotos.push(benefitPhoto);
       setAiPhotos([...sequentialPhotos]);
-      await delay(700);
+      await delay(600);
 
-      // Step 4: Konteks Penggunaan Nyata (Lifestyle)
+      // Selesai (Tepat 3 Foto Studio)
       setGenerationStep(4);
-      setStepMessage("Langkah 4/4: Membangun Konteks Penggunaan Nyata (Lifestyle Context)...");
-      const lifestyleUrl = generateLifestylePhoto(isolatedImg, aiKategori);
-      const lifestylePhoto = {
-        id: "lifestyle",
-        title: "4. Konteks Penggunaan (Lifestyle)",
-        angle: "Konteks Real Use",
-        badge: "Lifestyle Tabletop",
-        desc: "Fotografi kontekstual produk asli di atas meja kayu hangat dengan pencahayaan pagi estetik.",
-        url: lifestyleUrl,
-        directUrl: lifestyleUrl,
-      };
-      sequentialPhotos.push(lifestylePhoto);
-      setAiPhotos([...sequentialPhotos]);
-      await delay(500);
-
-      // Selesai
-      setGenerationStep(5);
-      setStepMessage("Selesai! 4 Foto Marketplace Komersial Berhasil Dihasilkan & Diterapkan.");
+      setStepMessage("Selesai! 3 Foto Studio Marketplace Berhasil Dihasilkan & Diterapkan.");
       applyAllAiPhotos(sequentialPhotos);
     } catch (err: any) {
       console.error("Studio generator error:", err);
@@ -639,8 +622,8 @@ export default function CreateProdiItem() {
       const confirmGen = confirm(
         "PERHATIAN STUDIO FOTO VISUAL AI:\n\n" +
         "Foto produk Anda belum dipoles melalui Studio Foto Visual AI.\n\n" +
-        "Katalog inovasi Sekolah Vokasi UNS mewajibkan standar 4 foto marketplace (Hero Utama, Sisi Samping 3/4, Infografis Keunggulan, dan Lifestyle) berformat portrait 3:4 yang seragam dan profesional.\n\n" +
-        "Apakah Anda ingin sistem men-generate otomatis 4 foto marketplace sekarang?\n\n" +
+        "Katalog inovasi Sekolah Vokasi UNS mewajibkan standar 3 foto marketplace (Hero Utama, Sisi Samping 3/4, dan Infografis Keunggulan) berformat portrait 3:4 yang seragam dan profesional.\n\n" +
+        "Apakah Anda ingin sistem men-generate otomatis 3 foto studio marketplace sekarang?\n\n" +
         "• Klik [OK] untuk men-generate otomatis sekarang.\n" +
         "• Klik [Batal] jika ingin tetap menyimpan foto mentah."
       );
@@ -648,7 +631,7 @@ export default function CreateProdiItem() {
       if (confirmGen) {
         setIsSubmitting(false);
         setIsAiStudioOpen(true);
-        toast.info("Memproses Studio Foto AI...", "Menghasilkan 4 foto marketplace komersial...");
+        toast.info("Memproses Studio Foto AI...", "Menghasilkan 3 foto studio marketplace komersial...");
         await handleGenerateAiPhotos();
         return;
       }
@@ -973,7 +956,7 @@ export default function CreateProdiItem() {
                     setHasGenerated(false);
                     toast.info(
                       "Foto Produk Diunggah",
-                      "Foto mentah siap! Klik 'Generate 4 Foto Marketplace' di bawah agar format studio 3:4 otomatis diterapkan."
+                      "Foto mentah siap! Klik 'Hasilkan 3 Foto Studio' di bawah agar format studio 3:4 otomatis diterapkan."
                     );
                   }
                 }}
@@ -1035,18 +1018,18 @@ export default function CreateProdiItem() {
                 <div>
                   <div className="flex items-center gap-2">
                     <span className="text-xs sm:text-sm font-black uppercase tracking-wide">
-                      {hasGenerated ? "4 Foto Studio AI Telah Terpasang" : "Wajib Dipoles: Studio Foto AI (Portrait 3:4)"}
+                      {hasGenerated ? "3 Foto Studio AI Telah Terpasang" : "Wajib Dipoles: Studio Foto AI (Portrait 3:4)"}
                     </span>
                     <span className={`px-2 py-0.5 rounded-full text-[10px] font-black ${
                       hasGenerated ? "bg-emerald-600 text-white" : "bg-amber-500 text-white"
                     }`}>
-                      {hasGenerated ? "✓ 4 Foto Aktif" : "Klik Generate"}
+                      {hasGenerated ? "✓ 3 Foto Aktif" : "Klik Generate"}
                     </span>
                   </div>
                   <p className="text-[11px] opacity-90 mt-0.5">
                     {hasGenerated 
-                      ? "Foto Mockup Utama (Hero) & Galeri Produk (Detail 3/4, Infografis, Lifestyle) sudah otomatis terpasang rapi."
-                      : "Foto mentah wajib dipoles ke 4 foto marketplace (Hero, Detail 3/4, Infografis, Lifestyle) agar standar katalog SV UNS terpenuhi."}
+                      ? "Foto Mockup Utama (Hero) & Galeri Produk (Detail 3/4 & Infografis) sudah otomatis terpasang rapi."
+                      : "Foto mentah wajib dipoles ke 3 foto marketplace (Hero, Detail 3/4, Infografis) agar standar katalog SV UNS terpenuhi."}
                   </p>
                 </div>
               </div>
@@ -1062,7 +1045,7 @@ export default function CreateProdiItem() {
                   className="w-full sm:w-auto px-5 py-2.5 rounded-full bg-gradient-to-r from-amber-500 via-[#C5A059] to-[#0F4C81] hover:brightness-110 text-white font-black text-xs shadow-md transition flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
                 >
                   <RefreshCw className={`w-3.5 h-3.5 ${aiLoading ? "animate-spin" : ""}`} />
-                  <span>{aiLoading ? "Sedang Merender..." : hasGenerated ? "Generate Ulang Foto" : "✨ Generate 4 Foto Sekarang"}</span>
+                  <span>{aiLoading ? "Sedang Merender..." : hasGenerated ? "Generate Ulang 3 Foto" : "Hasilkan 3 Foto Studio"}</span>
                 </button>
               </div>
             </div>
@@ -1200,7 +1183,7 @@ export default function CreateProdiItem() {
                     <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-2">
                       <span className="text-xs font-bold text-amber-600 dark:text-amber-400 flex items-center gap-1.5">
                         <SlidersHorizontal className="w-4 h-4" />
-                        <span>Generator 4 Foto Marketplace Komersial (Format Portrait 3:4)</span>
+                        <span>Generator 3 Foto Marketplace Komersial (Format Portrait 3:4)</span>
                       </span>
                       <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-amber-100 dark:bg-amber-950/80 text-amber-800 dark:text-amber-300 font-bold">
                         Target: {settings.ai_default_domain || "spsbu.unsmadiun.id"}
@@ -1209,7 +1192,7 @@ export default function CreateProdiItem() {
 
                     {/* Aturan Identitas Visual Konsisten */}
                     <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-400/20 text-[11px] text-amber-800 dark:text-amber-300">
-                      <strong>Standar 4 Foto Marketplace:</strong> Menghasilkan 1 set komplit (1. Foto Utama / Hero, 2. Detail & Kualitas Macro, 3. Infografis Fitur & Alasan Membeli, 4. Konteks Lifestyle) dengan visual identity, warna, logo, dan pencahayaan studio yang konsisten.
+                      <strong>Standar 3 Foto Marketplace:</strong> Menghasilkan 1 set komplit (1. Foto Utama / Hero, 2. Detail & Kualitas Macro, 3. Infografis Fitur & Alasan Membeli) dengan visual identity, warna, logo, dan pencahayaan studio yang konsisten.
                     </div>
 
                     {/* 1. Tambah Foto Mentah (Raw Photo) */}
@@ -1228,7 +1211,7 @@ export default function CreateProdiItem() {
                             setHasGenerated(false);
                             toast.info(
                               "Foto Mentah Siap",
-                              "Silakan pilih jenis produk dan klik 'Hasilkan 4 Foto Marketplace Komersial' di bawah."
+                              "Silakan pilih jenis produk dan klik 'Hasilkan 3 Foto Studio Marketplace' di bawah."
                             );
                           }
                         }}
@@ -1455,8 +1438,8 @@ export default function CreateProdiItem() {
                         <RefreshCw className={`w-4 h-4 ${aiLoading ? "animate-spin" : ""}`} />
                         <span>
                           {aiLoading
-                            ? `Memproses Studio Foto (${generationStep}/4)...`
-                            : "Hasilkan 4 Foto Marketplace Komersial"}
+                            ? `Memproses Studio Foto (${Math.min(generationStep, 3)}/3)...`
+                            : "Hasilkan 3 Foto Studio Marketplace"}
                         </span>
                       </button>
                     </div>
@@ -1470,11 +1453,9 @@ export default function CreateProdiItem() {
                             <span>Proses Studio Visual Sedang Berjalan</span>
                           </span>
                           <span className="text-xs font-mono font-black text-amber-600 dark:text-amber-400">
-                            {generationStep === 1 && "25%"}
-                            {generationStep === 2 && "50%"}
-                            {generationStep === 3 && "75%"}
-                            {generationStep === 4 && "95%"}
-                            {generationStep >= 5 && "100%"}
+                            {generationStep === 1 && "33%"}
+                            {generationStep === 2 && "66%"}
+                            {generationStep >= 3 && "100%"}
                           </span>
                         </div>
 
@@ -1485,22 +1466,16 @@ export default function CreateProdiItem() {
                             style={{
                               width:
                                 generationStep === 1
-                                  ? "25%"
+                                  ? "33%"
                                   : generationStep === 2
-                                  ? "50%"
-                                  : generationStep === 3
-                                  ? "75%"
-                                  : generationStep === 4
-                                  ? "95%"
-                                  : generationStep >= 5
-                                  ? "100%"
-                                  : "10%",
+                                  ? "66%"
+                                  : "100%",
                             }}
                           />
                         </div>
 
-                        {/* 4 Tahap Visual */}
-                        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-1 text-[11px]">
+                        {/* 3 Tahap Visual */}
+                        <div className="grid grid-cols-3 gap-2 pt-1 text-[11px]">
                           <div
                             className={`p-2 rounded-xl border flex items-center gap-1.5 transition ${
                               generationStep > 1
@@ -1545,21 +1520,6 @@ export default function CreateProdiItem() {
                             </span>
                             <span className="truncate">3. Infografis Fitur</span>
                           </div>
-
-                          <div
-                            className={`p-2 rounded-xl border flex items-center gap-1.5 transition ${
-                              generationStep > 4
-                                ? "bg-emerald-50 dark:bg-emerald-950/40 border-emerald-300 dark:border-emerald-800 text-emerald-700 dark:text-emerald-300 font-bold"
-                                : generationStep === 4
-                                ? "bg-amber-50 dark:bg-amber-950/50 border-amber-400 dark:border-amber-600 text-amber-800 dark:text-amber-200 font-black ring-2 ring-amber-400/30"
-                                : "bg-white/60 dark:bg-slate-800/60 border-slate-200 dark:border-slate-700 text-slate-400"
-                            }`}
-                          >
-                            <span className="w-4 h-4 rounded-full bg-slate-900/10 dark:bg-white/10 flex items-center justify-center font-black text-[9px] shrink-0">
-                              {generationStep > 4 ? "✓" : "4"}
-                            </span>
-                            <span className="truncate">4. Lifestyle</span>
-                          </div>
                         </div>
 
                         <p className="text-xs text-slate-600 dark:text-slate-300 font-medium italic pt-0.5">
@@ -1568,7 +1528,7 @@ export default function CreateProdiItem() {
                       </div>
                     )}
 
-                    {/* 6. Hasil 4 Foto Produk */}
+                    {/* 6. Hasil 3 Foto Produk */}
                     {aiPhotos.length > 0 && (
                       <div className="pt-2 space-y-3">
                         <div className="flex flex-wrap items-center justify-between gap-2 p-3 rounded-2xl bg-gradient-to-r from-emerald-500/15 via-teal-500/10 to-blue-500/10 border border-emerald-400/40 dark:border-emerald-500/30">
@@ -1576,10 +1536,10 @@ export default function CreateProdiItem() {
                             <CheckCircle2 className="w-4 h-4 text-emerald-600 dark:text-emerald-400 shrink-0" />
                             <div>
                               <span className="text-xs font-black text-slate-900 dark:text-white">
-                                4 Foto Standar Marketplace Komersial (Portrait 3:4)
+                                3 Foto Standar Marketplace Komersial (Portrait 3:4)
                               </span>
                               <p className="text-[10px] text-slate-500 dark:text-slate-400">
-                                Foto 1 Hero terpasang sebagai Mockup Utama, dan Foto 2–4 otomatis masuk ke Galeri Produk.
+                                Foto 1 Hero terpasang sebagai Mockup Utama, dan Foto 2–3 otomatis masuk ke Galeri Produk.
                               </p>
                             </div>
                           </div>
@@ -1593,7 +1553,7 @@ export default function CreateProdiItem() {
                           </button>
                         </div>
 
-                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                           {aiPhotos.map((photo, idx) => (
                             <div
                               key={photo.id}

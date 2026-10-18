@@ -294,7 +294,7 @@ export default function PimpinanDashboard() {
               </span>
             </div>
             <div className="flex items-center gap-4 text-xs font-bold text-slate-600 dark:text-slate-300">
-              <span>👁 2.890 Views</span>
+              <span className="flex items-center gap-1"><Eye className="w-3.5 h-3.5" /> 2.890 Views</span>
               <span className="text-slate-400">⚡ Demo: -</span>
             </div>
           </div>
@@ -314,7 +314,7 @@ export default function PimpinanDashboard() {
               </span>
             </div>
             <div className="flex items-center gap-4 text-xs font-bold text-slate-600 dark:text-slate-300">
-              <span>👁 1.240 Views</span>
+              <span className="flex items-center gap-1"><Eye className="w-3.5 h-3.5" /> 1.240 Views</span>
               <span className="text-[#C5A059]">⚡ 380 Sandbox Demo</span>
             </div>
           </div>
@@ -334,7 +334,7 @@ export default function PimpinanDashboard() {
               </span>
             </div>
             <div className="flex items-center gap-4 text-xs font-bold text-slate-600 dark:text-slate-300">
-              <span>👁 950 Views</span>
+              <span className="flex items-center gap-1"><Eye className="w-3.5 h-3.5" /> 950 Views</span>
               <span className="text-slate-400">⚡ Demo: -</span>
             </div>
           </div>
