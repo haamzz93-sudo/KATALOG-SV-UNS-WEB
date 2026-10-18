@@ -1482,10 +1482,15 @@ function AdminDashboardContent() {
           ],
     });
 
+    const isAlreadyStudio = Boolean(
+      (item.thumbnail_url && item.thumbnail_url.includes("/images/catalog/studio/")) ||
+      (existingGallery.length >= 3)
+    );
+
     setAiRawPhoto(item.thumbnail_url || "");
     setAiRawPhotoBase64("");
     setAiPhotos([]);
-    setHasGenerated(false);
+    setHasGenerated(isAlreadyStudio);
     setIsAiStudioOpen(false);
 
     // Auto set AI category
