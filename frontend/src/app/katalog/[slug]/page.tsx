@@ -113,12 +113,12 @@ export default function DetailProdukPage() {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-10 items-start">
           {/* Left Column: Visual Media & Demo Triggers (5 cols - Portrait 3:4 Marketplace) */}
           <div className="lg:col-span-5 space-y-4">
-            {/* Primary Media Display (Portrait 3:4 Standard) */}
-            <div className="relative aspect-[3/4] w-full max-w-[500px] mx-auto rounded-2xl sm:rounded-[32px] overflow-hidden bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xl flex items-center justify-center">
+            {/* Primary Media Display (Portrait 3:4 Standard & Zero-Crop Guarantee) */}
+            <div className="relative aspect-[3/4] max-h-[580px] w-full max-w-[480px] mx-auto rounded-2xl sm:rounded-[32px] overflow-hidden bg-gradient-to-b from-slate-50 via-slate-100 to-slate-200 dark:from-slate-900 dark:via-slate-900/90 dark:to-slate-950 border border-slate-200 dark:border-slate-800 shadow-xl flex items-center justify-center p-2.5">
               <img
                 src={mediaList[activeMediaIndex]?.file_url || safeThumbnail}
                 alt={item.nama_item}
-                className="w-full h-full object-cover object-center transition-all duration-300"
+                className="max-h-full max-w-full w-auto h-auto object-contain rounded-xl sm:rounded-2xl transition-all duration-300 drop-shadow-md"
                 onError={(e) => {
                   (e.currentTarget as HTMLImageElement).src = "/images/brand/slogan-poster-vokasi.jpg";
                 }}
@@ -126,10 +126,10 @@ export default function DetailProdukPage() {
 
               {/* Badges on top */}
               <div className="absolute top-4 left-4 flex gap-2 z-10">
-                <span className="px-3 py-1 rounded-full text-xs font-extrabold bg-[#0A2540]/80 backdrop-blur-md text-[#C5A059] border border-[#C5A059]/40 shadow-sm">
+                <span className="px-3 py-1 rounded-full text-xs font-extrabold bg-[#0A2540]/85 backdrop-blur-md text-[#C5A059] border border-[#C5A059]/40 shadow-sm">
                   {item.category?.nama}
                 </span>
-                <span className="px-3 py-1 rounded-full text-xs font-bold bg-white/80 dark:bg-slate-900/80 backdrop-blur-md text-slate-900 dark:text-white border border-slate-200 dark:border-slate-700 shadow-sm">
+                <span className="px-3 py-1 rounded-full text-xs font-bold bg-white/85 dark:bg-slate-900/85 backdrop-blur-md text-slate-900 dark:text-white border border-slate-200 dark:border-slate-700 shadow-sm">
                   {item.prodi?.kode_prodi}
                 </span>
               </div>
@@ -143,13 +143,13 @@ export default function DetailProdukPage() {
                     key={m.id || idx}
                     type="button"
                     onClick={() => setActiveMediaIndex(idx)}
-                    className={`relative w-16 h-22 sm:w-20 sm:h-28 aspect-[3/4] rounded-xl sm:rounded-2xl overflow-hidden border-2 transition shrink-0 cursor-pointer shadow-sm ${
+                    className={`relative w-16 h-22 sm:w-20 sm:h-28 aspect-[3/4] rounded-xl sm:rounded-2xl overflow-hidden border-2 transition shrink-0 cursor-pointer shadow-sm bg-slate-50 dark:bg-slate-800/80 flex items-center justify-center p-1 ${
                       activeMediaIndex === idx
                         ? "border-[#0F4C81] dark:border-[#C5A059] ring-2 ring-[#C5A059]/50 scale-105"
                         : "border-slate-200 dark:border-slate-700 opacity-60 hover:opacity-100"
                     }`}
                   >
-                    <img src={m.file_url} alt={`Thumbnail ${idx + 1}`} className="w-full h-full object-cover object-center" />
+                    <img src={m.file_url} alt={`Thumbnail ${idx + 1}`} className="max-h-full max-w-full w-auto h-auto object-contain rounded-lg" />
                   </button>
                 ))}
               </div>

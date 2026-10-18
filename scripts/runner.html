@@ -2,14 +2,14 @@
 <html lang="id">
 <head>
   <meta charset="UTF-8">
-  <title>Batch Studio Marketplace Photo Generator</title>
+  <title>Batch Studio Marketplace Photo Generator (3 Lini Layanan & Zero-Crop)</title>
   <style>
     body { font-family: system-ui, sans-serif; background: #0f172a; color: #fff; padding: 20px; }
     #log { font-family: monospace; font-size: 13px; max-height: 400px; overflow-y: auto; background: #1e293b; padding: 10px; border-radius: 8px; }
   </style>
 </head>
 <body>
-  <h2>Studio Generator Runner - 31 Produk Resmi SV UNS</h2>
+  <h2>Studio Generator Runner - Spesifik 3 Lini Layanan & Anti-Crop</h2>
   <div id="status">Memuat data produk...</div>
   <pre id="log"></pre>
 
@@ -23,7 +23,7 @@
       console.log(msg);
     }
 
-    // Helper Canvas
+    // Canvas Helpers
     const drawRoundRect = (ctx, x, y, w, h, r) => {
       if (typeof ctx.roundRect === "function") {
         ctx.roundRect(x, y, w, h, r);
@@ -42,152 +42,22 @@
       }
     };
 
-    const trimTransparentBorders = (canvas) => {
-      const ctx = canvas.getContext("2d");
-      if (!ctx) return canvas;
-      const w = canvas.width;
-      const h = canvas.height;
-      try {
-        const imgData = ctx.getImageData(0, 0, w, h);
-        const data = imgData.data;
-        let minX = w, minY = h, maxX = 0, maxY = 0;
-        let found = false;
-
-        for (let y = 0; y < h; y++) {
-          for (let x = 0; x < w; x++) {
-            const alpha = data[(y * w + x) * 4 + 3];
-            if (alpha > 15) {
-              if (x < minX) minX = x;
-              if (x > maxX) maxX = x;
-              if (y < minY) minY = y;
-              if (y > maxY) maxY = y;
-              found = true;
-            }
-          }
-        }
-
-        if (!found) return canvas;
-
-        const pad = 12;
-        minX = Math.max(0, minX - pad);
-        minY = Math.max(0, minY - pad);
-        maxX = Math.min(w, maxX + pad);
-        maxY = Math.min(h, maxY + pad);
-
-        const cropW = maxX - minX;
-        const cropH = maxY - minY;
-        if (cropW <= 0 || cropH <= 0) return canvas;
-
-        const cropped = document.createElement("canvas");
-        cropped.width = cropW;
-        cropped.height = cropH;
-        const cCtx = cropped.getContext("2d");
-        if (cCtx) {
-          cCtx.drawImage(canvas, minX, minY, cropW, cropH, 0, 0, cropW, cropH);
-          return cropped;
-        }
-      } catch (e) {
-        console.warn("Trim transparent error:", e);
+    // FUNGSI UTAMA: Menghitung ukuran fit sempurna tanpa pernah keluar bounding box (Zero-Crop Guarantee)
+    const calculateFit = (imgW, imgH, maxW, maxH) => {
+      const imgRatio = imgW / imgH;
+      const boxRatio = maxW / maxH;
+      let w, h;
+      if (imgRatio > boxRatio) {
+        w = maxW;
+        h = maxW / imgRatio;
+      } else {
+        h = maxH;
+        w = maxH * imgRatio;
       }
-      return canvas;
+      return { w: Math.round(w), h: Math.round(h) };
     };
 
-    const isolateProductForeground = (sourceImg, tolerance = 36) => {
-      const canvas = document.createElement("canvas");
-      const w = sourceImg.width;
-      const h = sourceImg.height;
-      canvas.width = w;
-      canvas.height = h;
-
-      const ctx = canvas.getContext("2d");
-      if (!ctx) return sourceImg;
-
-      ctx.drawImage(sourceImg, 0, 0);
-
-      try {
-        const imgData = ctx.getImageData(0, 0, w, h);
-        const data = imgData.data;
-
-        const sampleCorner = (px, py) => {
-          const idx = (py * w + px) * 4;
-          return [data[idx], data[idx + 1], data[idx + 2]];
-        };
-
-        const corners = [
-          sampleCorner(2, 2),
-          sampleCorner(w - 3, 2),
-          sampleCorner(2, h - 3),
-          sampleCorner(w - 3, h - 3),
-          sampleCorner(Math.floor(w / 2), 2),
-        ];
-
-        const avgBgR = corners.reduce((acc, c) => acc + c[0], 0) / corners.length;
-        const avgBgG = corners.reduce((acc, c) => acc + c[1], 0) / corners.length;
-        const avgBgB = corners.reduce((acc, c) => acc + c[2], 0) / corners.length;
-
-        const brightness = (avgBgR + avgBgG + avgBgB) / 3;
-        if (brightness < 105) {
-          return trimTransparentBorders(canvas);
-        }
-
-        const totalPixels = w * h;
-        const visited = new Uint8Array(totalPixels);
-        const queue = new Int32Array(totalPixels);
-        let head = 0;
-        let tail = 0;
-
-        const isBackground = (r, g, b) => {
-          const dr = r - avgBgR;
-          const dg = g - avgBgG;
-          const db = b - avgBgB;
-          return Math.sqrt(dr * dr + dg * dg + db * db) <= tolerance;
-        };
-
-        const enqueue = (px, py) => {
-          const pIdx = py * w + px;
-          if (visited[pIdx]) return;
-          const dIdx = pIdx * 4;
-          if (isBackground(data[dIdx], data[dIdx + 1], data[dIdx + 2])) {
-            visited[pIdx] = 1;
-            queue[tail++] = pIdx;
-          }
-        };
-
-        for (let x = 0; x < w; x++) {
-          enqueue(x, 0);
-          enqueue(x, h - 1);
-        }
-        for (let y = 0; y < h; y++) {
-          enqueue(0, y);
-          enqueue(w - 1, y);
-        }
-
-        while (head < tail) {
-          const curr = queue[head++];
-          const cx = curr % w;
-          const cy = Math.floor(curr / w);
-
-          if (cx > 0) enqueue(cx - 1, cy);
-          if (cx < w - 1) enqueue(cx + 1, cy);
-          if (cy > 0) enqueue(cx, cy - 1);
-          if (cy < h - 1) enqueue(cx, cy + 1);
-        }
-
-        for (let i = 0; i < totalPixels; i++) {
-          if (visited[i]) {
-            data[i * 4 + 3] = 0;
-          }
-        }
-
-        ctx.putImageData(imgData, 0, 0);
-      } catch (err) {
-        console.warn("Isolasi fallback:", err);
-      }
-
-      return trimTransparentBorders(canvas);
-    };
-
-    const drawContactShadow = (ctx, cx, cy, rx, ry, opacity = 0.36) => {
+    const drawContactShadow = (ctx, cx, cy, rx, ry, opacity = 0.35) => {
       ctx.save();
       const grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, rx);
       grad.addColorStop(0, `rgba(15, 23, 42, ${opacity})`);
@@ -200,44 +70,82 @@
       ctx.restore();
     };
 
-    // 1. HERO PHOTO
-    const generateHeroPhoto = (img, namaItem, kategori) => {
+    // ==========================================
+    // 1. FOTO UTAMA / HERO (ZERO-CROP BOUNDING BOX)
+    // ==========================================
+    const generateHeroPhoto = (img, item) => {
       const canvas = document.createElement("canvas");
       canvas.width = 960;
       canvas.height = 1280;
       const ctx = canvas.getContext("2d");
 
-      // Backdrop
-      const bgGrad = ctx.createLinearGradient(0, 0, 0, 1280);
-      bgGrad.addColorStop(0, "#F8FAFC");
-      bgGrad.addColorStop(0.65, "#EDF2F7");
-      bgGrad.addColorStop(1, "#E2E8F0");
-      ctx.fillStyle = bgGrad;
-      ctx.fillRect(0, 0, 960, 1280);
+      const lini = item.metaLini || "produk";
+      const isTech = lini === "teknologi";
+      const isJasa = lini === "jasa";
 
-      // Spotlight
-      const spotGrad = ctx.createRadialGradient(480, 520, 60, 480, 520, 620);
-      spotGrad.addColorStop(0, "rgba(255, 255, 255, 0.96)");
-      spotGrad.addColorStop(0.7, "rgba(255, 255, 255, 0.35)");
-      spotGrad.addColorStop(1, "rgba(255, 255, 255, 0)");
-      ctx.fillStyle = spotGrad;
-      ctx.fillRect(0, 0, 960, 1280);
+      // 1. Backdrop Studio Khusus
+      if (isTech) {
+        const bgGrad = ctx.createLinearGradient(0, 0, 0, 1280);
+        bgGrad.addColorStop(0, "#F0F4F8");
+        bgGrad.addColorStop(0.65, "#E1E8F0");
+        bgGrad.addColorStop(1, "#D2DCE6");
+        ctx.fillStyle = bgGrad;
+        ctx.fillRect(0, 0, 960, 1280);
 
-      // Podium 3D Pedestal
-      const podX = 480, podY = 960, podRx = 380, podRy = 65, podH = 80;
+        // Tech cyan spotlight
+        const spot = ctx.createRadialGradient(480, 500, 50, 480, 500, 600);
+        spot.addColorStop(0, "rgba(255, 255, 255, 0.98)");
+        spot.addColorStop(0.6, "rgba(224, 242, 254, 0.4)");
+        spot.addColorStop(1, "rgba(224, 242, 254, 0)");
+        ctx.fillStyle = spot;
+        ctx.fillRect(0, 0, 960, 1280);
+      } else if (isJasa) {
+        const bgGrad = ctx.createLinearGradient(0, 0, 0, 1280);
+        bgGrad.addColorStop(0, "#F8FAFC");
+        bgGrad.addColorStop(0.65, "#EDF2F7");
+        bgGrad.addColorStop(1, "#E2E8F0");
+        ctx.fillStyle = bgGrad;
+        ctx.fillRect(0, 0, 960, 1280);
+
+        // Warm gold spotlight
+        const spot = ctx.createRadialGradient(480, 500, 50, 480, 500, 600);
+        spot.addColorStop(0, "rgba(255, 255, 255, 0.98)");
+        spot.addColorStop(0.6, "rgba(254, 249, 195, 0.25)");
+        spot.addColorStop(1, "rgba(254, 249, 195, 0)");
+        ctx.fillStyle = spot;
+        ctx.fillRect(0, 0, 960, 1280);
+      } else {
+        // Produk Fisik Studio
+        const bgGrad = ctx.createLinearGradient(0, 0, 0, 1280);
+        bgGrad.addColorStop(0, "#F8FAFC");
+        bgGrad.addColorStop(0.65, "#EDF2F7");
+        bgGrad.addColorStop(1, "#E2E8F0");
+        ctx.fillStyle = bgGrad;
+        ctx.fillRect(0, 0, 960, 1280);
+
+        const spot = ctx.createRadialGradient(480, 500, 50, 480, 500, 600);
+        spot.addColorStop(0, "rgba(255, 255, 255, 0.98)");
+        spot.addColorStop(0.6, "rgba(255, 255, 255, 0.3)");
+        spot.addColorStop(1, "rgba(255, 255, 255, 0)");
+        ctx.fillStyle = spot;
+        ctx.fillRect(0, 0, 960, 1280);
+      }
+
+      // 2. Podium / Showcase Base
+      const podX = 480, podY = 960, podRx = 400, podRy = 65, podH = 75;
 
       ctx.save();
       ctx.beginPath();
-      ctx.ellipse(podX, podY + podH + 12, podRx + 25, podRy + 15, 0, 0, Math.PI * 2);
+      ctx.ellipse(podX, podY + podH + 12, podRx + 20, podRy + 15, 0, 0, Math.PI * 2);
       ctx.fillStyle = "rgba(15, 23, 42, 0.08)";
       ctx.fill();
       ctx.restore();
 
-      const podBodyGrad = ctx.createLinearGradient(podX - podRx, 0, podX + podRx, 0);
-      podBodyGrad.addColorStop(0, "#D9E2EC");
-      podBodyGrad.addColorStop(0.3, "#F0F4F8");
-      podBodyGrad.addColorStop(0.7, "#FFFFFF");
-      podBodyGrad.addColorStop(1, "#CBD5E1");
+      const podBody = ctx.createLinearGradient(podX - podRx, 0, podX + podRx, 0);
+      podBody.addColorStop(0, "#D9E2EC");
+      podBody.addColorStop(0.3, "#F0F4F8");
+      podBody.addColorStop(0.7, "#FFFFFF");
+      podBody.addColorStop(1, "#CBD5E1");
 
       ctx.beginPath();
       ctx.moveTo(podX - podRx, podY);
@@ -246,71 +154,86 @@
       ctx.lineTo(podX + podRx, podY);
       ctx.ellipse(podX, podY, podRx, podRy, 0, 0, Math.PI, true);
       ctx.closePath();
-      ctx.fillStyle = podBodyGrad;
+      ctx.fillStyle = podBody;
       ctx.fill();
 
-      const podTopGrad = ctx.createLinearGradient(podX, podY - podRy, podX, podY + podRy);
-      podTopGrad.addColorStop(0, "#FFFFFF");
-      podTopGrad.addColorStop(1, "#F1F5F9");
+      const podTop = ctx.createLinearGradient(podX, podY - podRy, podX, podY + podRy);
+      podTop.addColorStop(0, "#FFFFFF");
+      podTop.addColorStop(1, "#F1F5F9");
       ctx.beginPath();
       ctx.ellipse(podX, podY, podRx, podRy, 0, 0, Math.PI * 2);
-      ctx.fillStyle = podTopGrad;
+      ctx.fillStyle = podTop;
       ctx.fill();
-      ctx.strokeStyle = "rgba(226, 232, 240, 0.85)";
+      ctx.strokeStyle = "rgba(226, 232, 240, 0.9)";
       ctx.lineWidth = 2;
       ctx.stroke();
 
-      // Product
-      const prodTargetH = 740;
-      const prodRatio = img.width / img.height;
-      const prodW = prodTargetH * prodRatio;
-      const prodX = 480 - prodW / 2;
-      const prodY = podY - prodTargetH + 18;
+      // 3. FIT BOUNDING BOX MAKSIMAL (ANTI-CROP)
+      // Maksimum lebar 800px (aman di kanvas 960px), tinggi 650px
+      const fit = calculateFit(img.width, img.height, 800, 650);
+      const prodX = 480 - fit.w / 2;
+      const prodY = podY - fit.h + 15;
 
-      drawContactShadow(ctx, 480, podY + 5, prodW * 0.46, 22, 0.38);
-      ctx.drawImage(img, prodX, prodY, prodW, prodTargetH);
+      // Contact shadow proporsional dengan lebar aktual gambar
+      drawContactShadow(ctx, 480, podY + 5, fit.w * 0.46, 20, 0.35);
 
-      // Badges
-      ctx.fillStyle = "rgba(15, 76, 129, 0.92)";
+      // Gambar produk utuh tanpa terpotong
+      ctx.drawImage(img, prodX, prodY, fit.w, fit.h);
+
+      // 4. Header Badges
+      let headerTitle = "1. FOTO UTAMA • HERO MARKETPLACE";
+      if (isTech) headerTitle = "1. TEKNOLOGI SIAP TERAP • DIGITAL PLATFORM";
+      else if (isJasa) headerTitle = "1. JASA KONSULTAN & LAYANAN KEAHLIAN";
+      else headerTitle = "1. PRODUK SIAP TERAP • HASIL RISET TERAPAN";
+
+      ctx.fillStyle = isTech ? "rgba(14, 116, 144, 0.94)" : isJasa ? "rgba(15, 76, 129, 0.94)" : "rgba(197, 160, 89, 0.94)";
       ctx.beginPath();
-      drawRoundRect(ctx, 40, 40, 360, 42, 21);
+      drawRoundRect(ctx, 40, 40, 450, 44, 22);
       ctx.fill();
 
       ctx.fillStyle = "#FFFFFF";
-      ctx.font = "bold 14px system-ui, sans-serif";
-      ctx.fillText("1. FOTO UTAMA • HERO MARKETPLACE", 60, 66);
+      ctx.font = "bold 13px system-ui, sans-serif";
+      ctx.fillText(headerTitle, 60, 67);
 
-      if (kategori) {
-        ctx.fillStyle = "rgba(255, 255, 255, 0.92)";
-        ctx.strokeStyle = "rgba(197, 160, 89, 0.7)";
-        ctx.lineWidth = 1.5;
-        ctx.beginPath();
-        drawRoundRect(ctx, 680, 40, 240, 42, 21);
-        ctx.fill();
-        ctx.stroke();
+      // Kategori Tag Kanan Atas
+      ctx.fillStyle = "rgba(255, 255, 255, 0.94)";
+      ctx.strokeStyle = "rgba(15, 76, 129, 0.4)";
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      drawRoundRect(ctx, 670, 40, 250, 44, 22);
+      ctx.fill();
+      ctx.stroke();
 
-        ctx.fillStyle = "#0F4C81";
-        ctx.font = "bold 13px system-ui, sans-serif";
-        ctx.textAlign = "center";
-        ctx.fillText(kategori, 800, 66);
-        ctx.textAlign = "left";
-      }
+      ctx.fillStyle = "#0F4C81";
+      ctx.font = "bold 12px system-ui, sans-serif";
+      ctx.textAlign = "center";
+      ctx.fillText(item.metaKategoriBadge || "SEKOLAH VOKASI UNS", 795, 67);
+      ctx.textAlign = "left";
 
-      ctx.fillStyle = "rgba(15, 23, 42, 0.55)";
+      // 5. Footer Spesifik
+      ctx.fillStyle = "rgba(15, 23, 42, 0.6)";
       ctx.font = "12px system-ui, sans-serif";
-      ctx.fillText("Standar Foto Marketplace Komersial (3:4) • 100% Keaslian Identitas & Warna Terjaga", 45, 1240);
+      let footerText = "Standar Foto Komersial (3:4) • 100% Identitas, Karakter & Mutu Resmi Terjaga";
+      if (isTech) footerText = "Platform Digital Teruji • Solusi Efisiensi & Transformasi Digital Mitra Industri / DUDI";
+      else if (isJasa) footerText = "Layanan Konsultasi & Pengujian Terakreditasi • Dikelola Tenaga Ahli Profesional SV UNS";
+      ctx.fillText(footerText, 45, 1240);
 
       return canvas.toDataURL("image/jpeg", 0.92);
     };
 
-    // 2. DETAIL PHOTO
-    const generateDetailPhoto = (img, detailTags) => {
+    // ==========================================
+    // 2. FOTO DETAIL & KUALITAS (ANTI-CROP)
+    // ==========================================
+    const generateDetailPhoto = (img, item) => {
       const canvas = document.createElement("canvas");
       canvas.width = 960;
       canvas.height = 1280;
       const ctx = canvas.getContext("2d");
 
-      // BG
+      const lini = item.metaLini || "produk";
+      const isTech = lini === "teknologi";
+      const isJasa = lini === "jasa";
+
       const bg = ctx.createLinearGradient(0, 0, 960, 1280);
       bg.addColorStop(0, "#F1F5F9");
       bg.addColorStop(0.5, "#E2E8F0");
@@ -329,58 +252,61 @@
       ctx.fill();
       ctx.restore();
 
-      // Product 3/4 perspective
-      const macroH = 820;
-      const macroW = (macroH * img.width) / img.height;
-      const macroX = 480 - macroW / 2;
-      const macroY = 220;
+      // Fit Bounding Box Tengah (max 760 x 680)
+      const fit = calculateFit(img.width, img.height, 760, 680);
+      const macroX = 480 - fit.w / 2;
+      const macroY = 270;
 
+      // Soft Depth Shadow
       ctx.save();
-      ctx.save();
-      ctx.translate(28, 14);
-      ctx.globalAlpha = 0.22;
-      ctx.filter = "blur(12px)";
-      ctx.drawImage(img, macroX, macroY, macroW, macroH);
+      ctx.translate(20, 12);
+      ctx.globalAlpha = 0.18;
+      ctx.filter = "blur(14px)";
+      ctx.drawImage(img, macroX, macroY, fit.w, fit.h);
       ctx.restore();
 
-      drawContactShadow(ctx, 490, macroY + macroH + 10, macroW * 0.52, 38, 0.35);
+      drawContactShadow(ctx, 480, macroY + fit.h + 10, fit.w * 0.48, 28, 0.35);
 
+      // Gambar 3/4 Perspective halus
       ctx.save();
-      ctx.translate(480, macroY + macroH / 2);
-      ctx.transform(0.96, 0, -0.04, 1, 0, 0);
-      ctx.drawImage(img, -macroW / 2, -macroH / 2, macroW, macroH);
-      ctx.restore();
+      ctx.translate(480, macroY + fit.h / 2);
+      ctx.transform(0.97, 0, -0.03, 1, 0, 0);
+      ctx.drawImage(img, -fit.w / 2, -fit.h / 2, fit.w, fit.h);
       ctx.restore();
 
-      // Header
-      ctx.fillStyle = "rgba(15, 76, 129, 0.94)";
+      // Header Badge
+      let detailHeader = "2. DETAIL KUALITAS & MATERIAL • PRESISI";
+      if (isTech) detailHeader = "2. ARSITEKTUR SISTEM & INTERFACE • TEKNOLOGI";
+      else if (isJasa) detailHeader = "2. STANDAR KOMPETENSI & LEGALITAS • ACCREDITED";
+
+      ctx.fillStyle = isTech ? "rgba(14, 116, 144, 0.94)" : isJasa ? "rgba(15, 76, 129, 0.94)" : "rgba(15, 76, 129, 0.94)";
       ctx.beginPath();
-      drawRoundRect(ctx, 40, 40, 460, 44, 22);
+      drawRoundRect(ctx, 40, 40, 480, 44, 22);
       ctx.fill();
       ctx.fillStyle = "#FFFFFF";
-      ctx.font = "bold 14px system-ui, sans-serif";
-      ctx.fillText("2. SISI SAMPING & DETAIL KUALITAS • 3/4 PERSPECTIVE", 58, 67);
+      ctx.font = "bold 13px system-ui, sans-serif";
+      ctx.fillText(detailHeader, 58, 67);
 
-      const defaultSideTags = ["Sisi Samping Produk", "Ketebalan Presisi", "Detail Material", "Finishing Rapi"];
-      const tags = detailTags && detailTags.length > 0
-        ? ["Sisi Samping Produk", ...detailTags.slice(0, 3)]
-        : defaultSideTags;
+      // Feature Callout Tags
+      const tags = item.metaTags && item.metaTags.length > 0 ? item.metaTags.slice(0, 4) : [
+        "Standar Mutu Teruji", "Finishing Rapi", "Keandalan Tinggi", "Siap Pakai DUDI"
+      ];
 
       const badgePositions = [
         { x: 50, y: 130 },
-        { x: 560, y: 130 },
+        { x: 550, y: 130 },
         { x: 50, y: 1060 },
-        { x: 560, y: 1060 },
+        { x: 550, y: 1060 },
       ];
 
       tags.forEach((tag, idx) => {
         const pos = badgePositions[idx] || { x: 50, y: 200 + idx * 80 };
         ctx.save();
-        ctx.fillStyle = "rgba(255, 255, 255, 0.94)";
+        ctx.fillStyle = "rgba(255, 255, 255, 0.95)";
         ctx.strokeStyle = "rgba(197, 160, 89, 0.85)";
         ctx.lineWidth = 1.8;
         ctx.beginPath();
-        drawRoundRect(ctx, pos.x, pos.y, 350, 52, 26);
+        drawRoundRect(ctx, pos.x, pos.y, 360, 52, 26);
         ctx.fill();
         ctx.stroke();
         ctx.restore();
@@ -394,23 +320,32 @@
         ctx.fillText("✓", pos.x + 23.5, pos.y + 31);
 
         ctx.fillStyle = "#0F172A";
-        ctx.font = "bold 14px system-ui, sans-serif";
+        ctx.font = "bold 13px system-ui, sans-serif";
         ctx.fillText(tag, pos.x + 50, pos.y + 31);
       });
 
       ctx.fillStyle = "rgba(15, 23, 42, 0.6)";
       ctx.font = "12px system-ui, sans-serif";
-      ctx.fillText("Sudut 3/4 Komersial • Menampilkan Sisi Samping, Ketebalan 3D & Kualitas Finishing Asli", 45, 1240);
+      let footerText = "Sudut 3/4 Komersial • Menampilkan Sisi Samping, Kedalaman Fisik 3D & Kerapian Finishing";
+      if (isTech) footerText = "Dirancang dengan Standar Rekayasa Perangkat Lunak Modern & Uji Fungsionalitas Ketat";
+      else if (isJasa) footerText = "Dikelola Langsung oleh Tim Asesor, Instruktur & Peneliti Berkompeten Sekolah Vokasi UNS";
+      ctx.fillText(footerText, 45, 1240);
 
       return canvas.toDataURL("image/jpeg", 0.92);
     };
 
-    // 3. BENEFIT PHOTO (INFOGRAFIS)
-    const generateBenefitPhoto = (img, headline, namaItem, kategori) => {
+    // ==========================================
+    // 3. FOTO INFOGRAFIS (KATA-KATA KHUSUS 3 LINI)
+    // ==========================================
+    const generateBenefitPhoto = (img, item) => {
       const canvas = document.createElement("canvas");
       canvas.width = 960;
       canvas.height = 1280;
       const ctx = canvas.getContext("2d");
+
+      const lini = item.metaLini || "produk";
+      const isTech = lini === "teknologi";
+      const isJasa = lini === "jasa";
 
       const bg = ctx.createLinearGradient(0, 0, 960, 1280);
       bg.addColorStop(0, "#FFFFFF");
@@ -419,62 +354,115 @@
       ctx.fillStyle = bg;
       ctx.fillRect(0, 0, 960, 1280);
 
-      ctx.fillStyle = "#0F4C81";
+      // Stripe Accent
+      ctx.fillStyle = isTech ? "#0E7490" : isJasa ? "#0F4C81" : "#C5A059";
       ctx.fillRect(0, 0, 10, 1280);
 
+      // Top Tagline
       ctx.fillStyle = "#C5A059";
       ctx.font = "bold 13px system-ui, sans-serif";
-      ctx.fillText("INFOGRAFIS HILIRISASI PRODUK INOVASI VOKASI UNS", 50, 56);
+      let topCategory = "INFOGRAFIS HILIRISASI PRODUK SIAP TERAP VOKASI UNS";
+      if (isTech) topCategory = "INFOGRAFIS TRANSFORMASI DIGITAL & TEKNOLOGI VOKASI UNS";
+      else if (isJasa) topCategory = "INFOGRAFIS JASA KONSULTAN & PENGUJIAN LABORATORIUM";
+      ctx.fillText(topCategory, 50, 56);
 
-      const mainHeadline = headline || "KENAPA PRODUK INI LAYAK DIPILIH?";
+      // Main Headline
       ctx.fillStyle = "#0F172A";
-      ctx.font = "bold 28px system-ui, sans-serif";
-      ctx.fillText(mainHeadline, 50, 96);
+      ctx.font = "bold 26px system-ui, sans-serif";
+      ctx.fillText(item.metaHeadline || "KENAPA PRODUK INI LAYAK DIPILIH?", 50, 96);
 
+      // Subtitle
       ctx.fillStyle = "#64748B";
       ctx.font = "14px system-ui, sans-serif";
-      ctx.fillText("3 Alasan Utama Mengapa Produk Inovasi Ini Memiliki Nilai Jual & Mutu Tinggi:", 50, 126);
+      let subtitle = "3 Alasan Utama Mengapa Inovasi Ini Memiliki Nilai Jual & Mutu Unggul:";
+      if (isTech) subtitle = "3 Nilai Tambah Transformasi Digital Bersama Sekolah Vokasi UNS:";
+      else if (isJasa) subtitle = "3 Jaminan Mutu Profesional Tenaga Ahli dan Laboratorium SV UNS:";
+      ctx.fillText(subtitle, 50, 126);
 
-      // Product Showcase Frame
-      const prodH = 460;
-      const prodW = (prodH * img.width) / img.height;
-      const prodX = 480 - prodW / 2;
-      const prodY = 160;
+      // Product Showcase Frame (Fit max 780 x 440)
+      const fit = calculateFit(img.width, img.height, 780, 440);
+      const prodX = 480 - fit.w / 2;
+      const prodY = 175;
 
       ctx.save();
       ctx.beginPath();
-      ctx.ellipse(480, 620, 280, 40, 0, 0, Math.PI * 2);
+      ctx.ellipse(480, 620, Math.min(320, fit.w * 0.55), 36, 0, 0, Math.PI * 2);
       ctx.fillStyle = "rgba(15, 76, 129, 0.08)";
       ctx.fill();
       ctx.strokeStyle = "rgba(197, 160, 89, 0.5)";
-      ctx.lineWidth = 2;
+      ctx.lineWidth = 1.5;
       ctx.stroke();
       ctx.restore();
 
-      drawContactShadow(ctx, 480, 615, prodW * 0.44, 20, 0.35);
-      ctx.drawImage(img, prodX, prodY, prodW, prodH);
+      drawContactShadow(ctx, 480, 615, fit.w * 0.44, 20, 0.35);
+      ctx.drawImage(img, prodX, prodY, fit.w, fit.h);
 
-      // 3 Keunggulan Cards
-      const features = [
-        {
-          title: "Kualitas & Formula Terverifikasi Lab",
-          desc: "Diriset & dikembangkan langsung oleh sivitas akademika Sekolah Vokasi UNS dengan uji mutu ketat.",
-          badge: "01",
-          color: "#0F4C81",
-        },
-        {
-          title: "Kemasan Rapi, Higienis & Siap Pasar",
-          desc: "Standar packaging komersial modern, melindungi kualitas produk, serta siap bersaing di marketplace.",
-          badge: "02",
-          color: "#C5A059",
-        },
-        {
-          title: "Solutif & Siap Kolaborasi Industri",
-          desc: "Menjawab kebutuhan mitra DUDI dan konsumen dengan efisiensi biaya dan daya guna maksimal.",
-          badge: "03",
-          color: "#10B981",
-        },
-      ];
+      // 3 Kartu Keunggulan Spesifik per Lini
+      let features = [];
+      if (isTech) {
+        features = [
+          {
+            title: "Otomasi Alur Kerja & Akurasi Data Tinggi",
+            desc: "Memangkas proses manual hingga 80% dengan integrasi pemrosesan data real-time yang presisi.",
+            badge: "01",
+            color: "#0E7490",
+          },
+          {
+            title: "Arsitektur Cloud Andal & Keamanan Terjamin",
+            desc: "Sistem dirancang modular, stabil, dan siap disesuaikan langsung dengan infrastruktur mitra DUDI.",
+            badge: "02",
+            color: "#0F4C81",
+          },
+          {
+            title: "Pendampingan Implementasi & Alih Teknologi",
+            desc: "Didukung penuh dosen dan talenta vokasi hingga sistem beroperasi mandiri dan optimal.",
+            badge: "03",
+            color: "#10B981",
+          },
+        ];
+      } else if (isJasa) {
+        features = [
+          {
+            title: "Didukung Tenaga Ahli Bersertifikasi Resmi",
+            desc: "Instruktur, konsultan, dan teknisi berkualifikasi tinggi dengan portofolio proyek industri nyata.",
+            badge: "01",
+            color: "#0F4C81",
+          },
+          {
+            title: "Fasilitas Laboratorium & Instrumen Mutakhir",
+            desc: "Peralatan uji presisi terkalibrasi berstandar nasional dan global (ASME, ASTM, ISO, Glodon).",
+            badge: "02",
+            color: "#C5A059",
+          },
+          {
+            title: "Output Laporan Resmi & Sertifikat Sah Diakui",
+            desc: "Dokumen hasil uji, sertifikat kompetensi, dan kerja sama legal yang kredibel bagi mitra.",
+            badge: "03",
+            color: "#10B981",
+          },
+        ];
+      } else {
+        features = [
+          {
+            title: "Mutu & Formulasi Teruji Laboratorium",
+            desc: "Hasil riset terapan sivitas akademika SV UNS yang melewati serangkaian uji kelayakan ketat.",
+            badge: "01",
+            color: "#0F4C81",
+          },
+          {
+            title: "Kualitas Presisi & Siap Pasar Komersial",
+            desc: "Kontrol kualitas berstandar industri dengan kemasan/struktur kokoh dan siap didistribusikan.",
+            badge: "02",
+            color: "#C5A059",
+          },
+          {
+            title: "Efisiensi Biaya & Daya Guna Maksimal",
+            desc: "Menjawab kebutuhan mitra industri dan konsumen dengan nilai ekonomis kompetitif serta tahan lama.",
+            badge: "03",
+            color: "#10B981",
+          },
+        ];
+      }
 
       features.forEach((feat, i) => {
         const cardY = 670 + i * 165;
@@ -500,7 +488,7 @@
         ctx.textAlign = "left";
 
         ctx.fillStyle = "#0F172A";
-        ctx.font = "bold 17px system-ui, sans-serif";
+        ctx.font = "bold 16px system-ui, sans-serif";
         ctx.fillText(feat.title, 155, cardY + 48);
 
         ctx.fillStyle = "#475569";
@@ -517,99 +505,138 @@
 
       ctx.fillStyle = "rgba(15, 23, 42, 0.55)";
       ctx.font = "12px system-ui, sans-serif";
-      ctx.fillText("Standar Infografis Edukatif & Promotif • Membantu Calon Pembeli Memahami Manfaat Utama Produk", 50, 1240);
+      let footerNote = "Standar Infografis Edukatif & Promotif • Membantu Mitra DUDI Memahami Nilai Tambah Inovasi";
+      ctx.fillText(footerNote, 50, 1240);
 
       return canvas.toDataURL("image/jpeg", 0.92);
     };
 
-    // 4. LIFESTYLE PHOTO
-    const generateLifestylePhoto = (img, kategori) => {
+    // ==========================================
+    // 4. FOTO LIFESTYLE / CONTEXT (SPESIFIK 3 LINI)
+    // ==========================================
+    const generateLifestylePhoto = (img, item) => {
       const canvas = document.createElement("canvas");
       canvas.width = 960;
       canvas.height = 1280;
       const ctx = canvas.getContext("2d");
 
-      // Wall
-      const wallGrad = ctx.createLinearGradient(0, 0, 0, 700);
-      wallGrad.addColorStop(0, "#F1ECE6");
-      wallGrad.addColorStop(0.5, "#E8DFD5");
-      wallGrad.addColorStop(1, "#D6C8B8");
-      ctx.fillStyle = wallGrad;
-      ctx.fillRect(0, 0, 960, 700);
+      const lini = item.metaLini || "produk";
+      const isTech = lini === "teknologi";
+      const isJasa = lini === "jasa";
 
-      // Sunlight
-      ctx.save();
-      ctx.beginPath();
-      ctx.moveTo(0, 0);
-      ctx.lineTo(500, 0);
-      ctx.lineTo(720, 700);
-      ctx.lineTo(180, 700);
-      ctx.closePath();
-      const sunGrad = ctx.createLinearGradient(200, 0, 450, 700);
-      sunGrad.addColorStop(0, "rgba(255, 250, 240, 0.45)");
-      sunGrad.addColorStop(1, "rgba(255, 250, 240, 0.05)");
-      ctx.fillStyle = sunGrad;
-      ctx.fill();
-      ctx.restore();
+      if (isTech) {
+        // Workspace Tech / Control Room Modern
+        const wallGrad = ctx.createLinearGradient(0, 0, 0, 700);
+        wallGrad.addColorStop(0, "#0F172A");
+        wallGrad.addColorStop(0.5, "#1E293B");
+        wallGrad.addColorStop(1, "#334155");
+        ctx.fillStyle = wallGrad;
+        ctx.fillRect(0, 0, 960, 700);
 
-      // Wood table
-      const woodGrad = ctx.createLinearGradient(0, 700, 0, 1280);
-      woodGrad.addColorStop(0, "#C79C6F");
-      woodGrad.addColorStop(0.4, "#B58455");
-      woodGrad.addColorStop(1, "#8A582F");
-      ctx.fillStyle = woodGrad;
-      ctx.fillRect(0, 700, 960, 580);
+        // Tech cyan ambient glow
+        const glow = ctx.createRadialGradient(480, 400, 20, 480, 400, 500);
+        glow.addColorStop(0, "rgba(56, 189, 248, 0.25)");
+        glow.addColorStop(1, "rgba(56, 189, 248, 0)");
+        ctx.fillStyle = glow;
+        ctx.fillRect(0, 0, 960, 700);
 
-      ctx.strokeStyle = "rgba(110, 65, 30, 0.18)";
-      ctx.lineWidth = 1.5;
-      for (let y = 745; y < 1280; y += 50) {
-        ctx.beginPath();
-        ctx.moveTo(0, y);
-        ctx.lineTo(960, y);
-        ctx.stroke();
+        // Tech desk
+        const desk = ctx.createLinearGradient(0, 700, 0, 1280);
+        desk.addColorStop(0, "#1E293B");
+        desk.addColorStop(0.5, "#0F172A");
+        desk.addColorStop(1, "#020617");
+        ctx.fillStyle = desk;
+        ctx.fillRect(0, 700, 960, 580);
+      } else if (isJasa) {
+        // Ruang Konsultasi / Laboratorium Eksekutif
+        const wallGrad = ctx.createLinearGradient(0, 0, 0, 700);
+        wallGrad.addColorStop(0, "#E2E8F0");
+        wallGrad.addColorStop(0.5, "#CBD5E1");
+        wallGrad.addColorStop(1, "#94A3B8");
+        ctx.fillStyle = wallGrad;
+        ctx.fillRect(0, 0, 960, 700);
+
+        // Executive desk surface
+        const desk = ctx.createLinearGradient(0, 700, 0, 1280);
+        desk.addColorStop(0, "#334155");
+        desk.addColorStop(0.5, "#1E293B");
+        desk.addColorStop(1, "#0F172A");
+        ctx.fillStyle = desk;
+        ctx.fillRect(0, 700, 960, 580);
+      } else {
+        // Meja Kayu Hangat untuk Produk Fisik / Pangan / Herbal
+        const wallGrad = ctx.createLinearGradient(0, 0, 0, 700);
+        wallGrad.addColorStop(0, "#F1ECE6");
+        wallGrad.addColorStop(0.5, "#E8DFD5");
+        wallGrad.addColorStop(1, "#D6C8B8");
+        ctx.fillStyle = wallGrad;
+        ctx.fillRect(0, 0, 960, 700);
+
+        // Wood table
+        const woodGrad = ctx.createLinearGradient(0, 700, 0, 1280);
+        woodGrad.addColorStop(0, "#C79C6F");
+        woodGrad.addColorStop(0.4, "#B58455");
+        woodGrad.addColorStop(1, "#8A582F");
+        ctx.fillStyle = woodGrad;
+        ctx.fillRect(0, 700, 960, 580);
+
+        ctx.strokeStyle = "rgba(110, 65, 30, 0.18)";
+        ctx.lineWidth = 1.5;
+        for (let y = 745; y < 1280; y += 50) {
+          ctx.beginPath();
+          ctx.moveTo(0, y);
+          ctx.lineTo(960, y);
+          ctx.stroke();
+        }
       }
 
+      // Edge shadow
       const edgeShadow = ctx.createLinearGradient(0, 700, 0, 725);
-      edgeShadow.addColorStop(0, "rgba(0, 0, 0, 0.18)");
+      edgeShadow.addColorStop(0, "rgba(0, 0, 0, 0.25)");
       edgeShadow.addColorStop(1, "rgba(0, 0, 0, 0)");
       ctx.fillStyle = edgeShadow;
       ctx.fillRect(0, 700, 960, 25);
 
-      // Product placement
-      const prodH = 680;
-      const prodRatio = img.width / img.height;
-      const prodW = prodH * prodRatio;
-      const prodX = 480 - prodW / 2;
-      const prodY = 720 - prodH + 20;
+      // Fit Bounding Box Tabletop (max 780 x 600)
+      const fit = calculateFit(img.width, img.height, 780, 600);
+      const prodX = 480 - fit.w / 2;
+      const prodY = 720 - fit.h + 20;
 
-      drawContactShadow(ctx, 480, 725, prodW * 0.46, 24, 0.45);
+      drawContactShadow(ctx, 480, 725, fit.w * 0.46, 24, 0.45);
 
+      // Soft reflection
       ctx.save();
       ctx.translate(480, 720);
-      ctx.scale(1, -0.32);
+      ctx.scale(1, -0.28);
       ctx.translate(-480, -720);
-      ctx.globalAlpha = 0.14;
-      ctx.drawImage(img, prodX, prodY, prodW, prodH);
+      ctx.globalAlpha = 0.12;
+      ctx.drawImage(img, prodX, prodY, fit.w, fit.h);
       ctx.restore();
 
-      ctx.drawImage(img, prodX, prodY, prodW, prodH);
+      // Main image
+      ctx.drawImage(img, prodX, prodY, fit.w, fit.h);
 
-      ctx.fillStyle = "rgba(15, 76, 129, 0.9)";
+      // Header Badge
+      let contextTitle = "4. KONTEKS PENGGUNAAN RIIL • REAL CONTEXT";
+      if (isTech) contextTitle = "4. WORKSPACE DIGITAL • CONTROL & MONITORING";
+      else if (isJasa) contextTitle = "4. FASILITAS LABORATORIUM & RUANG KONSULTASI";
+
+      ctx.fillStyle = isTech ? "rgba(14, 116, 144, 0.94)" : isJasa ? "rgba(15, 76, 129, 0.94)" : "rgba(15, 76, 129, 0.9)";
       ctx.beginPath();
-      drawRoundRect(ctx, 40, 40, 390, 42, 21);
+      drawRoundRect(ctx, 40, 40, 460, 42, 21);
       ctx.fill();
       ctx.fillStyle = "#FFFFFF";
-      ctx.font = "bold 14px system-ui, sans-serif";
-      ctx.fillText("4. KONTEKS LIFESTYLE • REAL USE DISPLAY", 58, 66);
+      ctx.font = "bold 13px system-ui, sans-serif";
+      ctx.fillText(contextTitle, 58, 66);
 
-      ctx.fillStyle = "rgba(255, 255, 255, 0.88)";
+      ctx.fillStyle = isTech ? "rgba(224, 242, 254, 0.9)" : "rgba(255, 255, 255, 0.9)";
       ctx.font = "12px system-ui, sans-serif";
-      ctx.fillText("Display Meja Komersial Estetik (3:4) • Menampilkan Kesan Produk Digunakan dalam Kehidupan Nyata", 45, 1240);
+      let footerNote = "Display Penggunaan Nyata (3:4) • Representasi Lingkungan Implementasi Lapangan Mitra Industri";
+      ctx.fillText(footerNote, 45, 1240);
 
       return canvas.toDataURL("image/jpeg", 0.92);
     };
 
-    // Load Image Promise
     const loadImageAsync = (src) => {
       return new Promise((resolve, reject) => {
         const img = new Image();
@@ -631,18 +658,18 @@
         for (let i = 0; i < products.length; i++) {
           const p = products[i];
           statusEl.innerText = `Memproses (${i + 1}/${products.length}): ${p.nama_item}`;
-          log(`\n[${i + 1}/${products.length}] Memproses: ${p.slug}...`);
+          log(`\n[${i + 1}/${products.length}] [${p.metaLini.toUpperCase()}] Memproses: ${p.slug}...`);
 
           try {
-            // Load gambar mentah
-            const rawImg = await loadImageAsync(p.thumbnail_url);
-            const isolated = isolateProductForeground(rawImg);
+            // Load gambar mentah asli 100% resolusi penuh
+            const rawUrl = p.rawImageUrl || p.thumbnail_url;
+            const rawImg = await loadImageAsync(rawUrl);
 
-            // Generate 4 Photos
-            const heroDataUrl = generateHeroPhoto(isolated, p.nama_item, p.metaKategori);
-            const detailDataUrl = generateDetailPhoto(isolated, p.metaTags);
-            const benefitDataUrl = generateBenefitPhoto(isolated, p.metaHeadline, p.nama_item, p.metaKategori);
-            const lifestyleDataUrl = generateLifestylePhoto(isolated, p.metaKategori);
+            // Generate 4 Photos dengan Zero-Crop Fit & Kata-Kata Khusus 3 Lini
+            const heroDataUrl = generateHeroPhoto(rawImg, p);
+            const detailDataUrl = generateDetailPhoto(rawImg, p);
+            const benefitDataUrl = generateBenefitPhoto(rawImg, p);
+            const lifestyleDataUrl = generateLifestylePhoto(rawImg, p);
 
             // Simpan Foto 1: Hero
             await fetch("/api/save-photo", {
@@ -672,7 +699,7 @@
               body: JSON.stringify({ slug: p.slug, photoIndex: 4, photoId: "lifestyle", dataUrl: lifestyleDataUrl })
             });
 
-            log(`-> Sukses generate 4 foto studio portrait 3:4 untuk ${p.slug}`);
+            log(`-> Sukses generate 4 foto studio (${p.metaLini}) untuk ${p.slug}`);
           } catch (err) {
             log(`[ERROR] Gagal memproses ${p.slug}: ${err.message}`);
           }

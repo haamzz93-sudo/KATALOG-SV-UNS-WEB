@@ -171,16 +171,16 @@ export const ProductCard: React.FC<ProductCardProps> = ({
 
       {/* Top Image & Badge */}
       <div>
-        <div className="relative aspect-[3/4] w-full overflow-hidden bg-gradient-to-b from-slate-100 to-slate-200 dark:from-slate-900 dark:to-slate-950 rounded-t-[32px]">
+        <div className="relative h-60 sm:h-68 w-full overflow-hidden bg-gradient-to-b from-slate-50 via-slate-100 to-slate-200 dark:from-slate-900 dark:via-slate-900/90 dark:to-slate-950 rounded-t-[32px] flex items-center justify-center p-2.5">
           <img
             src={item.thumbnail_url && !item.thumbnail_url.startsWith("blob:") ? item.thumbnail_url : "/images/brand/slogan-poster-vokasi.jpg"}
             alt={item.nama_item}
-            className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700 ease-[cubic-bezier(0.16,1,0.3,1)]"
+            className="max-h-full max-w-full w-auto h-auto object-contain rounded-xl drop-shadow-sm group-hover:scale-105 transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]"
             onError={(e) => {
               (e.currentTarget as HTMLImageElement).src = "/images/brand/slogan-poster-vokasi.jpg";
             }}
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none rounded-t-[32px]" />
 
           {/* Badges on top of image */}
           <div className="absolute top-3 inset-x-3 flex items-center justify-between pointer-events-none z-20">
