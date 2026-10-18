@@ -686,9 +686,14 @@ export default function CreateProdiItem() {
         {/* Card 1: Kategori & Informasi Utama (Elemen 3) */}
         <div className="p-6 rounded-3xl bg-white dark:bg-[#07192C] border border-slate-200 dark:border-slate-800 shadow-sm space-y-4">
           <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 dark:border-slate-800 pb-2">
-            <h3 className="font-bold text-base text-slate-900 dark:text-white">
-              1. Klasifikasi 3 Lini Layanan & Identitas Produk
-            </h3>
+            <div>
+              <h3 className="font-bold text-base text-slate-900 dark:text-white">
+                1. Klasifikasi 3 Lini Layanan & Identitas Produk
+              </h3>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
+                {settings.services_subtitle || "Produk unggulan hasil riset terapan dan implementasi project based learning"}
+              </p>
+            </div>
             <span className="text-xs font-bold px-2.5 py-0.5 rounded-full bg-blue-100 dark:bg-blue-950/80 text-[#0F4C81] dark:text-sky-300 border border-blue-200 dark:border-blue-800">
               39 Prodi Resmi Terhubung
             </span>
@@ -722,45 +727,84 @@ export default function CreateProdiItem() {
               type="button"
               onClick={() => setCategoryId(1)}
               style={{ borderRadius: "20px" }}
-              className={`p-4 rounded-2xl border text-left transition cursor-pointer ${
+              className={`p-4 rounded-2xl border text-left transition cursor-pointer flex flex-col justify-between ${
                 categoryId === 1
-                  ? "border-[#0F4C81] bg-blue-50/50 dark:bg-blue-950/40 text-[#0F4C81] dark:text-sky-300 ring-2 ring-[#0F4C81]/20"
+                  ? "border-[#0F4C81] bg-blue-50/50 dark:bg-blue-950/40 text-[#0F4C81] dark:text-sky-300 ring-2 ring-[#0F4C81]/20 shadow-xs"
                   : "border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-900"
               }`}
             >
-              <Laptop className="w-5 h-5 mb-2 text-[#0F4C81] dark:text-sky-400" />
-              <h4 className="font-bold text-sm sm:text-base">1. Teknologi & Digital</h4>
-              <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Aplikasi, AI, SaaS & Web</p>
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <Laptop className="w-5 h-5 text-[#0F4C81] dark:text-sky-400" />
+                  {settings.service_1_badge && (
+                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-100 dark:bg-blue-900/60 text-[#0F4C81] dark:text-sky-300 border border-blue-200/50 dark:border-blue-700/50">
+                      {settings.service_1_badge}
+                    </span>
+                  )}
+                </div>
+                <h4 className="font-bold text-sm sm:text-base leading-snug">
+                  {settings.service_1_title || "1. Teknologi & Digital"}
+                </h4>
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 line-clamp-2">
+                  {settings.service_1_desc || "Aplikasi, AI, SaaS & Web"}
+                </p>
+              </div>
             </button>
 
             <button
               type="button"
               onClick={() => setCategoryId(2)}
               style={{ borderRadius: "20px" }}
-              className={`p-4 rounded-2xl border text-left transition cursor-pointer ${
+              className={`p-4 rounded-2xl border text-left transition cursor-pointer flex flex-col justify-between ${
                 categoryId === 2
-                  ? "border-[#C5A059] bg-amber-50/50 dark:bg-amber-950/40 text-[#C5A059] ring-2 ring-[#C5A059]/20"
+                  ? "border-[#C5A059] bg-amber-50/50 dark:bg-amber-950/40 text-[#C5A059] ring-2 ring-[#C5A059]/20 shadow-xs"
                   : "border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-900"
               }`}
             >
-              <Cpu className="w-5 h-5 mb-2 text-[#C5A059]" />
-              <h4 className="font-bold text-sm sm:text-base">2. Produk Inovasi & Riset</h4>
-              <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Pangan, Herbal, Mesin & Fisik</p>
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <Cpu className="w-5 h-5 text-[#C5A059]" />
+                  {settings.service_2_badge && (
+                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-100 dark:bg-amber-900/60 text-[#C5A059] border border-amber-200/50 dark:border-amber-700/50">
+                      {settings.service_2_badge}
+                    </span>
+                  )}
+                </div>
+                <h4 className="font-bold text-sm sm:text-base leading-snug">
+                  {settings.service_2_title || "2. Produk Inovasi & Riset"}
+                </h4>
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 line-clamp-2">
+                  {settings.service_2_desc || "Pangan, Herbal, Mesin & Fisik"}
+                </p>
+              </div>
             </button>
 
             <button
               type="button"
               onClick={() => setCategoryId(3)}
               style={{ borderRadius: "20px" }}
-              className={`p-4 rounded-2xl border text-left transition cursor-pointer ${
+              className={`p-4 rounded-2xl border text-left transition cursor-pointer flex flex-col justify-between ${
                 categoryId === 3
-                  ? "border-slate-500 bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white ring-2 ring-slate-400/20"
+                  ? "border-slate-500 bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white ring-2 ring-slate-400/20 shadow-xs"
                   : "border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-900"
               }`}
             >
-              <Wrench className="w-5 h-5 mb-2 text-slate-600 dark:text-slate-300" />
-              <h4 className="font-bold text-sm sm:text-base">3. Jasa & Layanan Keahlian</h4>
-              <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">Konsultasi, Uji Lab & Pelatihan</p>
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <Wrench className="w-5 h-5 text-slate-600 dark:text-slate-300" />
+                  {settings.service_3_badge && (
+                    <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 border border-slate-300 dark:border-slate-600">
+                      {settings.service_3_badge}
+                    </span>
+                  )}
+                </div>
+                <h4 className="font-bold text-sm sm:text-base leading-snug">
+                  {settings.service_3_title || "3. Jasa & Layanan Keahlian"}
+                </h4>
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1 line-clamp-2">
+                  {settings.service_3_desc || "Konsultasi, Uji Lab & Pelatihan"}
+                </p>
+              </div>
             </button>
           </div>
 

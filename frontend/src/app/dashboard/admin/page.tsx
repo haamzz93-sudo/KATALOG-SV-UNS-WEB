@@ -2299,9 +2299,9 @@ function AdminDashboardContent() {
                   className="px-3.5 py-2 text-xs rounded-full border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-200 font-bold cursor-pointer"
                 >
                   <option value="all">Semua Kategori</option>
-                  <option value="1">1. Teknologi & Digital</option>
-                  <option value="2">2. Produk Inovasi & Riset</option>
-                  <option value="3">3. Jasa & Layanan Keahlian</option>
+                  <option value="1">{settings.service_1_title || "1. Teknologi & Digital"}</option>
+                  <option value="2">{settings.service_2_title || "2. Produk Inovasi & Riset"}</option>
+                  <option value="3">{settings.service_3_title || "3. Jasa & Layanan Keahlian"}</option>
                 </select>
 
                 <select
@@ -7363,11 +7363,20 @@ function AdminDashboardContent() {
                         : "border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/50"
                     }`}
                   >
-                    <div className="flex items-center gap-2 mb-1">
-                      <Laptop className="w-4 h-4 text-[#0F4C81] dark:text-sky-300" />
-                      <span className="text-xs font-bold">1. Teknologi & Digital</span>
+                    <div>
+                      <div className="flex items-center justify-between mb-1">
+                        <div className="flex items-center gap-1.5">
+                          <Laptop className="w-4 h-4 text-[#0F4C81] dark:text-sky-300" />
+                          <span className="text-xs font-bold leading-tight">{settings.service_1_title || "1. Teknologi & Digital"}</span>
+                        </div>
+                        {settings.service_1_badge && (
+                          <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-blue-100 dark:bg-blue-900/60 text-[#0F4C81] dark:text-sky-300">
+                            {settings.service_1_badge}
+                          </span>
+                        )}
+                      </div>
+                      <span className="text-[10px] text-slate-500 dark:text-slate-400 line-clamp-1">{settings.service_1_desc || "Web, Mobile, AI & SaaS"}</span>
                     </div>
-                    <span className="text-[10px] text-slate-500 dark:text-slate-400">Web, Mobile, AI & SaaS</span>
                   </button>
 
                   <button
@@ -7380,11 +7389,20 @@ function AdminDashboardContent() {
                         : "border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/50"
                     }`}
                   >
-                    <div className="flex items-center gap-2 mb-1">
-                      <Package className="w-4 h-4 text-[#C5A059]" />
-                      <span className="text-xs font-bold">2. Produk Inovasi & Riset</span>
+                    <div>
+                      <div className="flex items-center justify-between mb-1">
+                        <div className="flex items-center gap-1.5">
+                          <Package className="w-4 h-4 text-[#C5A059]" />
+                          <span className="text-xs font-bold leading-tight">{settings.service_2_title || "2. Produk Inovasi & Riset"}</span>
+                        </div>
+                        {settings.service_2_badge && (
+                          <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-amber-100 dark:bg-amber-900/60 text-[#C5A059]">
+                            {settings.service_2_badge}
+                          </span>
+                        )}
+                      </div>
+                      <span className="text-[10px] text-slate-500 dark:text-slate-400 line-clamp-1">{settings.service_2_desc || "Pangan, Herbal, Mesin, Kimia"}</span>
                     </div>
-                    <span className="text-[10px] text-slate-500 dark:text-slate-400">Pangan, Herbal, Mesin, Kimia</span>
                   </button>
 
                   <button
@@ -7397,11 +7415,20 @@ function AdminDashboardContent() {
                         : "border-slate-200 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/50"
                     }`}
                   >
-                    <div className="flex items-center gap-2 mb-1">
-                      <Briefcase className="w-4 h-4 text-[#0F4C81] dark:text-sky-300" />
-                      <span className="text-xs font-bold">3. Jasa & Layanan Keahlian</span>
+                    <div>
+                      <div className="flex items-center justify-between mb-1">
+                        <div className="flex items-center gap-1.5">
+                          <Briefcase className="w-4 h-4 text-[#0F4C81] dark:text-sky-300" />
+                          <span className="text-xs font-bold leading-tight">{settings.service_3_title || "3. Jasa & Layanan Keahlian"}</span>
+                        </div>
+                        {settings.service_3_badge && (
+                          <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200">
+                            {settings.service_3_badge}
+                          </span>
+                        )}
+                      </div>
+                      <span className="text-[10px] text-slate-500 dark:text-slate-400 line-clamp-1">{settings.service_3_desc || "Konsultasi, Pelatihan & Uji Lab"}</span>
                     </div>
-                    <span className="text-[10px] text-slate-500 dark:text-slate-400">Konsultasi, Pelatihan & Uji Lab</span>
                   </button>
                 </div>
               </div>
