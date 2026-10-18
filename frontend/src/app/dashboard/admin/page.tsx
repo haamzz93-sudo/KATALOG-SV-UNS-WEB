@@ -10,8 +10,16 @@ import {
   Globe, Palette, Settings2, UploadCloud, Key, Search, Lock, Award, Laptop,
   Briefcase, Handshake, ExternalLink, ExternalLink as ExtLink, TrendingUp, Box, Cpu, Wrench, Building2, Package,
   GraduationCap, Navigation, X, LayoutGrid, SlidersHorizontal, AlignLeft, AlignRight,
-  Star, Quote, Camera, Image as ImageIcon
+  Star, Quote, Camera, Image as ImageIcon, Images, ChevronDown, Maximize2
 } from "lucide-react";
+import {
+  loadImage,
+  isolateProductForeground,
+  generateHeroPhoto,
+  generateDetailPhoto,
+  generateBenefitPhoto,
+  generateLifestylePhoto,
+} from "../../../lib/studioMarketplaceGenerator";
 import { api } from "../../../lib/api";
 import { CatalogItem } from "../../../types/catalog";
 import { DEFAULT_SHOWCASE_PROJECTS, ShowcaseProject } from "../../../components/3d/CanvasScrollyRobot";
@@ -30,6 +38,40 @@ import {
 } from "../../../context/SiteSettingsContext";
 import { MediaUploader } from "../../../components/ui/MediaUploader";
 import { autoTranslateIndonesianToEnglish } from "../../../lib/i18n";
+const AI_PRODUCT_CATEGORIES = [
+  "PRODUK MAKANAN",
+  "PRODUK MINUMAN",
+  "PRODUK OBAT HERBAL",
+  "PRODUK TEKNOLOGI",
+  "PRODUK KIMIA",
+  "PRODUK LAINNYA",
+];
+
+const AI_DETAIL_TAGS = [
+  "Detail Material",
+  "Finishing Rapi",
+  "Desain Presisi",
+  "Tekstur Berkualitas",
+  "Kemasan Premium",
+  "Detail Fungsional",
+];
+
+const AI_BENEFIT_HEADLINES = [
+  {
+    id: "KENAPA PRODUK INI LAYAK DIPILIH?",
+    title: "KENAPA PRODUK INI LAYAK DIPILIH?",
+    lang: "Bahasa Indonesia",
+    badge: "Pasar Domestik & B2B / Kemitraan DUDI",
+    desc: "Format formal & persuasif untuk inovasi teknologi terapan, riset kampus, alat mesin, dan produk herbal.",
+  },
+  {
+    id: "WHY YOU'LL LOVE IT",
+    title: "WHY YOU'LL LOVE IT",
+    lang: "Bahasa Inggris",
+    badge: "Modern Lifestyle, F&B & Ekspor",
+    desc: "Format modern & ramah konsumen (consumer-centric) untuk produk ritel, F&B, fashion, skincare, dan suvenir.",
+  },
+];
 
 function AdminDashboardContent() {
   const router = useRouter();
@@ -270,12 +312,33 @@ function AdminDashboardContent() {
     pic_nama: "",
     pic_kontak: "6281234567890",
     pic_laboratorium: "Laboratorium Riset Terapan SV",
+    galleryImages: [] as { id: string; url: string; caption?: string }[],
     specs: [
       { group_name: "Tech Stack", spec_key: "Frontend", spec_value: "Next.js 14, Tailwind CSS" },
       { group_name: "Tech Stack", spec_key: "Backend API", spec_value: "Laravel 11 REST API" },
     ],
   });
   const [isItemSubmitting, setIsItemSubmitting] = useState(false);
+
+  // Studio AI State for Catalog Item Modal
+  const [isAiStudioOpen, setIsAiStudioOpen] = useState(false);
+  const [aiRawPhoto, setAiRawPhoto] = useState<string>("");
+  const [aiRawPhotoBase64, setAiRawPhotoBase64] = useState<string>("");
+  const [aiLoading, setAiLoading] = useState(false);
+  const [generationStep, setGenerationStep] = useState<number>(0);
+  const [stepMessage, setStepMessage] = useState<string>("");
+  const [aiPhotos, setAiPhotos] = useState<any[]>([]);
+  const [hasGenerated, setHasGenerated] = useState<boolean>(false);
+  const [aiKategori, setAiKategori] = useState<string>("PRODUK MAKANAN");
+  const [aiDetailLabels, setAiDetailLabels] = useState<string[]>([
+    "Detail Material",
+    "Finishing Rapi",
+    "Desain Presisi",
+  ]);
+  const [aiBenefitHeadline, setAiBenefitHeadline] = useState<string>("KENAPA PRODUK INI LAYAK DIPILIH?");
+  const [aiPrompt, setAiPrompt] = useState<string>(
+    "Pencahayaan studio komersial lembut, resolusi Ultra HD 8K super tajam (razor-sharp focus), format portrait 3:4 (960x1280), sudut 3/4 komersial memperlihatkan sisi depan dan sisi samping kanan produk, clean minimalis, bebas blur, pertahankan keaslian warna, logo, dan identitas visual konsisten di seluruh foto."
+  );
   const [itemSearchQuery, setItemSearchQuery] = useState("");
   const [itemCategoryFilter, setItemCategoryFilter] = useState("all");
   const [itemStatusFilter, setItemStatusFilter] = useState("all");
@@ -1361,23 +1424,36 @@ function AdminDashboardContent() {
       deskripsi_lengkap: "",
       live_demo_url: "",
       model_3d_url: "",
-      thumbnail_url: "/images/brand/slogan-poster-vokasi.jpg",
+      thumbnail_url: "",
       status_publikasi: "published",
       harga_tipe: "starting_at",
-      harga_nominal: 5000000,
+      harga_nominal: 0,
       pic_nama: "",
       pic_kontak: "6281234567890",
-      pic_laboratorium: "Laboratorium Riset Terapan SV",
+      pic_laboratorium: "Teaching Factory SV UNS",
+      galleryImages: [],
       specs: [
-        { group_name: "Tech Stack", spec_key: "Frontend", spec_value: "Next.js 14, Tailwind CSS" },
-        { group_name: "Tech Stack", spec_key: "Backend API", spec_value: "Laravel 11 REST API" },
+        { group_name: "Spesifikasi Umum", spec_key: "", spec_value: "" },
       ],
     });
+    setAiRawPhoto("");
+    setAiRawPhotoBase64("");
+    setAiPhotos([]);
+    setHasGenerated(false);
+    setIsAiStudioOpen(false);
     setIsItemModalOpen(true);
   };
 
   const handleOpenEditItem = (item: any) => {
     setEditingItem(item);
+    const existingGallery = (item.media || [])
+      .filter((m: any) => !m.is_primary && m.file_url)
+      .map((m: any, idx: number) => ({
+        id: `media-${m.id || idx}`,
+        url: m.file_url,
+        caption: m.caption || `Foto Tambahan #${idx + 2}`,
+      }));
+
     setItemForm({
       nama_item: item.nama_item || "",
       category_id: item.category_id || item.category?.id || 1,
@@ -1394,6 +1470,7 @@ function AdminDashboardContent() {
       pic_nama: item.pic_nama || "",
       pic_kontak: item.pic_kontak || "",
       pic_laboratorium: item.pic_laboratorium || "",
+      galleryImages: existingGallery,
       specs: item.specs && item.specs.length > 0
         ? item.specs.map((s: any) => ({
             group_name: s.group_name || "Umum",
@@ -1401,10 +1478,215 @@ function AdminDashboardContent() {
             spec_value: s.spec_value || "",
           }))
         : [
-            { group_name: "Tech Stack", spec_key: "Platform", spec_value: "Web Application" },
+            { group_name: "Spesifikasi Umum", spec_key: "", spec_value: "" },
           ],
     });
+
+    setAiRawPhoto(item.thumbnail_url || "");
+    setAiRawPhotoBase64("");
+    setAiPhotos([]);
+    setHasGenerated(false);
+    setIsAiStudioOpen(false);
+
+    // Auto set AI category
+    if (item.category_id === 1) {
+      setAiKategori("PRODUK TEKNOLOGI");
+    } else if (item.category_id === 3) {
+      setAiKategori("PRODUK LAINNYA");
+    } else {
+      const nameLower = (item.nama_item || "").toLowerCase();
+      if (nameLower.includes("herbal") || nameLower.includes("oil") || nameLower.includes("kapsul") || nameLower.includes("tablet")) {
+        setAiKategori("PRODUK OBAT HERBAL");
+      } else if (nameLower.includes("minuman") || nameLower.includes("jahe") || nameLower.includes("latte") || nameLower.includes("breeze")) {
+        setAiKategori("PRODUK MINUMAN");
+      } else if (nameLower.includes("kimia") || nameLower.includes("powder") || nameLower.includes("mhp")) {
+        setAiKategori("PRODUK KIMIA");
+      } else {
+        setAiKategori("PRODUK MAKANAN");
+      }
+    }
+
     setIsItemModalOpen(true);
+  };
+
+  const applyAllAiPhotosToItem = (photosList: any[]) => {
+    if (!photosList || photosList.length === 0) return;
+
+    const hero = photosList[0];
+    const newThumb = hero?.url || itemForm.thumbnail_url;
+
+    const otherPhotos = photosList.slice(1);
+    const newGalleryItems = otherPhotos.map((p, idx) => ({
+      id: `ai-gen-${Date.now()}-${idx}-${Math.random().toString(36).substr(2, 4)}`,
+      url: p.url,
+      caption: p.title || `Foto Studio #${idx + 2}`,
+    }));
+
+    setItemForm((prev) => ({
+      ...prev,
+      thumbnail_url: newThumb,
+      galleryImages: newGalleryItems,
+    }));
+    setHasGenerated(true);
+    toast.success(
+      "4 Foto Studio Diterapkan!",
+      "Foto 1 Hero terpasang sebagai Mockup Utama, dan Foto 2–4 otomatis masuk ke Galeri Produk."
+    );
+  };
+
+  const handleGenerateAiPhotosForModal = async () => {
+    const rawImg = aiRawPhotoBase64 || aiRawPhoto || (itemForm.thumbnail_url && !itemForm.thumbnail_url.startsWith("blob:") ? itemForm.thumbnail_url : undefined);
+
+    if (!rawImg) {
+      toast.info(
+        "Unggah Foto Produk Terlebih Dahulu",
+        "Silakan unggah foto produk mentah agar 4 foto marketplace presisi dapat dihasilkan."
+      );
+      return;
+    }
+
+    setAiLoading(true);
+    setAiPhotos([]);
+    setGenerationStep(1);
+    setStepMessage("Menganalisis objek produk dan mengisolasi latar belakang studio...");
+
+    const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
+    // Coba backend jika ada OpenAI API Key
+    const hasPaidKey = !!(settings.openai_api_key && settings.openai_api_key.trim());
+    if (hasPaidKey) {
+      try {
+        const API_BASE = typeof window !== "undefined" ? "/api/v1" : (process.env.NEXT_PUBLIC_API_URL || "http://127.0.0.1:8000/api/v1");
+        const payload = {
+          apiKey: settings.gemini_api_key,
+          openaiApiKey: settings.openai_api_key,
+          photoroom_api_key: settings.photoroom_api_key || "sandbox_sk_pr_kataloguns_1dba88ad21d6609f8fd00ac6058273fae7de8253",
+          namaItem: itemForm.nama_item.trim() || "Produk Inovasi Vokasi UNS",
+          tagline: itemForm.tagline.trim() || undefined,
+          kategori: aiKategori,
+          detailLabels: aiDetailLabels,
+          benefitHeadline: aiBenefitHeadline,
+          selectedAngles: ["front", "right_side", "back"],
+          rawImageBase64: rawImg,
+          customPrompt: aiPrompt,
+        };
+
+        let res = await fetch(`${API_BASE}/public/ai/catalog-photo`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json", Accept: "application/json" },
+          body: JSON.stringify(payload),
+        });
+
+        if (!res.ok) {
+          res = await fetch("/api/ai/catalog-photo", {
+            method: "POST",
+            headers: { "Content-Type": "application/json", Accept: "application/json" },
+            body: JSON.stringify(payload),
+          });
+        }
+
+        if (res.ok) {
+          const data = await res.json();
+          const rawPhotos = data.data?.photos || data.photos;
+          if (rawPhotos && rawPhotos.length > 0) {
+            setGenerationStep(5);
+            setStepMessage("Selesai! 4 Foto Marketplace Komersial Berhasil Dihasilkan & Diterapkan.");
+            setAiPhotos(rawPhotos);
+            applyAllAiPhotosToItem(rawPhotos);
+            setAiLoading(false);
+            return;
+          }
+        }
+      } catch (backendErr) {
+        console.warn("Backend AI call, proceeding to sequential canvas studio engine:", backendErr);
+      }
+    }
+
+    // Sequential Canvas Engine
+    try {
+      const img = await loadImage(rawImg);
+      const isolatedImg = isolateProductForeground(img);
+      await delay(400);
+
+      const sequentialPhotos: any[] = [];
+
+      // Step 1: Hero
+      setGenerationStep(1);
+      setStepMessage("Langkah 1/4: Merender Foto Utama (Hero Product Photography)...");
+      const heroUrl = generateHeroPhoto(isolatedImg, itemForm.nama_item.trim() || "Produk Inovasi Vokasi UNS", aiKategori);
+      const heroPhoto = {
+        id: "hero",
+        title: "1. Foto Utama (Hero Marketplace)",
+        angle: "Foto Utama",
+        badge: "Hero Product",
+        desc: "Fokus utama produk asli di atas podium studio putih ivory bersih, pencahayaan lembut portrait 3:4.",
+        url: heroUrl,
+        directUrl: heroUrl,
+      };
+      sequentialPhotos.push(heroPhoto);
+      setAiPhotos([...sequentialPhotos]);
+      await delay(600);
+
+      // Step 2: Detail Macro
+      setGenerationStep(2);
+      setStepMessage("Langkah 2/4: Memproses Sisi Samping Produk (3/4 Perspective) & Detail Finishing...");
+      const detailUrl = generateDetailPhoto(isolatedImg, aiDetailLabels);
+      const detailPhoto = {
+        id: "detail",
+        title: "2. Sisi Samping & Detail Kualitas (3/4 Perspective)",
+        angle: "Sisi Samping 3/4",
+        badge: "3/4 Side Angle",
+        desc: "Sudut 3/4 komersial memperlihatkan sisi samping, ketebalan fisik 3D, dan kerapian finishing kemasan asli.",
+        url: detailUrl,
+        directUrl: detailUrl,
+      };
+      sequentialPhotos.push(detailPhoto);
+      setAiPhotos([...sequentialPhotos]);
+      await delay(600);
+
+      // Step 3: Infografis Keunggulan
+      setGenerationStep(3);
+      setStepMessage("Langkah 3/4: Menyusun Infografis Fitur & Alasan Membeli...");
+      const benefitUrl = generateBenefitPhoto(isolatedImg, aiBenefitHeadline, itemForm.nama_item.trim() || "Produk Inovasi Vokasi UNS", aiKategori);
+      const benefitPhoto = {
+        id: "benefit",
+        title: "3. Keunggulan & Fitur (Infografis)",
+        angle: "Alasan Membeli",
+        badge: "Infografis Komersial",
+        desc: "Tata letak infografis portrait menyajikan headline dan poin keunggulan utama produk.",
+        url: benefitUrl,
+        directUrl: benefitUrl,
+      };
+      sequentialPhotos.push(benefitPhoto);
+      setAiPhotos([...sequentialPhotos]);
+      await delay(600);
+
+      // Step 4: Lifestyle
+      setGenerationStep(4);
+      setStepMessage("Langkah 4/4: Membangun Konteks Penggunaan Nyata (Lifestyle Context)...");
+      const lifestyleUrl = generateLifestylePhoto(isolatedImg, aiKategori);
+      const lifestylePhoto = {
+        id: "lifestyle",
+        title: "4. Konteks Penggunaan (Lifestyle)",
+        angle: "Konteks Real Use",
+        badge: "Lifestyle Tabletop",
+        desc: "Fotografi kontekstual produk asli di atas meja kayu hangat dengan pencahayaan pagi estetik.",
+        url: lifestyleUrl,
+        directUrl: lifestyleUrl,
+      };
+      sequentialPhotos.push(lifestylePhoto);
+      setAiPhotos([...sequentialPhotos]);
+      await delay(400);
+
+      setGenerationStep(5);
+      setStepMessage("Selesai! 4 Foto Marketplace Komersial Berhasil Dihasilkan & Diterapkan.");
+      applyAllAiPhotosToItem(sequentialPhotos);
+    } catch (err: any) {
+      console.error("Studio generator error:", err);
+      toast.error("Gagal Studio Foto", err?.message || "Terjadi kendala saat memproses gambar.");
+    } finally {
+      setAiLoading(false);
+    }
   };
 
   const handleAddSpec = () => {
@@ -1447,6 +1729,20 @@ function AdminDashboardContent() {
         live_demo_url: itemForm.live_demo_url?.trim() || null,
         model_3d_url: itemForm.model_3d_url?.trim() || null,
         specs: itemForm.specs.filter((s) => s.spec_key.trim() !== ""),
+        media: [
+          ...(itemForm.thumbnail_url && !itemForm.thumbnail_url.startsWith("blob:") ? [{
+            file_url: itemForm.thumbnail_url,
+            media_type: "image",
+            is_primary: true,
+            caption: itemForm.nama_item || "Foto Mockup Utama",
+          }] : []),
+          ...itemForm.galleryImages.filter((g: any) => g.url && !g.url.startsWith("blob:")).map((g: any, idx: number) => ({
+            file_url: g.url,
+            media_type: "image",
+            is_primary: false,
+            caption: g.caption || `Foto Tambahan #${idx + 2}`,
+          })),
+        ],
       };
 
       if (editingItem) {
@@ -7509,35 +7805,414 @@ function AdminDashboardContent() {
                 </div>
               </div>
 
-              {/* 4. Media Mockup & Thumbnail */}
-              <div>
-                <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block mb-1">
-                  Foto Mockup / Thumbnail Produk *
-                </label>
-                <div className="space-y-2">
-                  <div className="flex items-center gap-3">
-                    <img
-                      src={itemForm.thumbnail_url && !itemForm.thumbnail_url.startsWith("blob:") ? itemForm.thumbnail_url : "/images/brand/slogan-poster-vokasi.jpg"}
-                      alt="Preview"
-                      className="w-16 h-12 rounded-xl object-cover border border-slate-200 dark:border-slate-700 shrink-0 bg-slate-100"
-                      onError={(e) => {
-                        (e.currentTarget as HTMLImageElement).src = "/images/brand/slogan-poster-vokasi.jpg";
+              {/* 4. Media Mockup & Thumbnail & Galeri Produk */}
+              <div className="space-y-4 pt-2 border-t border-slate-100 dark:border-slate-800">
+                <div>
+                  <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block mb-1">
+                    Foto Mockup / Thumbnail Produk Utama *
+                  </label>
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-3">
+                      <img
+                        src={itemForm.thumbnail_url && !itemForm.thumbnail_url.startsWith("blob:") ? itemForm.thumbnail_url : "/images/brand/slogan-poster-vokasi.jpg"}
+                        alt="Preview"
+                        className="w-16 h-12 rounded-xl object-cover border border-slate-200 dark:border-slate-700 shrink-0 bg-slate-100"
+                        onError={(e) => {
+                          (e.currentTarget as HTMLImageElement).src = "/images/brand/slogan-poster-vokasi.jpg";
+                        }}
+                      />
+                      <input
+                        type="text"
+                        required
+                        value={itemForm.thumbnail_url}
+                        onChange={(e) => {
+                          setItemForm({ ...itemForm, thumbnail_url: e.target.value });
+                          setAiRawPhoto(e.target.value);
+                        }}
+                        placeholder="/images/catalog/... atau URL gambar"
+                        className="flex-1 px-3.5 py-2 text-xs rounded-full border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-white font-mono"
+                      />
+                    </div>
+                    <MediaUploader
+                      label="Unggah Foto Mockup / Mentah Baru"
+                      description="Upload foto produk asli/mockup (PNG, JPG, WEBP maks 5MB)"
+                      acceptedType="image"
+                      maxSizeMb={5}
+                      onUploadSuccess={(url, info) => {
+                        if (url) {
+                          setItemForm((prev) => ({ ...prev, thumbnail_url: url }));
+                          setAiRawPhoto(url);
+                          if (info?.dataUrl) setAiRawPhotoBase64(info.dataUrl);
+                          setHasGenerated(false);
+                          setIsAiStudioOpen(true);
+                          toast.info(
+                            "Foto Mentah Diunggah",
+                            "Foto siap! Klik 'Generate 4 Foto Sekarang' di bawah agar format studio 3:4 otomatis diterapkan."
+                          );
+                        }
+                      }}
+                      onDelete={() => {
+                        setItemForm((prev) => ({ ...prev, thumbnail_url: "" }));
+                        setAiRawPhoto("");
+                        setAiRawPhotoBase64("");
+                        setHasGenerated(false);
                       }}
                     />
-                    <input
-                      type="text"
-                      required
-                      value={itemForm.thumbnail_url}
-                      onChange={(e) => setItemForm({ ...itemForm, thumbnail_url: e.target.value })}
-                      placeholder="/images/catalog/... atau URL gambar"
-                      className="flex-1 px-3.5 py-2 text-xs rounded-full border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 text-slate-900 dark:text-white font-mono"
-                    />
                   </div>
+                </div>
+
+                {/* Banner Status & Aksi Cepat Studio Foto Visual AI */}
+                {(itemForm.thumbnail_url || aiRawPhoto || aiRawPhotoBase64) && (
+                  <div className={`p-3.5 rounded-2xl border transition-all flex flex-col sm:flex-row items-center justify-between gap-3 shadow-xs ${
+                    hasGenerated 
+                      ? "bg-emerald-50 dark:bg-emerald-950/40 border-emerald-400 dark:border-emerald-600 text-emerald-900 dark:text-emerald-100"
+                      : "bg-gradient-to-r from-amber-500/15 via-[#C5A059]/15 to-[#0F4C81]/15 border-2 border-amber-400 dark:border-amber-500 text-slate-900 dark:text-white"
+                  }`}>
+                    <div className="flex items-center gap-3">
+                      <div className={`w-9 h-9 rounded-xl flex items-center justify-center shrink-0 shadow-md ${
+                        hasGenerated ? "bg-emerald-600 text-white" : "bg-gradient-to-br from-amber-500 to-[#C5A059] text-white"
+                      }`}>
+                        {hasGenerated ? <CheckCircle2 className="w-4 h-4" /> : <Camera className="w-4 h-4 animate-pulse" />}
+                      </div>
+                      <div>
+                        <div className="flex items-center gap-1.5">
+                          <span className="text-xs font-black uppercase tracking-wide">
+                            {hasGenerated ? "4 Foto Studio AI Telah Terpasang" : "Wajib Dipoles: Studio Foto AI (Portrait 3:4)"}
+                          </span>
+                          <span className={`px-2 py-0.5 rounded-full text-[9px] font-black ${
+                            hasGenerated ? "bg-emerald-600 text-white" : "bg-amber-500 text-white"
+                          }`}>
+                            {hasGenerated ? "✓ 4 Foto Aktif" : "Klik Generate"}
+                          </span>
+                        </div>
+                        <p className="text-[10px] opacity-90 mt-0.5">
+                          {hasGenerated 
+                            ? "Foto Mockup Utama (Hero) & Galeri Produk (Detail 3/4, Infografis, Lifestyle) sudah otomatis terpasang."
+                            : "Poles foto mentah menjadi 4 foto marketplace (Hero, Detail 3/4, Infografis, Lifestyle) format portrait 3:4."}
+                        </p>
+                      </div>
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (!isAiStudioOpen) setIsAiStudioOpen(true);
+                        handleGenerateAiPhotosForModal();
+                      }}
+                      disabled={aiLoading}
+                      className="w-full sm:w-auto px-4 py-2 rounded-full bg-gradient-to-r from-amber-500 via-[#C5A059] to-[#0F4C81] hover:brightness-110 text-white font-black text-xs shadow-md transition flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-50 shrink-0"
+                    >
+                      <RefreshCw className={`w-3.5 h-3.5 ${aiLoading ? "animate-spin" : ""}`} />
+                      <span>{aiLoading ? "Sedang Merender..." : hasGenerated ? "Generate Ulang Foto" : "✨ Generate 4 Foto Sekarang"}</span>
+                    </button>
+                  </div>
+                )}
+
+                {/* Studio Foto Visual Katalog (Multi-Angle Studio Accordion) */}
+                <div className="border border-amber-400/40 dark:border-amber-500/30 rounded-2xl p-3 bg-amber-50/30 dark:bg-amber-950/20 space-y-3">
+                  <button
+                    type="button"
+                    onClick={() => setIsAiStudioOpen(!isAiStudioOpen)}
+                    className="w-full flex items-center justify-between text-left font-bold text-xs text-[#0F4C81] dark:text-amber-300 cursor-pointer"
+                  >
+                    <div className="flex items-center gap-2">
+                      <Camera className="w-4 h-4 text-amber-500" />
+                      <span>Studio Foto Visual Katalog (Multi-Angle Studio)</span>
+                    </div>
+                    <ChevronDown className={`w-4 h-4 transition-transform duration-200 ${isAiStudioOpen ? "rotate-180" : ""}`} />
+                  </button>
+
+                  {isAiStudioOpen && (
+                    <div className="space-y-4 pt-2 border-t border-amber-300/40 dark:border-amber-700/40 text-left">
+                      <div className="p-2.5 rounded-xl bg-amber-500/10 border border-amber-400/20 text-[11px] text-amber-800 dark:text-amber-300">
+                        <strong>Standar 4 Foto Marketplace:</strong> Menghasilkan 1 set komplit (1. Hero Product, 2. Detail & Kualitas Macro 3/4, 3. Infografis Fitur & Alasan Membeli, 4. Konteks Lifestyle) dengan identitas warna dan logo konsisten.
+                      </div>
+
+                      {/* 1. Pilih Kategori Produk AI */}
+                      <div>
+                        <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block mb-1">
+                          1. Pilih Jenis Produk:
+                        </label>
+                        <div className="grid grid-cols-2 sm:grid-cols-3 gap-1.5">
+                          {AI_PRODUCT_CATEGORIES.map((cat) => {
+                            const isSelected = aiKategori === cat;
+                            return (
+                              <button
+                                key={cat}
+                                type="button"
+                                onClick={() => setAiKategori(cat)}
+                                className={`p-2 text-xs font-bold transition border rounded-xl flex items-center justify-between px-2.5 cursor-pointer text-left ${
+                                  isSelected
+                                    ? "bg-[#0F4C81] text-white border-[#0F4C81] shadow-xs"
+                                    : "bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 border-slate-200 dark:border-slate-700 hover:bg-slate-50"
+                                }`}
+                              >
+                                <span className="truncate text-[11px]">{cat}</span>
+                                {isSelected && <Check className="w-3 h-3 text-amber-400 shrink-0" />}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+
+                      {/* 2. Tag Karakter Detail (Foto 2) */}
+                      <div>
+                        <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block mb-1">
+                          2. Tag Karakter Detail & Kualitas (Foto 2 Macro Shot):
+                        </label>
+                        <div className="flex flex-wrap gap-1.5">
+                          {AI_DETAIL_TAGS.map((tag) => {
+                            const isChecked = aiDetailLabels.includes(tag);
+                            return (
+                              <button
+                                key={tag}
+                                type="button"
+                                onClick={() => {
+                                  if (isChecked) {
+                                    if (aiDetailLabels.length > 1) {
+                                      setAiDetailLabels(aiDetailLabels.filter((t) => t !== tag));
+                                    }
+                                  } else {
+                                    setAiDetailLabels([...aiDetailLabels, tag]);
+                                  }
+                                }}
+                                className={`px-2.5 py-1 rounded-full text-[10px] font-bold border transition cursor-pointer ${
+                                  isChecked
+                                    ? "bg-amber-500 text-white border-amber-500"
+                                    : "bg-white dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700"
+                                }`}
+                              >
+                                {tag}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+
+                      {/* 3. Headline Infografis (Foto 3) */}
+                      <div>
+                        <label className="text-xs font-bold text-slate-700 dark:text-slate-300 block mb-1">
+                          3. Headline Infografis Keunggulan (Foto 3):
+                        </label>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                          {AI_BENEFIT_HEADLINES.map((h) => {
+                            const isSelected = aiBenefitHeadline === h.id;
+                            return (
+                              <button
+                                key={h.id}
+                                type="button"
+                                onClick={() => setAiBenefitHeadline(h.id)}
+                                className={`p-2.5 rounded-xl border text-left transition cursor-pointer ${
+                                  isSelected
+                                    ? "border-[#0F4C81] bg-blue-50/80 dark:bg-blue-950/60 ring-2 ring-[#0F4C81]/30"
+                                    : "border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800"
+                                }`}
+                              >
+                                <span className="text-xs font-black block text-slate-900 dark:text-white">{h.title}</span>
+                                <span className="text-[10px] text-slate-500 dark:text-slate-400 block mt-0.5">{h.desc}</span>
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+
+                      {/* Tombol Generate Tunggal */}
+                      <button
+                        type="button"
+                        onClick={handleGenerateAiPhotosForModal}
+                        disabled={aiLoading}
+                        className="w-full py-3 rounded-full bg-gradient-to-r from-amber-500 via-[#C5A059] to-[#0F4C81] hover:brightness-105 text-white font-black text-xs shadow-md transition flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+                      >
+                        <RefreshCw className={`w-4 h-4 ${aiLoading ? "animate-spin" : ""}`} />
+                        <span>{aiLoading ? `Memproses Studio Foto (${generationStep}/4)...` : "Hasilkan 4 Foto Marketplace Komersial"}</span>
+                      </button>
+
+                      {/* Step Progress Animasi */}
+                      {aiLoading && (
+                        <div className="p-3 rounded-xl bg-amber-500/10 border border-amber-400/30 space-y-2 animate-in fade-in">
+                          <div className="flex items-center justify-between text-xs font-bold text-slate-800 dark:text-white">
+                            <span>{stepMessage}</span>
+                            <span className="font-mono font-black text-amber-600">{generationStep * 25}%</span>
+                          </div>
+                          <div className="w-full h-1.5 rounded-full bg-slate-200 dark:bg-slate-700 overflow-hidden">
+                            <div
+                              className="h-full bg-gradient-to-r from-amber-500 to-[#0F4C81] transition-all duration-300"
+                              style={{ width: `${Math.min(generationStep * 25, 100)}%` }}
+                            />
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Grid 4 Foto Marketplace */}
+                      {aiPhotos.length > 0 && (
+                        <div className="space-y-2 pt-2 border-t border-amber-300/40">
+                          <div className="flex items-center justify-between">
+                            <span className="text-xs font-black text-slate-900 dark:text-white">Hasil 4 Foto Studio AI:</span>
+                            <button
+                              type="button"
+                              onClick={() => applyAllAiPhotosToItem(aiPhotos)}
+                              className="px-3 py-1 rounded-full bg-emerald-600 hover:bg-emerald-700 text-white text-[10px] font-black transition cursor-pointer"
+                            >
+                              Terapkan Semua ke Mockup & Galeri
+                            </button>
+                          </div>
+                          <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                            {aiPhotos.map((photo, idx) => (
+                              <div
+                                key={photo.id || idx}
+                                className={`p-2 rounded-xl border bg-white dark:bg-slate-800 flex flex-col justify-between space-y-1.5 ${
+                                  itemForm.thumbnail_url === photo.url ? "border-emerald-500 ring-2 ring-emerald-400/40" : "border-slate-200 dark:border-slate-700"
+                                }`}
+                              >
+                                <div className="aspect-[3/4] w-full rounded-lg overflow-hidden bg-slate-100 relative">
+                                  <img src={photo.url} alt={photo.title} className="w-full h-full object-cover" />
+                                  <span className="absolute top-1 left-1 px-1.5 py-0.5 rounded-full bg-slate-950/80 text-[8px] font-bold text-white">
+                                    {photo.angle || `Foto #${idx + 1}`}
+                                  </span>
+                                </div>
+                                <span className="text-[10px] font-bold text-slate-800 dark:text-slate-200 truncate">{photo.title}</span>
+                                <div className="flex items-center gap-1 pt-1">
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      setItemForm((prev) => ({ ...prev, thumbnail_url: photo.url }));
+                                      toast.success("Foto Utama Dipilih", `Foto "${photo.title}" dijadikan Mockup Utama.`);
+                                    }}
+                                    className={`flex-1 py-1 px-1.5 rounded-lg text-[9px] font-bold transition text-center ${
+                                      itemForm.thumbnail_url === photo.url ? "bg-emerald-600 text-white" : "bg-[#0F4C81] text-white"
+                                    }`}
+                                  >
+                                    {itemForm.thumbnail_url === photo.url ? "Utama" : "Jadikan Utama"}
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={() => {
+                                      const isAlready = itemForm.galleryImages.some((g) => g.url === photo.url);
+                                      if (isAlready) {
+                                        toast.info("Sudah Ada", "Foto ini sudah ada di galeri.");
+                                      } else {
+                                        setItemForm((prev) => ({
+                                          ...prev,
+                                          galleryImages: [
+                                            ...prev.galleryImages,
+                                            { id: `gal-${Date.now()}-${idx}`, url: photo.url, caption: photo.title }
+                                          ],
+                                        }));
+                                        toast.success("Masuk Galeri", "Foto ditambahkan ke galeri produk.");
+                                      }
+                                    }}
+                                    className="py-1 px-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 text-[9px] font-bold"
+                                  >
+                                    + Galeri
+                                  </button>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+
+                {/* Galeri Foto Produk Tambahan (Multi-Image / Screenshots / Angles) */}
+                <div className="pt-3 border-t border-slate-100 dark:border-slate-800 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <label className="text-xs font-bold text-slate-800 dark:text-slate-200 flex items-center gap-1.5">
+                        <Images className="w-3.5 h-3.5 text-[#0F4C81] dark:text-[#C5A059]" />
+                        <span>Galeri Foto Produk Tambahan ({itemForm.galleryImages.length} Foto)</span>
+                      </label>
+                      <p className="text-[10px] text-slate-500 dark:text-slate-400">
+                        Unggah foto screenshot, tampak samping, belakang, kemasan, atau detail lainnya (Bisa Tambah Banyak).
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Grid Preview Foto Galeri */}
+                  {itemForm.galleryImages.length > 0 && (
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+                      {itemForm.galleryImages.map((img, idx) => (
+                        <div
+                          key={img.id || idx}
+                          className="rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/60 p-2 flex flex-col justify-between space-y-1.5 shadow-xs"
+                        >
+                          <div className="relative aspect-[4/3] w-full rounded-lg overflow-hidden bg-slate-200 dark:bg-slate-800">
+                            <img src={img.url} alt={img.caption || `Foto #${idx + 2}`} className="w-full h-full object-cover" />
+                            <span className="absolute top-1 left-1 px-1.5 py-0.5 rounded-full bg-slate-900/80 text-[8px] font-bold text-white">
+                              #{idx + 2}
+                            </span>
+                          </div>
+                          <input
+                            type="text"
+                            placeholder="Caption foto..."
+                            value={img.caption || ""}
+                            onChange={(e) => {
+                              const updated = [...itemForm.galleryImages];
+                              updated[idx].caption = e.target.value;
+                              setItemForm((prev) => ({ ...prev, galleryImages: updated }));
+                            }}
+                            className="w-full px-2 py-0.5 text-[10px] rounded-md border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-800 dark:text-slate-200 focus:outline-none"
+                          />
+                          <div className="flex items-center gap-1 pt-0.5">
+                            <button
+                              type="button"
+                              onClick={() => {
+                                const oldThumb = itemForm.thumbnail_url;
+                                const updated = [...itemForm.galleryImages];
+                                if (oldThumb) {
+                                  updated[idx] = { ...img, url: oldThumb };
+                                } else {
+                                  updated.splice(idx, 1);
+                                }
+                                setItemForm((prev) => ({
+                                  ...prev,
+                                  thumbnail_url: img.url,
+                                  galleryImages: updated,
+                                }));
+                                toast.success("Foto Utama Ditukar", "Foto galeri dijadikan Mockup Utama.");
+                              }}
+                              className="flex-1 py-1 px-1.5 rounded-md bg-blue-50 hover:bg-blue-100 dark:bg-blue-950/40 text-[#0F4C81] dark:text-sky-300 text-[9px] font-bold text-center cursor-pointer"
+                            >
+                              Jadikan Utama
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setItemForm((prev) => ({
+                                  ...prev,
+                                  galleryImages: prev.galleryImages.filter((_, i) => i !== idx),
+                                }));
+                                toast.info("Foto Dihapus", "Foto dihapus dari galeri.");
+                              }}
+                              className="p-1 rounded-md bg-rose-50 hover:bg-rose-100 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400 cursor-pointer"
+                            >
+                              <Trash2 className="w-3 h-3" />
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+
+                  {/* Uploader Tambah Foto ke Galeri */}
                   <MediaUploader
-                    label="Unggah Foto Mockup Baru"
+                    label="+ Tambah Foto ke Galeri Produk (Bisa Banyak)"
+                    description="Upload foto screenshot atau variasi angle tambahan (PNG, JPG, WEBP maks 5MB)"
                     acceptedType="image"
                     maxSizeMb={5}
-                    onUploadSuccess={(url) => setItemForm({ ...itemForm, thumbnail_url: url })}
+                    onUploadSuccess={(url) => {
+                      if (url) {
+                        setItemForm((prev) => ({
+                          ...prev,
+                          galleryImages: [
+                            ...prev.galleryImages,
+                            { id: `gal-${Date.now()}-${Math.random().toString(36).substr(2, 4)}`, url, caption: "" }
+                          ],
+                        }));
+                        toast.success("Foto Ditambahkan!", "Foto baru berhasil dimasukkan ke galeri produk.");
+                      }
+                    }}
                   />
                 </div>
               </div>
